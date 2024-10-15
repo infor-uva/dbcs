@@ -1,29 +1,32 @@
 package com.uva.roomBooking.Models;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Hotel")
+@Table(name = "hotels")
 public class Hotel {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Basic(optional = false)
-  @Column(name = "ID")
   private int id;
 
   @Basic(optional = false)
-  @Column(name = "NAME")
+  @Column(name = "name")
   private String name;
 
-  @Basic(optional = false)
-  @Column(name = "ADDRESS")
+  @JoinColumn(name = "address_id", referencedColumnName = "id")
+  @OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Address address;
 
   public Hotel() {

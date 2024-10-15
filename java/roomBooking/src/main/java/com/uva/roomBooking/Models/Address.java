@@ -1,52 +1,59 @@
 package com.uva.roomBooking.Models;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Address")
+@Table(name = "addresses")
 public class Address {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Basic(optional = false)
-  @Column(name = "ID")
+  @Column(name = "id")
   private int id;
 
   @Basic(optional = false)
-  @Column(name = "STREET_KIND")
+  @Column(name = "street_kind")
   private String streetKind;
 
   @Basic(optional = false)
-  @Column(name = "STREET_NAME")
+  @Column(name = "street_name")
   private String streetName;
 
   @Basic(optional = false)
-  @Column(name = "NUMBER")
+  @Column(name = "number")
   private int number;
 
   @Basic(optional = false)
-  @Column(name = "POST_CODE")
+  @Column(name = "post_code")
   private String postCode;
 
   @Basic(optional = true)
-  @Column(name = "OTHER_INFO")
+  @Column(name = "other_info")
   private String otherInfo;
+
+  @OneToOne(mappedBy = "address", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+  private Hotel hotel;
 
   public Address() {
   }
 
-  public Address(String streetKind, String streetName, int number, String postCode, String otherInfo) {
+  public Address(String streetKind, String streetName, int number, String postCode, String otherInfo, Hotel hotel) {
     setStreetKind(streetKind);
     setStreetName(streetName);
     setNumber(number);
     setPostCode(postCode);
     setOtherInfo(otherInfo);
+    setHotel(hotel);
   }
 
   public int getId() {
@@ -97,4 +104,11 @@ public class Address {
     this.otherInfo = otherInfo;
   }
 
+  public Hotel getHotel() {
+    return this.hotel;
+  }
+
+  public void setHotel(Hotel hotel) {
+    this.hotel = hotel;
+  }
 }
