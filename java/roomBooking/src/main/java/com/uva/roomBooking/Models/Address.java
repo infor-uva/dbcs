@@ -1,5 +1,7 @@
 package com.uva.roomBooking.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -41,6 +43,7 @@ public class Address {
   @Column(name = "other_info")
   private String otherInfo;
 
+  @JsonIgnore
   @OneToOne(mappedBy = "address", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   private Hotel hotel;
 
