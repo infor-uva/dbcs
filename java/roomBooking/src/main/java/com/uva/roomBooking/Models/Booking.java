@@ -2,6 +2,8 @@ package com.uva.roomBooking.Models;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,14 +29,15 @@ public class Booking {
     private User userId;
     @JoinColumn(name = "room_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    // @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade =
+    // CascadeType.MERGE)
     private Room roomID;
     @Column(name = "start_date", nullable = false)
     private Date startDate;
     @Column(name = "end_date", nullable = false)
     private Date endDate;
 
-
-    public Booking (int id, User userId, Room roomID, Date startDate, Date endDate) {
+    public Booking(int id, User userId, Room roomID, Date startDate, Date endDate) {
         this.id = id;
         this.userId = userId;
         this.roomID = roomID;
@@ -42,46 +45,43 @@ public class Booking {
         this.endDate = endDate;
     }
 
-    public void setId (int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public int getId () {
+    public int getId() {
         return this.id;
     }
 
-    public void setUser (User userId) {
+    public void setUser(User userId) {
         this.userId = userId;
     }
 
-    public User getUser () {
+    public User getUser() {
         return this.userId;
     }
 
-    public void setRoom (Room roomID) {
+    public void setRoom(Room roomID) {
         this.roomID = roomID;
     }
 
-    public Room getRoom () {
+    public Room getRoom() {
         return this.roomID;
     }
 
-    public void setStartDate (Date startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public Date getStartDate () {
+    public Date getStartDate() {
         return this.startDate;
     }
 
-    public void setEndDate (Date endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
-    public Date getEndDate () {
+    public Date getEndDate() {
         return this.endDate;
     }
-
-
 }
-

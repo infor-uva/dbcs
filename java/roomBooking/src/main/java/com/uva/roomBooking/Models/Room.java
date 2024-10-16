@@ -1,5 +1,7 @@
 package com.uva.roomBooking.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -21,6 +23,9 @@ public class Room {
     private int id;
     @JoinColumn(name = "hotel_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    // @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade =
+    // CascadeType.MERGE)
+    // @JsonIgnore
     private Hotel hotelId;
     @Column(name = "room_number", nullable = false)
     private int roomNumber;
@@ -29,9 +34,10 @@ public class Room {
     @Column(name = "available", nullable = false)
     private boolean available;
 
-    public Room(){}
+    public Room() {
+    }
 
-    public Room (int id, Hotel hotelId, int roomNumber, Tipo type, boolean available) {
+    public Room(int id, Hotel hotelId, int roomNumber, Tipo type, boolean available) {
         this.id = id;
         this.hotelId = hotelId;
         this.roomNumber = roomNumber;
@@ -39,43 +45,43 @@ public class Room {
         this.available = available;
     }
 
-    public void setId (int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public int getId(){
+    public int getId() {
         return this.id;
     }
 
-    public void setHotel (Hotel hotelId) {
+    public void setHotel(Hotel hotelId) {
         this.hotelId = hotelId;
     }
 
-    public Hotel getHotel () {
+    public Hotel getHotel() {
         return this.hotelId;
     }
 
-    public void setRoomNumber (int roomNumber) {
+    public void setRoomNumber(int roomNumber) {
         this.roomNumber = roomNumber;
     }
 
-    public int getRoomNumber () {
+    public int getRoomNumber() {
         return this.roomNumber;
     }
 
-    public void setType (Tipo type) {
+    public void setType(Tipo type) {
         this.type = type;
     }
 
-    public Tipo getType () {
+    public Tipo getType() {
         return this.type;
     }
 
-    public void setAvailable (boolean available) {
+    public void setAvailable(boolean available) {
         this.available = available;
     }
 
-    public boolean getAvailable () {
+    public boolean getAvailable() {
         return this.available;
     }
 

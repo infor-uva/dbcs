@@ -1,13 +1,18 @@
 package com.uva.roomBooking.Models;
 
+import java.util.List;
+
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -31,6 +36,19 @@ public class User {
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
   private UseStatus status;
+
+  @OneToMany(mappedBy = "id", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+  private List<Booking> bookings;
+
+  public User() {
+  }
+
+  public User(int id, String name, String email, UseStatus status, List<Booking> bookings) {
+    setId(id);
+    setEmail(email);
+    setStatus(status);
+    setBookings(bookings);
+  }
 
   public int getId() {
     return this.id;
@@ -64,4 +82,11 @@ public class User {
     this.status = status;
   }
 
+  public List<Booking> getBookings() {
+    return this.bookings;
+  }
+
+  public void setBookings(List<Booking> bookings) {
+    this.bookings = bookings;
+  }
 }
