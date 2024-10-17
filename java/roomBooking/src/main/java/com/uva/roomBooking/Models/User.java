@@ -2,6 +2,8 @@ package com.uva.roomBooking.Models;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Basic;
@@ -32,7 +34,7 @@ public class User {
 
   @Basic(optional = false)
   @Enumerated(EnumType.STRING)
-  private UseStatus status;
+  private UserStatus status = UserStatus.NO_BOOKINGS;
 
   @JsonIgnore
   @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
@@ -41,7 +43,7 @@ public class User {
   public User() {
   }
 
-  public User(int id, String name, String email, UseStatus status, List<Booking> bookings) {
+  public User(int id, String name, String email, UserStatus status, List<Booking> bookings) {
     setId(id);
     setEmail(email);
     setStatus(status);
@@ -72,11 +74,11 @@ public class User {
     this.email = email;
   }
 
-  public UseStatus getStatus() {
+  public UserStatus getStatus() {
     return this.status;
   }
 
-  public void setStatus(UseStatus status) {
+  public void setStatus(UserStatus status) {
     this.status = status;
   }
 

@@ -28,8 +28,8 @@ interface Booking {
 
 interface Room {
 	roomNumber: String;
-	roomType: "single" | "double" | "suite";
-	// roomType: "SINGLE" | "DOUBLE" | "SUITE"
+	type: "single" | "double" | "suite";
+	// type: "SINGLE" | "DOUBLE" | "SUITE"
 	available: boolean;
 }
 
@@ -61,17 +61,17 @@ const users: User[] = [
 const rooms: Room[] = [
 	{
 		roomNumber: "101",
-		roomType: "single",
+		type: "single",
 		available: true,
 	},
 	{
 		roomNumber: "102",
-		roomType: "double",
+		type: "double",
 		available: false,
 	},
 	{
 		roomNumber: "103",
-		roomType: "suite",
+		type: "suite",
 		available: true,
 	},
 ];
@@ -154,3 +154,27 @@ const save = async ({ name, value }) => {
 for (const object of data) {
 	save(object);
 }
+
+const _hotels: Hotel[] = [
+	{
+		name: "Hotel 1",
+		address: {
+			streetName: "Aca al lao",
+			streetKind: "Alargada",
+			number: 12,
+			postCode: "12345",
+		},
+		rooms: [
+			{
+				roomNumber: "101",
+				type: "SINGLE",
+				available: true,
+			},
+			{
+				roomNumber: "102",
+				type: "DOUBLE",
+				available: false,
+			},
+		],
+	},
+];
