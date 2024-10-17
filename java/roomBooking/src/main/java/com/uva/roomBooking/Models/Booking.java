@@ -25,12 +25,10 @@ public class Booking {
     @Basic(optional = false)
     private int id;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private User userId;
     @JoinColumn(name = "room_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    // @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade =
-    // CascadeType.MERGE)
     private Room roomID;
     @Column(name = "start_date", nullable = false)
     private Date startDate;

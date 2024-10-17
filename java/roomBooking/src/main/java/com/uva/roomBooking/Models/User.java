@@ -2,9 +2,10 @@ package com.uva.roomBooking.Models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,23 +22,20 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Basic(optional = false)
-  @Column(name = "id")
   private int id;
 
   @Basic(optional = false)
-  @Column(name = "name")
   private String name;
 
   @Basic(optional = false)
-  @Column(name = "email")
   private String email;
 
   @Basic(optional = false)
-  @Column(name = "status")
   @Enumerated(EnumType.STRING)
   private UseStatus status;
 
-  @OneToMany(mappedBy = "id", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+  @JsonIgnore
+  @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   private List<Booking> bookings;
 
   public User() {

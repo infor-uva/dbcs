@@ -32,7 +32,7 @@ public class Hotel {
   @OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Address address;
 
-  @OneToMany(mappedBy = "id", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+  @OneToMany(mappedBy = "hotelId", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   private List<Room> rooms;
 
   public Hotel() {

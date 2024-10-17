@@ -1,5 +1,7 @@
 package com.uva.roomBooking.Models;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Basic;
@@ -12,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,11 +24,9 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     private int id;
+    @JsonIgnore
     @JoinColumn(name = "hotel_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    // @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade =
-    // CascadeType.MERGE)
-    // @JsonIgnore
     private Hotel hotelId;
     @Column(name = "room_number", nullable = false)
     private int roomNumber;
@@ -33,16 +34,20 @@ public class Room {
     private Tipo type;
     @Column(name = "available", nullable = false)
     private boolean available;
+    @JsonIgnore
+    @OneToMany(mappedBy = "roomID", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    private List<Booking> bookings;
 
     public Room() {
     }
 
-    public Room(int id, Hotel hotelId, int roomNumber, Tipo type, boolean available) {
+    public Room(int id, Hotel hotelId, int roomNumber, Tipo type, boolean available, List<Booking> bookings) {
         this.id = id;
         this.hotelId = hotelId;
         this.roomNumber = roomNumber;
         this.type = type;
         this.available = available;
+        this.bookings = bookings;
     }
 
     public void setId(int id) {
@@ -85,4 +90,11 @@ public class Room {
         return this.available;
     }
 
+    public List<Booking> getBookings() {
+        return this.bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
 }
