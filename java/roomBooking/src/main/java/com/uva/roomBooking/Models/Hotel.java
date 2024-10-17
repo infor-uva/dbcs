@@ -2,7 +2,8 @@ package com.uva.roomBooking.Models;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
@@ -18,6 +19,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "hotels")
+// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+// property = "id")
 public class Hotel {
 
   @Id
@@ -32,7 +35,7 @@ public class Hotel {
   @OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Address address;
 
-  @OneToMany(mappedBy = "hotelId", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+  @OneToMany(mappedBy = "hotelId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private List<Room> rooms;
 
   public Hotel() {
@@ -75,6 +78,7 @@ public class Hotel {
 
   public void setRooms(List<Room> rooms) {
     this.rooms = rooms;
+    rooms.forEach(room -> room.setHotelId(this));
   }
 
 }
