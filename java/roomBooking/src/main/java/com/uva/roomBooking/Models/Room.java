@@ -32,7 +32,7 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "hotel_id", referencedColumnName = "id")
     @JsonIgnore
-    private Hotel hotelId;
+    private Hotel hotel;
     @Column(name = "room_number", nullable = false)
     private int roomNumber;
     @Column(name = "type", nullable = false)
@@ -48,7 +48,7 @@ public class Room {
 
     public Room(int id, Hotel hotelId, int roomNumber, Tipo type, boolean available, List<Booking> bookings) {
         this.id = id;
-        this.hotelId = hotelId;
+        this.hotel = hotelId;
         this.roomNumber = roomNumber;
         this.type = type;
         this.available = available;
@@ -64,11 +64,11 @@ public class Room {
     }
 
     public void setHotel(Hotel hotelId) {
-        this.hotelId = hotelId;
+        this.hotel = hotelId;
     }
 
     public Hotel getHotel() {
-        return this.hotelId;
+        return this.hotel;
     }
 
     public void setRoomNumber(int roomNumber) {
