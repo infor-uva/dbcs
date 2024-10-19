@@ -63,11 +63,11 @@ public class Room {
         return this.id;
     }
 
-    public void setHotelId(Hotel hotelId) {
+    public void setHotel(Hotel hotelId) {
         this.hotelId = hotelId;
     }
 
-    public Hotel getHotelId() {
+    public Hotel getHotel() {
         return this.hotelId;
     }
 
@@ -91,7 +91,7 @@ public class Room {
         this.available = available;
     }
 
-    public boolean getAvailable() {
+    public boolean isAvailable() {
         return this.available;
     }
 

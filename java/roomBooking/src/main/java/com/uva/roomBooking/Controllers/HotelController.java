@@ -1,92 +1,108 @@
 package com.uva.roomBooking.Controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.time.LocalDate;
 
+import com.uva.roomBooking.Exceptions.HotelNotFoundException;
 import com.uva.roomBooking.Models.Hotel;
 import com.uva.roomBooking.Models.Room;
 import com.uva.roomBooking.Repositories.HotelRepository;
 import com.uva.roomBooking.Repositories.RoomRepository;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-// TODO incluir excepciones y procesado de respuestas con entidad y código de estado
 
 @RestController
 @RequestMapping("hotels")
 @CrossOrigin(origins = "*")
 public class HotelController {
-  private final HotelRepository hotelRepository;
-  private final RoomRepository roomRepository;
+    private final HotelRepository hotelRepository;
+    private final RoomRepository roomRepository;
 
-  public HotelController(HotelRepository hotelRepository, RoomRepository roomRepository) {
-    this.hotelRepository = hotelRepository;
-    this.roomRepository = roomRepository;
-  }
-
-  @GetMapping
-  public List<Hotel> getAllHotels() {
-    return hotelRepository.findAll();
-  }
-
-  @PostMapping
-  public Hotel addHotel(@RequestBody Hotel hotel) {
-    // TODO comprobar y asegurar que se agregan todas sus habitaciones también
-    return hotelRepository.save(hotel);
-  }
-
-  @GetMapping("/{id}")
-  public Hotel getHotelById(@PathVariable int id) {
-    return hotelRepository.findById(id).orElse(null);
-  }
-
-  @DeleteMapping("/{id}")
-  public Hotel deleteHotel(@PathVariable Integer id) {
-    Hotel target;
-    if ((target = hotelRepository.findById(id).orElse(null)) != null) {
-      // TODO asegurarse de que el borrado es en CASCADA -> Hotel y habitaciones
-      hotelRepository.deleteById(id);
+    public HotelController(HotelRepository hotelRepository, RoomRepository roomRepository) {
+        this.hotelRepository = hotelRepository;
+        this.roomRepository = roomRepository;
     }
-    return target;
-  }
 
-  // TODO completar controllers de rooms
-  @GetMapping("/{id}/rooms")
-  // Dejo un esqueleto, a lo mejor sería mejor otra forma de plantear el manejo y
-  // recogida de query params
-  public List<Room> getRoomsFromHotel(@PathVariable int hotelId, @RequestParam LocalDate date1,
-      @RequestParam LocalDate date2) {
-    throw new IllegalStateException("Not implemented yet");
-  }
+    // Obtener todos los hoteles
+    @GetMapping
+    public ResponseEntity<List<Hotel>> getAllHotels() {
+        List<Hotel> hotels = hotelRepository.findAll();
+        return new ResponseEntity<>(hotels, HttpStatus.OK);
+    }
 
-  @PatchMapping("/{id}/rooms")
-  public List<Room> updateRoomAvailabilityFromHotel(@PathVariable int hotelId) {
-    throw new IllegalStateException("Not implemented yet");
-  }
+    // Añadir un hotel con sus habitaciones
+    @PostMapping
+    public ResponseEntity<Hotel> addHotel(@RequestBody Hotel hotel) {
+        if (hotel.getRooms() != null) {
+            hotel.getRooms().forEach(room -> room.setHotel(hotel));  // Aseguramos la relación bidireccional
+        }
+        Hotel savedHotel = hotelRepository.save(hotel);
+        return new ResponseEntity<>(savedHotel, HttpStatus.CREATED);
+    }
 
-  @GetMapping("/{hotelId}/rooms/{roomId}")
-  public List<Room> getRoomByIdFromHotel(@PathVariable int hotelId, @PathVariable int roomId) {
-    throw new IllegalStateException("Not implemented yet");
-  }
+    // Obtener un hotel por su ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Hotel> getHotelById(@PathVariable int id) {
+        return hotelRepository.findById(id)
+            .map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+            .orElseThrow(() -> new HotelNotFoundException(id));
+    }
 
-  // Te dejo esto de la otra clase comentado por si te sirve algo
+    // Borrar un hotel junto con sus habitaciones (borrado en cascada)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteHotel(@PathVariable Integer id) {
+        Optional<Hotel> target = hotelRepository.findById(id);
+        if (target.isPresent()) {
+            // Borramos habitaciones asociadas
+            roomRepository.deleteAllByHotelId(id);
+            hotelRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        throw new HotelNotFoundException(id); // Lanzamos excepción personalizada
+    }
 
-  // @GetMapping
-  // public List<Room> getAllRooms() {
-  // return roomRepository.findAll();
-  // }
+    // Obtener habitaciones de un hotel según disponibilidad y fechas
+    @GetMapping("/{hotelId}/rooms")
+    public ResponseEntity<List<Room>> getRoomsFromHotel(
+        @PathVariable int hotelId,
+        @RequestParam(required = false) LocalDate date1,
+        @RequestParam(required = false) LocalDate date2) {
 
-  // @PostMapping
-  // public Room addRoom(@RequestBody Room room) {
-  // return roomRepository.save(room);
-  // }
+        List<Room> rooms;
+        if (date1 != null && date2 != null) {
+            rooms = roomRepository.findAvailableRoomsByHotelAndDates(hotelId, date1, date2);
+        } else {
+            rooms = roomRepository.findByHotelId(hotelId);
+        }
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
+    }
 
-  // @DeleteMapping("/{id}")
-  // public void deleteRoom(@PathVariable Integer id) {
-  // roomRepository.deleteById(id);
-  // }
+    // Actualizar disponibilidad de habitaciones de un hotel
+    @PatchMapping("/{hotelId}/rooms")
+    public ResponseEntity<List<Room>> updateRoomAvailabilityFromHotel(
+        @PathVariable int hotelId, @RequestBody List<Room> updatedRooms) {
 
+        List<Room> existingRooms = roomRepository.findByHotelId(hotelId);
+        for (Room updatedRoom : updatedRooms) {
+            existingRooms.stream()
+                .filter(room -> Integer.valueOf(room.getId()).equals(updatedRoom.getId())) // Conversión a Integer
+                .findFirst()
+                .ifPresent(room -> room.setAvailable(updatedRoom.isAvailable()));
+        }
+        roomRepository.saveAll(existingRooms);
+        return new ResponseEntity<>(existingRooms, HttpStatus.OK);
+    }
+
+    // Obtener los detalles de una habitación específica en un hotel
+    @GetMapping("/{hotelId}/rooms/{roomId}")
+    public ResponseEntity<Room> getRoomByIdFromHotel(
+        @PathVariable int hotelId, @PathVariable int roomId) {
+
+        Optional<Room> room = roomRepository.findByHotelIdAndRoomId(hotelId, roomId);
+        return room.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                   .orElseThrow(() -> new HotelNotFoundException(hotelId)); // Lanzamos excepción personalizada
+    }
 }

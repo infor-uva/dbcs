@@ -78,7 +78,7 @@ public class Hotel {
 
   public void setRooms(List<Room> rooms) {
     this.rooms = rooms;
-    rooms.forEach(room -> room.setHotelId(this));
+    rooms.forEach(room -> room.setHotel(this));
   }
 
 }
