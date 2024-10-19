@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Hotel 1",
+    "address": {
+      "streetName": "Aca al lao",
+      "streetKind": "Alargada",
+      "number": 12,
+      "postCode": "12345"
+    },
+    "rooms": [
+      {
+        "roomNumber": "101",
+        "type": "SINGLE",
+        "available": true
+      },
+      {
+        "roomNumber": "102",
+        "type": "DOUBLE",
+        "available": false
+      }
+    ]
+  },
+  {
+    "name": "Hotel 2",
+    "address": {
+      "streetName": "Calle de la plaza",
+      "streetKind": "Alargada",
+      "number": 12,
+      "postCode": "12345"
+    },
+    "rooms": [
+      {
+        "roomNumber": "103",
+        "type": "SUITE",
+        "available": true
+      }
+    ]
+  }
+]

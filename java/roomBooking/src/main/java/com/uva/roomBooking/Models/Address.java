@@ -20,7 +20,6 @@ public class Address {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Basic(optional = false)
-  @Column(name = "id")
   private int id;
 
   @Basic(optional = false)
@@ -32,7 +31,6 @@ public class Address {
   private String streetName;
 
   @Basic(optional = false)
-  @Column(name = "number")
   private int number;
 
   @Basic(optional = false)
@@ -44,7 +42,7 @@ public class Address {
   private String otherInfo;
 
   @JsonIgnore
-  @OneToOne(mappedBy = "address", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+  @OneToOne(mappedBy = "address", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private Hotel hotel;
 
   public Address() {
