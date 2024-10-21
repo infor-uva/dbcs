@@ -1,7 +1,9 @@
 [
   {
+    "id": 1,
     "name": "Hotel 1",
     "address": {
+      "id": 1,
       "streetName": "Aca al lao",
       "streetKind": "Alargada",
       "number": 12,
@@ -9,11 +11,13 @@
     },
     "rooms": [
       {
+        "id": 1,
         "roomNumber": "101",
         "type": "SINGLE",
         "available": true
       },
       {
+        "id": 2,
         "roomNumber": "102",
         "type": "DOUBLE",
         "available": false
@@ -21,8 +25,10 @@
     ]
   },
   {
+    "id": 2,
     "name": "Hotel 2",
     "address": {
+      "id": 2,
       "streetName": "Calle de la plaza",
       "streetKind": "Alargada",
       "number": 12,
@@ -30,6 +36,7 @@
     },
     "rooms": [
       {
+        "id": 3,
         "roomNumber": "103",
         "type": "SUITE",
         "available": true
