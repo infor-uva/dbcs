@@ -1,5 +1,8 @@
 <div class="container">
   <h2>Hotel List</h2>
+  @if (mostrarMensaje) {
+  <strong style="font-size: xx-large; color: red">{{ mensaje }}</strong>
+  }
   <mat-accordion>
     @for(hotel of hotels; track hotel.id) {
     <mat-expansion-panel>
@@ -28,7 +31,9 @@
           <td mat-cell *matCellDef="let room">
             <mat-slide-toggle
               [checked]="room.available"
-              (change)="toggleRoomAvailability(hotel.id, room.id)"
+              (change)="
+                toggleRoomAvailability(hotel.id, room.id, !room.available)
+              "
             ></mat-slide-toggle>
           </td>
         </ng-container>

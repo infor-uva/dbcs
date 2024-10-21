@@ -38,7 +38,7 @@ export class ClienteApiRestService {
     const url = `${ClienteApiRestService.HOTEL_URI}/${hotelId}/rooms/${roomId}`;
     return this.http.patch(
       url,
-      { availability },
+      { available: availability },
       {
         observe: 'response',
         responseType: 'text',

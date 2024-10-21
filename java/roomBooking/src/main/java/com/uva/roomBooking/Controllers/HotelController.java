@@ -1,10 +1,12 @@
 package com.uva.roomBooking.Controllers;
 
 import java.util.List;
+import java.util.Map;
 import java.time.LocalDate;
 
 import com.uva.roomBooking.Exceptions.HotelNotFoundException;
 import com.uva.roomBooking.Exceptions.InvalidDateRangeException;
+import com.uva.roomBooking.Exceptions.InvalidRequestException;
 import com.uva.roomBooking.Models.Hotel;
 import com.uva.roomBooking.Models.Room;
 import com.uva.roomBooking.Repositories.HotelRepository;
@@ -79,12 +81,16 @@ public class HotelController {
     public ResponseEntity<Room> updateRoomAvailability(
             @PathVariable int hotelId,
             @PathVariable int roomId,
-            @RequestBody boolean available) {
+            @RequestBody Map<String, Boolean> body) {
+
+        if (!body.containsKey("available")) {
+            throw new InvalidRequestException("El campo 'available' es obligatorio");
+        }
 
         Room targetRoom = roomRepository.findByIdAndHotelId(roomId, hotelId)
                 .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada"));
 
-        targetRoom.setAvailable(available);
+        targetRoom.setAvailable(body.get("available"));
         roomRepository.save(targetRoom);
 
         return new ResponseEntity<>(targetRoom, HttpStatus.OK);
