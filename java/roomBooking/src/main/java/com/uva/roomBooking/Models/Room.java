@@ -32,7 +32,7 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "hotel_id", referencedColumnName = "id")
     @JsonIgnore
-    private Hotel hotelId;
+    private Hotel hotel;
     @Column(name = "room_number", nullable = false)
     private int roomNumber;
     @Column(name = "type", nullable = false)
@@ -40,7 +40,7 @@ public class Room {
     @Column(name = "available", nullable = false)
     private boolean available;
     @JsonIgnore
-    @OneToMany(mappedBy = "roomID", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "roomId", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private List<Booking> bookings;
 
     public Room() {
@@ -48,7 +48,7 @@ public class Room {
 
     public Room(int id, Hotel hotelId, int roomNumber, Tipo type, boolean available, List<Booking> bookings) {
         this.id = id;
-        this.hotelId = hotelId;
+        this.hotel = hotelId;
         this.roomNumber = roomNumber;
         this.type = type;
         this.available = available;
@@ -63,12 +63,12 @@ public class Room {
         return this.id;
     }
 
-    public void setHotelId(Hotel hotelId) {
-        this.hotelId = hotelId;
+    public void setHotel(Hotel hotelId) {
+        this.hotel = hotelId;
     }
 
-    public Hotel getHotelId() {
-        return this.hotelId;
+    public Hotel getHotel() {
+        return this.hotel;
     }
 
     public void setRoomNumber(int roomNumber) {
@@ -91,7 +91,7 @@ public class Room {
         this.available = available;
     }
 
-    public boolean getAvailable() {
+    public boolean isAvailable() {
         return this.available;
     }
 

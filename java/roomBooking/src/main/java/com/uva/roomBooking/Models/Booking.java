@@ -2,8 +2,6 @@ package com.uva.roomBooking.Models;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -24,21 +22,25 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     private int id;
+    // TODO revisar si lo de cascade es estrictamente necesario
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private User userId;
     @JoinColumn(name = "room_id", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Room roomID;
+    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    private Room roomId;
     @Column(name = "start_date", nullable = false)
-    private Date startDate;
+    private LocalDate startDate;
     @Column(name = "end_date", nullable = false)
-    private Date endDate;
+    private LocalDate endDate;
 
-    public Booking(int id, User userId, Room roomID, Date startDate, Date endDate) {
+    public Booking() {
+    }
+
+    public Booking(int id, User userId, Room roomID, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.userId = userId;
-        this.roomID = roomID;
+        this.roomId = roomID;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -51,35 +53,36 @@ public class Booking {
         return this.id;
     }
 
-    public void setUser(User userId) {
+    public void setUserId(User userId) {
         this.userId = userId;
     }
 
-    public User getUser() {
+    public User getUserId() {
         return this.userId;
     }
 
-    public void setRoom(Room roomID) {
-        this.roomID = roomID;
+    public void setRoomId(Room roomID) {
+        this.roomId = roomID;
     }
 
-    public Room getRoom() {
-        return this.roomID;
+    public Room getRoomId() {
+        return this.roomId;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return this.startDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return this.endDate;
     }
+
 }
