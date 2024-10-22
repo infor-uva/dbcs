@@ -2,8 +2,6 @@ package com.uva.roomBooking.Models;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Basic;
@@ -37,7 +35,7 @@ public class User {
   private UserStatus status = UserStatus.NO_BOOKINGS;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+  @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private List<Booking> bookings;
 
   public User() {

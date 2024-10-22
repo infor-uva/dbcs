@@ -40,7 +40,7 @@ public class Room {
     @Column(name = "available", nullable = false)
     private boolean available;
     @JsonIgnore
-    @OneToMany(mappedBy = "roomId", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "roomId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Booking> bookings;
 
     public Room() {
