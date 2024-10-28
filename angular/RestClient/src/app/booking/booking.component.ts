@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 interface BookingRequest {
   userId: number;      // ID del usuario que realiza la reserva
   hotelId: number;     // ID del hotel en el que se realiza la reserva
@@ -10,10 +10,13 @@ interface BookingRequest {
 import { BookingService } from '../booking.service'; // Asegúrate de que el servicio exista
 
 @Component({
+  standalone : true,
+  imports : [ReactiveFormsModule],
   selector: 'app-booking',
   templateUrl: './booking.component.html',
   styleUrls: ['./booking.component.css']
 })
+
 export class BookingComponent implements OnInit {
   bookingForm: FormGroup;
 
