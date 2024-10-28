@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import hotels from '../../mocks/hotels.json';
-import { Hotel } from '../../types';
+import { Hotel, Booking } from '../../types';
 
 @Injectable({
   providedIn: 'root',
@@ -45,4 +46,9 @@ export class ClienteApiRestService {
       }
     );
   }
+
+  createBooking(bookingRequest: Booking): Observable<any> {
+    return this.http.post('http://localhost:8080/bookings', bookingRequest);
+  }
+  
 }
