@@ -1,0 +1,17 @@
+/* main-page.component.css */
+h1 {
+  font-size: 24px;
+}
+
+label {
+  margin-right: 10px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 5px 0;
+}

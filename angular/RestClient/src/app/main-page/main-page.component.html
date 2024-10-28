@@ -1,0 +1,17 @@
+<div>
+  <h1>Listado de Usuarios</h1>
+  
+  <label for="filter">Filtrar por estado:</label>
+  <select id="filter" [(ngModel)]="selectedStatus" (change)="filterUsers()">
+    <option value="all">Todos</option>
+    <option value="NO_BOOKINGS">Sin reservas</option>
+    <option value="WITH_ACTIVE_BOOKINGS">Con reservas activas</option>
+    <option value="WITH_INACTIVE_BOOKING">Con reservas inactivas</option>
+  </select>
+
+  <ul>
+    <li *ngFor="let user of filteredUsers">
+      {{ user.name }} - {{ user.email }} - {{ user.status }}
+    </li>
+  </ul>
+</div>
