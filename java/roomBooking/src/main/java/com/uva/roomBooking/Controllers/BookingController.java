@@ -35,8 +35,24 @@ public class BookingController {
 
     @PostMapping
     public Booking createBooking(@RequestBody Booking booking) {
-        User user = userRepository.findById(booking.getUserId().getId()).orElseThrow();
-        Room room = roomRepository.findById(booking.getRoomId().getId()).orElseThrow();
+        User user = userRepository.findById(booking.getUserId().getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Room room = roomRepository.findById(booking.getRoomId().getId())
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        // Validar el tipo de habitación
+        if (!room.getType().equals(booking.getRoomId().getType())) {
+            throw new RuntimeException("Room type does not match the requested type");
+        }
+
+        // Verificar disponibilidad
+        List<Booking> existingBookings = bookingRepository.findByRoomIdAndDateRange(
+                room.getId(), booking.getStartDate(), booking.getEndDate());
+
+        if (!existingBookings.isEmpty()) {
+            throw new RuntimeException("Room is not available for the selected dates");
+        }
+
         booking.setUserId(user);
         booking.setRoomId(room);
         return bookingRepository.save(booking);
@@ -46,4 +62,6 @@ public class BookingController {
     public void deleteBooking(@PathVariable Integer id) {
         bookingRepository.deleteById(id);
     }
+
+    
 }
