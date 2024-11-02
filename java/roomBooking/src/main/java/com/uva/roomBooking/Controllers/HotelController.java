@@ -61,15 +61,15 @@ public class HotelController {
     @GetMapping("/{hotelId}/rooms")
     public ResponseEntity<List<Room>> getRoomsFromHotel(
             @PathVariable int hotelId,
-            @RequestParam(required = false) LocalDate date1,
-            @RequestParam(required = false) LocalDate date2) {
+            @RequestParam(required = false) LocalDate start,
+            @RequestParam(required = false) LocalDate end) {
 
         List<Room> rooms;
-        if (date1 != null && date2 != null) {
-            if (!date1.isBefore(date2)) {
+        if (start != null && end != null) {
+            if (!start.isBefore(end)) {
                 throw new InvalidDateRangeException("La fecha de inicio debe ser anterior a la fecha de fin");
             }
-            rooms = roomRepository.findAvailableRoomsByHotelAndDates(hotelId, date1, date2);
+            rooms = roomRepository.findAvailableRoomsByHotelAndDates(hotelId, start, end);
         } else {
             rooms = roomRepository.findAllByHotelId(hotelId);
         }

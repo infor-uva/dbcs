@@ -1,22 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormGroup,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 interface BookingRequest {
-  userId: number;      // ID del usuario que realiza la reserva
-  hotelId: number;     // ID del hotel en el que se realiza la reserva
-  roomType: string;    // Tipo de habitación (single, double, suite)
-  startDate: string;   // Fecha de inicio de la reserva
-  endDate: string;     // Fecha de fin de la reserva// Asegúrate de ajustar la ruta
+  userId: number; // ID del usuario que realiza la reserva
+  hotelId: number; // ID del hotel en el que se realiza la reserva
+  roomType: string; // Tipo de habitación (single, double, suite)
+  startDate: string; // Fecha de inicio de la reserva
+  endDate: string; // Fecha de fin de la reserva// Asegúrate de ajustar la ruta
 }
-import { BookingService } from '../booking.service'; // Asegúrate de que el servicio exista
+import { BookingService } from '../shared/booking.service'; // Asegúrate de que el servicio exista
 
 @Component({
-  standalone : true,
-  imports : [ReactiveFormsModule],
+  standalone: true,
+  imports: [ReactiveFormsModule],
   selector: 'app-booking',
   templateUrl: './booking.component.html',
-  styleUrls: ['./booking.component.css']
+  styleUrls: ['./booking.component.css'],
 })
-
 export class BookingComponent implements OnInit {
   bookingForm: FormGroup;
 
@@ -27,7 +31,7 @@ export class BookingComponent implements OnInit {
       hotelId: ['', Validators.required],
       roomType: ['', Validators.required],
       startDate: ['', Validators.required],
-      endDate: ['', Validators.required]
+      endDate: ['', Validators.required],
     });
   }
 
@@ -39,12 +43,12 @@ export class BookingComponent implements OnInit {
 
       // Llama al servicio para crear una nueva reserva
       this.bookingService.createBooking(bookingRequest).subscribe(
-        response => {
+        (response) => {
           console.log('Reserva creada con éxito', response);
           // Aquí puedes redirigir al usuario o mostrar un mensaje de éxito
           this.bookingForm.reset(); // Opcional: resetea el formulario después de una reserva exitosa
         },
-        error => {
+        (error) => {
           console.error('Error al crear la reserva', error);
           // Manejo de errores
         }

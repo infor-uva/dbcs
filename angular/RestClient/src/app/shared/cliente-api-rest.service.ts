@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import hotels from '../../mocks/hotels.json';
-import { Hotel, Booking } from '../../types';
+import { Hotel, Booking, Room } from '../../types';
 
 @Injectable({
   providedIn: 'root',
@@ -50,5 +50,12 @@ export class ClienteApiRestService {
   createBooking(bookingRequest: Booking): Observable<any> {
     return this.http.post('http://localhost:8080/bookings', bookingRequest);
   }
-  
+
+  getRoomsAvailableInDateRange(hotelId: number, start: Date, end: Date) {
+    const startStr = start.toISOString().split('T')[0];
+    const endStr = end.toISOString().split('T')[0];
+    return this.http.get<Room[]>(
+      `${ClienteApiRestService.HOTEL_URI}/${hotelId}/rooms?start=${startStr}&end=${endStr}`
+    );
+  }
 }
