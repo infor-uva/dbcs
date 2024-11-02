@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Hotel } from '../../types';
+import { Observable } from 'rxjs';
+import { Hotel, Booking, Room } from '../../types';
 import { Observable } from 'rxjs';
 import { User } from '../../types';
 
@@ -49,6 +50,18 @@ export class ClienteApiRestService {
         observe: 'response',
         responseType: 'text',
       }
+    );
+  }
+
+  createBooking(bookingRequest: Booking): Observable<any> {
+    return this.http.post('http://localhost:8080/bookings', bookingRequest);
+  }
+
+  getRoomsAvailableInDateRange(hotelId: number, start: Date, end: Date) {
+    const startStr = start.toISOString().split('T')[0];
+    const endStr = end.toISOString().split('T')[0];
+    return this.http.get<Room[]>(
+      `${ClienteApiRestService.HOTEL_URI}/${hotelId}/rooms?start=${startStr}&end=${endStr}`
     );
   }
 
