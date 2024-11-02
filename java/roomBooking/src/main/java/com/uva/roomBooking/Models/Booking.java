@@ -20,7 +20,6 @@ import java.time.LocalDate;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     private int id;
     // TODO revisar si lo de cascade es estrictamente necesario
     @JoinColumn(name = "user_id", referencedColumnName = "id")

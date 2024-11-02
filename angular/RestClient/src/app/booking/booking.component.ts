@@ -5,15 +5,10 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
-interface BookingRequest {
-  userId: number; // ID del usuario que realiza la reserva
-  hotelId: number; // ID del hotel en el que se realiza la reserva
-  roomType: string; // Tipo de habitación (single, double, suite)
-  startDate: string; // Fecha de inicio de la reserva
-  endDate: string; // Fecha de fin de la reserva// Asegúrate de ajustar la ruta
-}
+
 import { BookingService } from '../shared/booking.service'; // Asegúrate de que el servicio exista
 import { ActivatedRoute } from '@angular/router';
+import { Booking } from '../../types';
 
 @Component({
   standalone: true,
@@ -34,7 +29,7 @@ export class BookingComponent implements OnInit {
     // Inicialización del formulario con validaciones
     this.bookingForm = this.fb.group({
       userId: ['', Validators.required],
-      hotelId: ['', Validators.required],
+      roomId: ['', Validators.required],
       roomType: ['', Validators.required],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
@@ -49,7 +44,13 @@ export class BookingComponent implements OnInit {
 
   submitBooking() {
     if (this.bookingForm.valid) {
-      const bookingRequest: BookingRequest = this.bookingForm.value;
+      const formValue = this.bookingForm.value;
+      const bookingRequest: Booking = {
+        ...formValue,
+        userId: { id: formValue.userId },
+        roomId: { id: formValue.roomId },
+      };
+      console.warn(bookingRequest);
 
       // Llama al servicio para crear una nueva reserva
       this.bookingService.createBooking(bookingRequest).subscribe(

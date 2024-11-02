@@ -59,9 +59,9 @@ export class ClienteApiRestService {
   getRoomsAvailableInDateRange(hotelId: number, start: Date, end: Date) {
     const startStr = start.toISOString().split('T')[0];
     const endStr = end.toISOString().split('T')[0];
-    return this.http.get<Room[]>(
-      `${ClienteApiRestService.HOTEL_URI}/${hotelId}/rooms?start=${startStr}&end=${endStr}`
-    );
+    const url = `${ClienteApiRestService.HOTEL_URI}/${hotelId}/rooms?start=${startStr}&end=${endStr}`;
+    console.warn(url);
+    return this.http.get<Room[]>(url);
   }
 
   getAllUsers() {

@@ -16,7 +16,6 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     List<Room> findAllByHotelId(int hotelId);
 
     // Encontrar habitaciones disponibles de un hotel en un rango de fechas
-    // TODO revisar los límites en las fechas
     @Query("""
                 SELECT r FROM Room r
                 WHERE r.hotel.id = ?1
@@ -24,7 +23,11 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
                 AND NOT EXISTS (
                     SELECT b FROM Booking b
                     WHERE b.roomId.id = r.id
-                    AND (b.startDate < ?3 AND b.endDate > ?2)
+                    AND (
+                        b.endDate > ?2
+                        OR
+                        b.startDate > ?3
+                    )
                 )
             """)
     List<Room> findAvailableRoomsByHotelAndDates(

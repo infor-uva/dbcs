@@ -40,11 +40,6 @@ public class BookingController {
         Room room = roomRepository.findById(booking.getRoomId().getId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        // Validar el tipo de habitación
-        if (!room.getType().equals(booking.getRoomId().getType())) {
-            throw new RuntimeException("Room type does not match the requested type");
-        }
-
         // Verificar disponibilidad
         List<Booking> existingBookings = bookingRepository.findByRoomIdAndDateRange(
                 room.getId(), booking.getStartDate(), booking.getEndDate());
@@ -63,5 +58,4 @@ public class BookingController {
         bookingRepository.deleteById(id);
     }
 
-    
 }
