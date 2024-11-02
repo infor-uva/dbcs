@@ -34,7 +34,7 @@ public class Room {
     @JsonIgnore
     private Hotel hotel;
     @Column(name = "room_number", nullable = false)
-    private int roomNumber;
+    private String roomNumber;
     @Column(name = "type", nullable = false)
     private Tipo type;
     @Column(name = "available", nullable = false)
@@ -46,7 +46,7 @@ public class Room {
     public Room() {
     }
 
-    public Room(int id, Hotel hotelId, int roomNumber, Tipo type, boolean available, List<Booking> bookings) {
+    public Room(int id, Hotel hotelId, String roomNumber, Tipo type, boolean available, List<Booking> bookings) {
         this.id = id;
         this.hotel = hotelId;
         this.roomNumber = roomNumber;
@@ -71,11 +71,11 @@ public class Room {
         return this.hotel;
     }
 
-    public void setRoomNumber(int roomNumber) {
+    public void setRoomNumber(String roomNumber) {
         this.roomNumber = roomNumber;
     }
 
-    public int getRoomNumber() {
+    public String getRoomNumber() {
         return this.roomNumber;
     }
 
