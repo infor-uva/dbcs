@@ -1,17 +1,105 @@
-/* main-page.component.css */
+/* Fondo oscuro de la aplicación para un aspecto futurista */
+body {
+  background-color: #121212;
+  color: #e0e0e0;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Contenedor principal con esquinas redondeadas y sombra sutil */
+.user-container {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: #1f1f1f;
+  border-radius: 12px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Título centralizado y con un estilo moderno */
 h1 {
-  font-size: 24px;
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 25px;
+  color: #ffffff;
+  letter-spacing: 1px;
+}
+
+/* Contenedor de filtro centrado y limpio */
+.filter-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 label {
+  font-weight: 600;
   margin-right: 10px;
+  color: #a1a1a1;
 }
 
-ul {
+/* Select estilizado con borde suave y sombras */
+select {
+  padding: 10px;
+  font-size: 1em;
+  border: none;
+  outline: none;
+  background-color: #292929;
+  color: #e0e0e0;
+  border-radius: 6px;
+  box-shadow: inset 0px 3px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+select:hover {
+  background-color: #3a3a3a;
+}
+
+/* Lista de usuarios sin puntos y con bordes modernos */
+.user-list {
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
 
-li {
-  margin: 5px 0;
+/* Elementos de la lista con espaciado y efecto hover futurista */
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  margin-bottom: 8px;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.user-item:hover {
+  background-color: #333333;
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos de usuario con tipografía clara y futurista */
+.user-name {
+  flex: 1;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.user-email {
+  flex: 2;
+  color: #b0b0b0;
+  font-style: italic;
+  text-align: left;
+  padding-left: 15px;
+}
+
+.user-status {
+  flex: 1;
+  font-weight: 500;
+  color: #76c7c0;
+  text-transform: uppercase;
+  text-align: right;
 }
