@@ -1,14 +1,14 @@
 import { Routes } from '@angular/router';
-import { HotelListComponent } from './hotel-list/hotel-list.component';
+import { MainPageComponent } from './main-page/main-page.component'; // Asegúrate de que la ruta al componente principal sea correcta
 
 export const routes: Routes = [
   {
-    path: 'hotels',
-    component: HotelListComponent,
+    path: '', // Ruta principal
+    component: MainPageComponent, // Componente de la página principal
   },
   {
-    path: '**',
-    redirectTo: 'hotels',
+    path: '**', // Redirección para rutas no encontradas
+    redirectTo: '', // Redirige a la página principal
     pathMatch: 'full',
   },
 ];
