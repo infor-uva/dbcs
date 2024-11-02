@@ -47,7 +47,6 @@ export class HotelListComponent {
   getHotels() {
     this.client.getAllHotels().subscribe({
       next: (resp) => {
-        console.warn({ resp });
         if (!!resp || (resp as never[]).length != 0) this.hotels = [...resp];
       },
       error(err) {
@@ -59,8 +58,6 @@ export class HotelListComponent {
 
   deleteHotel(id: number) {
     if (!confirm(`Borrar hotel con id ${id}. Continuar?`)) return;
-    // this.hotels = this.hotels.filter((h) => h.id !== id);
-    // return;
 
     this.client.deleteHotel(id).subscribe({
       next: (resp) => {
@@ -85,16 +82,6 @@ export class HotelListComponent {
     roomId: number,
     availability: boolean
   ) {
-    // const target = hotels
-    //   .find((hotel) => hotel.id === hotelId)!
-    //   .rooms.find((room) => room.id === roomId);
-    // if (!target) {
-    //   alert('Error');
-    //   return;
-    // }
-    // const availability = !target.available;
-    // target.available = availability;
-    // alert(`Change availability from room ${roomId} to ${availability}`);
     this.client.alterRoomAvailability(hotelId, roomId, availability).subscribe({
       next: (resp) => {
         if (resp.status < 400) {

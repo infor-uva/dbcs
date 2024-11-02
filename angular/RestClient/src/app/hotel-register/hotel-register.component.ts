@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import {
-  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
@@ -18,17 +17,16 @@ import { ClienteApiRestService } from '../shared/cliente-api-rest.service';
 import { Address, Hotel, Room } from '../../types';
 import { ActivatedRoute, Router } from '@angular/router';
 
+const emptyRoom: Room = {
+  id: 0,
+  roomNumber: '',
+  type: 'SINGLE',
+  available: false,
+};
 const emptyHotel: Hotel = {
   id: 0,
   name: '',
-  rooms: [
-    {
-      id: 0,
-      available: false,
-      roomNumber: '',
-      type: 'SINGLE',
-    },
-  ],
+  rooms: [emptyRoom],
   address: {
     id: 0,
     number: 0,
@@ -73,11 +71,10 @@ export class HotelRegisterComponent {
           this.client.getHotel(id).subscribe({
             next: (h) => this.setHotelForm(h),
             error: (error) => {
-              router.navigate(['/hotels/new']);
+              this.router.navigate(['/hotels/new']);
             },
           });
         }
-        console.warn({ id });
       },
     });
   }
@@ -89,16 +86,15 @@ export class HotelRegisterComponent {
   // Agregar una nueva habitación
   addRoom(): void {
     const roomForm = this.fb.group({
-      roomNumber: ['', Validators.required],
-      type: ['SINGLE', Validators.required],
-      available: [true],
+      roomNumber: [emptyRoom.roomNumber, Validators.required],
+      type: [emptyRoom.type, Validators.required],
+      available: [emptyRoom.available],
     });
     this.rooms.push(roomForm);
   }
 
   // Eliminar habitación
   removeRoom(index: number): void {
-    alert('remove action');
     this.rooms.removeAt(index);
   }
 
@@ -106,11 +102,11 @@ export class HotelRegisterComponent {
   onSubmit(): void {
     if (this.hotelForm.valid) {
       const hotel = this.hotelForm.value as Hotel;
-      console.log(hotel);
       this.client.addHotel(hotel).subscribe({
         next: (resp) => {
           if (resp.status < 400) {
             alert('Hotel guardado correctamente');
+            this.router.navigate(['/hotels']);
           } else {
           }
         },
@@ -146,7 +142,7 @@ export class HotelRegisterComponent {
             this.fb.group({
               roomNumber: [room.roomNumber, Validators.required],
               type: [room.type, Validators.required],
-              available: [true],
+              available: [room.available],
             }),
           Validators.required
         )
