@@ -1,24 +1,28 @@
 <div class="container">
-  <h2 style="text-align: center">Hotel List</h2>
+  <h2 class="text-center text-5xl font-bold mb-4">Hotel List</h2>
   <mat-accordion>
-    <mat-expansion-panel disabled="">
-      <mat-expansion-panel-header class="header-text">
-        <mat-panel-title>HOTEL</mat-panel-title>
-        <mat-panel-description>Location</mat-panel-description>
+    <mat-expansion-panel disabled class="cursor-default">
+      <mat-expansion-panel-header>
+        <mat-panel-title class="text-3xl font-bold">Hotel</mat-panel-title>
+        <mat-panel-description class="text-3xl font-bold"
+          >Location</mat-panel-description
+        >
       </mat-expansion-panel-header>
     </mat-expansion-panel>
     @for(hotel of hotels; track hotel.id) {
-    <mat-expansion-panel expanded="true">
-      <mat-expansion-panel-header class="header-text">
-        <mat-panel-title> {{ hotel.id }}. {{ hotel.name }} </mat-panel-title>
-        <mat-panel-description>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title class="text-3xl">
+          {{ $index + 1 }}. {{ hotel.name }}
+        </mat-panel-title>
+        <mat-panel-description class="text-3xl">
           {{ hotel.address.streetKind }} {{ hotel.address.streetName }} No.
           {{ hotel.address.number }}, {{ hotel.address.postCode }}
           {{ hotel.address.otherInfo }}
         </mat-panel-description>
       </mat-expansion-panel-header>
 
-      <div style="text-align: end; margin-bottom: 1rem">
+      <div class="text-end mb-4">
         <button
           mat-raised-button
           (click)="goToHotelDetails(hotel.id)"
@@ -34,6 +38,7 @@
           mat-raised-button
           (click)="deleteHotel(hotel.id)"
           style="
+            margin-left: 2rem;
             font-size: medium;
             background-color: rgb(223, 36, 36);
             color: rgb(250, 250, 250);
@@ -44,26 +49,26 @@
       </div>
       <table mat-table [dataSource]="hotel.rooms" class="mat-elevation-z8">
         <ng-container matColumnDef="roomNumber">
-          <th class="header-text" mat-header-cell *matHeaderCellDef>
+          <th class="text-3xl" mat-header-cell *matHeaderCellDef>
             Room Number
           </th>
-          <td class="body-text" mat-cell *matCellDef="let room">
+          <td class="text-2xl" mat-cell *matCellDef="let room">
             {{ room.roomNumber }}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="type">
-          <th class="header-text" mat-header-cell *matHeaderCellDef>Type</th>
-          <td class="body-text" ce mat-cell *matCellDef="let room">
+          <th class="text-3xl" mat-header-cell *matHeaderCellDef>Type</th>
+          <td class="text-2xl" ce mat-cell *matCellDef="let room">
             {{ room.type }}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="available">
-          <th class="header-text" mat-header-cell *matHeaderCellDef>
+          <th class="text-3xl text-center" mat-header-cell *matHeaderCellDef>
             Available
           </th>
-          <td class="body-text" mat-cell *matCellDef="let room">
+          <td class="text-2xl" mat-cell *matCellDef="let room">
             <mat-slide-toggle
               [checked]="room.available"
               (change)="

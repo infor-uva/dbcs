@@ -1,7 +1,12 @@
 <nav>
-    <ul>
-      <li><a routerLink="/hotels" routerLinkActive="Hoteles">Home</a></li>
-      <li><a routerLink="/about" routerLinkActive="active">About</a></li>
-    </ul>
-  </nav>
-  
+  <ul>
+    <li><a class="btn" [routerLink]="['/']">Home</a></li>
+    <li>
+      <a class="btn" [routerLink]="['/hotels', 'new']">Registrar Hotel</a>
+    </li>
+    <li><a class="btn" [routerLink]="['/hotels']">Hoteles</a></li>
+    <li>
+      <a class="btn" [routerLink]="['/booking', 'search']">Nueva Reserva</a>
+    </li>
+  </ul>
+</nav>

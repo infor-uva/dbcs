@@ -1,7 +1,8 @@
-.header-text {
-  font-size: large;
-}
-
-.body-text {
-  font-size: small;
+.container {
+  max-width: 1000px;
+  margin-top: 2rem;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
 }

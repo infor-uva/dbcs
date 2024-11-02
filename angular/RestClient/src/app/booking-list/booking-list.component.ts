@@ -6,10 +6,11 @@ import {
 } from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { Hotel, Room, RoomType, roomTypeArray } from '../../types';
 import { ClienteApiRestService } from '../shared/cliente-api-rest.service';
 import { Router } from '@angular/router';
+import { MatCard, MatCardModule } from '@angular/material/card';
 
 type SelectableRoomType = 'All' | RoomType;
 const selectableRoomTypeArray: SelectableRoomType[] = ['All', ...roomTypeArray];
@@ -20,6 +21,7 @@ const selectableRoomTypeArray: SelectableRoomType[] = ['All', ...roomTypeArray];
   imports: [
     MatFormFieldModule,
     MatDatepickerModule,
+    MatCardModule,
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
@@ -32,7 +34,7 @@ export class BookingListComponent {
   start?: Date;
   end?: Date;
   hotels!: Hotel[];
-  hotelSelected: number = -1;
+  hotelSelected?: Hotel;
   roomTypeSelected?: SelectableRoomType;
   roomTypes = selectableRoomTypeArray;
   rooms: Room[] = [];
@@ -47,7 +49,7 @@ export class BookingListComponent {
   getHotels() {
     this.client.getAllHotels().subscribe({
       next: (resp) => {
-        if (resp.body != null) this.hotels = [...resp.body];
+        if (resp != null) this.hotels = [...resp];
       },
       error(err) {
         console.log('Error al traer la lista: ' + err.message);
@@ -66,7 +68,11 @@ export class BookingListComponent {
 
   search() {
     this.client
-      .getRoomsAvailableInDateRange(this.hotelSelected, this.start!, this.end!)
+      .getRoomsAvailableInDateRange(
+        this.hotelSelected!.id,
+        this.start!,
+        this.end!
+      )
       .subscribe({
         next: (resp) => {
           this.rooms = resp;
@@ -83,6 +89,6 @@ export class BookingListComponent {
   }
 
   bookingRoom(roomId: number) {
-    this.router.navigateByUrl(`/booking?room=${roomId}`);
+    this.router.navigate(['/booking'], { queryParams: { roomId } });
   }
 }

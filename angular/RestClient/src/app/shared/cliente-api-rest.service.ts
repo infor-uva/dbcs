@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { Hotel, Booking, Room } from '../../types';
 import { Observable } from 'rxjs';
 import { User } from '../../types';
@@ -53,7 +52,7 @@ export class ClienteApiRestService {
     );
   }
 
-  createBooking(bookingRequest: Booking): Observable<any> {
+  createBooking(bookingRequest: Booking) {
     return this.http.post('http://localhost:8080/bookings', bookingRequest);
   }
 
@@ -65,8 +64,9 @@ export class ClienteApiRestService {
     );
   }
 
-  getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>('http://localhost:8080/users', { observe: 'body' });
+  getAllUsers() {
+    return this.http.get<User[]>('http://localhost:8080/users', {
+      observe: 'body',
+    });
   }
-  
 }

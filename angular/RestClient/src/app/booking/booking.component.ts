@@ -13,6 +13,7 @@ interface BookingRequest {
   endDate: string; // Fecha de fin de la reserva// Asegúrate de ajustar la ruta
 }
 import { BookingService } from '../shared/booking.service'; // Asegúrate de que el servicio exista
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -23,8 +24,13 @@ import { BookingService } from '../shared/booking.service'; // Asegúrate de que
 })
 export class BookingComponent implements OnInit {
   bookingForm: FormGroup;
+  roomId: number = 0;
 
-  constructor(private fb: FormBuilder, private bookingService: BookingService) {
+  constructor(
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
+    private bookingService: BookingService
+  ) {
     // Inicialización del formulario con validaciones
     this.bookingForm = this.fb.group({
       userId: ['', Validators.required],
@@ -35,7 +41,11 @@ export class BookingComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit() {
+    this.route.queryParams.subscribe((params) => {
+      this.roomId = params['roomId'];
+    });
+  }
 
   submitBooking() {
     if (this.bookingForm.valid) {

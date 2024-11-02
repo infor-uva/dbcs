@@ -1,51 +1,82 @@
-<div>
-  <mat-form-field>
-    <mat-label>Enter a date range</mat-label>
-    <mat-date-range-input [rangePicker]="picker">
-      <input
-        matStartDate
-        placeholder="Start date"
-        (dateInput)="updateStart($event)"
-        (dateChange)="updateStart($event)"
-      />
-      <input
-        matEndDate
-        placeholder="End date"
-        (dateInput)="updateEnd($event)"
-        (dateChange)="updateEnd($event)"
-      />
-    </mat-date-range-input>
-    <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
-    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-date-range-picker #picker></mat-date-range-picker>
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Hotel</mat-label>
-    <mat-select [(value)]="hotelSelected">
-      @for (hotel of hotels; track hotel.id) {
-      <mat-option [value]="hotel.id">{{ hotel.name }}</mat-option>
+<div class="container">
+  <mat-card>
+    <mat-card-title class="flex text-center p-4">
+      <strong class="text-5xl">Registro de Hotel</strong>
+    </mat-card-title>
+
+    <mat-card-content>
+      <div class="form-group text-xl flex justify-center gap-20">
+        <mat-form-field>
+          <mat-label class="text-2xl">Enter a date range</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input
+              matStartDate
+              placeholder="Start date"
+              (dateInput)="updateStart($event)"
+              (dateChange)="updateStart($event)"
+            />
+            <input
+              matEndDate
+              placeholder="End date"
+              (dateInput)="updateEnd($event)"
+              (dateChange)="updateEnd($event)"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label class="text-2xl">Hotel</mat-label>
+          <mat-select [(value)]="hotelSelected" class="text-2xl">
+            @for (hotel of hotels; track hotel.id) {
+            <mat-option [value]="hotel" class="text-3xl">{{
+              hotel.name
+            }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button
+          [disabled]="!this.start || !this.end || !this.hotelSelected"
+          mat-raised-button
+          class="bg-blue-500 rounded-full p-2"
+          (click)="search()"
+        >
+          <img class="w-3/4" src="/search.svg" />
+        </button>
+        <mat-form-field>
+          <mat-label>Filter by Room Type</mat-label>
+          <mat-select
+            [(value)]="roomTypeSelected"
+            (selectionChange)="updateRooms()"
+          >
+            @for (type of roomTypes; track type) {
+            <mat-option [value]="type">{{ type }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <!-- Lista de Habitaciones -->
+      @if (trateRooms.length > 0) {
+      <div class="grid gap-4 text-lg mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Habitaciones Disponibles</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for(room of trateRooms; track room.id) {
+          <button
+            mat-raised-button
+            color="accent"
+            class="w-full text-center py-3 rounded-lg shadow-md hover:shadow-lg text-2xl"
+            (click)="bookingRoom(room.id)"
+          >
+            <strong>Habitación {{ room.roomNumber }}</strong> -
+            <span class="italic">{{ room.type }}</span> (#{{ $index + 1 }})
+          </button>
+          }
+        </div>
+      </div>
       }
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Room Type</mat-label>
-    <mat-select [(value)]="roomTypeSelected" (selectionChange)="updateRooms()">
-      @for (type of roomTypes; track type) {
-      <mat-option [value]="type">{{ type }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-  <button
-    [disabled]="!this.start || !this.end || this.hotelSelected == -1"
-    mat-raised-button
-    color="primary"
-    (click)="search()"
-  >
-    Search
-  </button>
-  @for (room of trateRooms; track $index) {
-  <button (click)="bookingRoom(room.id)">
-    {{ room.id }} {{ room.type }} {{ room.roomNumber }}
-  </button>
-  }
+    </mat-card-content>
+  </mat-card>
 </div>
