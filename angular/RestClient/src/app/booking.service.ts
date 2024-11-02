@@ -15,7 +15,7 @@ import { Booking } from '../types/Booking'; // Ajusta la ruta a tu modelo Bookin
   providedIn: 'root' // Esto hace que el servicio esté disponible en toda la aplicación
 })
 export class BookingService {
-  private apiUrl = 'http://localhost:8080/api/bookings'; // Cambia esta URL a la de tu API
+  private apiUrl = 'http://localhost:8080/api/bookings'; 
 
   constructor(private http: HttpClient) {}
 
