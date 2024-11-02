@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import hotels from '../../mocks/hotels.json';
 import { Hotel, Booking, Room } from '../../types';
+import { Observable } from 'rxjs';
+import { User } from '../../types';
 
 @Injectable({
   providedIn: 'root',
@@ -11,11 +11,17 @@ import { Hotel, Booking, Room } from '../../types';
 export class ClienteApiRestService {
   private static readonly BASE_URI = 'http://localhost:8080';
   private static readonly HOTEL_URI = `${ClienteApiRestService.BASE_URI}/hotels`;
+  private static readonly USER_URI = `${ClienteApiRestService.BASE_URI}/users`;
   constructor(private http: HttpClient) {}
+
+  getHotel(id: number) {
+    const url = `${ClienteApiRestService.HOTEL_URI}/${id}`;
+    return this.http.get<Hotel>(url);
+  }
 
   getAllHotels() {
     const url = `${ClienteApiRestService.HOTEL_URI}`;
-    return this.http.get<Hotel[]>(url, { observe: 'response' });
+    return this.http.get<Hotel[]>(url);
   }
 
   deleteHotel(id: number) {
@@ -58,4 +64,9 @@ export class ClienteApiRestService {
       `${ClienteApiRestService.HOTEL_URI}/${hotelId}/rooms?start=${startStr}&end=${endStr}`
     );
   }
+
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>('http://localhost:8080/users', { observe: 'body' });
+  }
+  
 }

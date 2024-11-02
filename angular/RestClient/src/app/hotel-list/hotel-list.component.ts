@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
-import { Hotel, Address } from '../../types';
+import { Hotel } from '../../types';
 import {
   MatAccordion,
   MatExpansionPanel,
@@ -11,8 +11,7 @@ import {
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatButton } from '@angular/material/button';
-
-import hotels from '../../mocks/hotels.json';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { ClienteApiRestService } from '../shared/cliente-api-rest.service';
 
 @Component({
@@ -29,6 +28,7 @@ import { ClienteApiRestService } from '../shared/cliente-api-rest.service';
     MatExpansionPanelHeader,
     MatExpansionPanelTitle,
     MatExpansionPanelDescription,
+    NgbAccordionModule,
   ],
   templateUrl: './hotel-list.component.html',
   styleUrl: './hotel-list.component.css',
@@ -41,15 +41,13 @@ export class HotelListComponent {
   constructor(private router: Router, private client: ClienteApiRestService) {}
 
   ngOnInit() {
-    this.getHotelsResponse();
+    this.getHotels();
   }
 
-  getHotelsResponse() {
-    // this.hotels = hotels as Hotel[];
-    // return;
+  getHotels() {
     this.client.getAllHotels().subscribe({
       next: (resp) => {
-        if (resp.body != null) this.hotels = [...resp.body];
+        if (!!resp || (resp as never[]).length != 0) this.hotels = [...resp];
       },
       error(err) {
         console.log('Error al traer la lista: ' + err.message);
@@ -60,15 +58,13 @@ export class HotelListComponent {
 
   deleteHotel(id: number) {
     if (!confirm(`Borrar hotel con id ${id}. Continuar?`)) return;
-    // this.hotels = this.hotels.filter((h) => h.id !== id);
-    // return;
 
     this.client.deleteHotel(id).subscribe({
       next: (resp) => {
         if (resp.status < 400) {
           this.mostrarMensaje = true;
           this.mensaje = resp.body as string;
-          this.getHotelsResponse();
+          this.getHotels();
         } else {
           this.mostrarMensaje = true;
           this.mensaje = 'Error al eliminar registro';
@@ -86,22 +82,12 @@ export class HotelListComponent {
     roomId: number,
     availability: boolean
   ) {
-    // const target = hotels
-    //   .find((hotel) => hotel.id === hotelId)!
-    //   .rooms.find((room) => room.id === roomId);
-    // if (!target) {
-    //   alert('Error');
-    //   return;
-    // }
-    // const availability = !target.available;
-    // target.available = availability;
-    // alert(`Change availability from room ${roomId} to ${availability}`);
     this.client.alterRoomAvailability(hotelId, roomId, availability).subscribe({
       next: (resp) => {
         if (resp.status < 400) {
           this.mostrarMensaje = true;
           this.mensaje = resp.body as string;
-          this.getHotelsResponse();
+          this.getHotels();
         } else {
           this.mostrarMensaje = true;
           this.mensaje = 'Error al cambiar disponibilidad';
@@ -115,7 +101,7 @@ export class HotelListComponent {
     });
   }
 
-  goToEdit(hotelId: number): void {
-    this.router.navigate(['/hotels', hotelId, 'edit']);
+  goToHotelDetails(hotelId: number): void {
+    this.router.navigate(['/hotels', hotelId]);
   }
 }
