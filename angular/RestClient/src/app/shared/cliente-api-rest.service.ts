@@ -1,7 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
-import hotels from '../../mocks/hotels.json';
 import { Hotel } from '../../types';
 import { Observable } from 'rxjs';
 import { User } from '../../types';
@@ -15,9 +13,14 @@ export class ClienteApiRestService {
   private static readonly USER_URI = `${ClienteApiRestService.BASE_URI}/users`;
   constructor(private http: HttpClient) {}
 
+  getHotel(id: number) {
+    const url = `${ClienteApiRestService.HOTEL_URI}/${id}`;
+    return this.http.get<Hotel>(url);
+  }
+
   getAllHotels() {
     const url = `${ClienteApiRestService.HOTEL_URI}`;
-    return this.http.get<Hotel[]>(url, { observe: 'response' });
+    return this.http.get<Hotel[]>(url);
   }
 
   deleteHotel(id: number) {
