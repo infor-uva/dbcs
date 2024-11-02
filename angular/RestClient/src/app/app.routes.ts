@@ -1,11 +1,12 @@
 import { Routes } from '@angular/router';
 import { HotelListComponent } from './hotel-list/hotel-list.component';
 import { HotelRegisterComponent } from './hotel-register/hotel-register.component';
+import { MainPageComponent } from './main-page/main-page.component';
 
 export const routes: Routes = [
   {
-    path: 'hotels',
-    component: HotelListComponent,
+    path: '', // Ruta principal
+    component: MainPageComponent, // Componente de la página principal
   },
   {
     path: 'hotels/new',
@@ -16,8 +17,8 @@ export const routes: Routes = [
     component: HotelRegisterComponent,
   },
   {
-    path: '**',
-    redirectTo: 'hotels',
+    path: '**', 
+    redirectTo: '', 
     pathMatch: 'full',
   },
 ];

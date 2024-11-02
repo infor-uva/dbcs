@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Hotel } from '../../types';
+import { Observable } from 'rxjs';
+import { User } from '../../types';
 
 @Injectable({
   providedIn: 'root',
@@ -8,6 +10,7 @@ import { Hotel } from '../../types';
 export class ClienteApiRestService {
   private static readonly BASE_URI = 'http://localhost:8080';
   private static readonly HOTEL_URI = `${ClienteApiRestService.BASE_URI}/hotels`;
+  private static readonly USER_URI = `${ClienteApiRestService.BASE_URI}/users`;
   constructor(private http: HttpClient) {}
 
   getHotel(id: number) {
@@ -48,4 +51,9 @@ export class ClienteApiRestService {
       }
     );
   }
+
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>('http://localhost:8080/users', { observe: 'body' });
+  }
+  
 }
