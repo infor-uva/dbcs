@@ -3,7 +3,7 @@
 
   <div class="filter-container">
     <label for="filter">Filtrar por estado:</label>
-    <select id="filter" [(ngModel)]="selectedState" (change)="updateBookings()">
+    <select id="filter" [(ngModel)]="selectedState">
       <option value="all">Todas</option>
       <option value="active">Reservas activas</option>
       <option value="inactive">Reservas inactivas</option>
@@ -11,14 +11,15 @@
   </div>
 
   <ul class="booking-list">
-    @for( booking of bookings; track booking.id) {
-    <li class="booking-item">
-      <span class="booking-id">Reserva #{{ booking.id }}</span>
-      <span class="booking-dates"
-        >{{ booking.startDate }} - {{ booking.endDate }}</span
-      >
-      <span class="booking-status">{{ genBookingState(booking) }}</span>
-    </li>
-    }
+    <ng-container *ngFor="let booking of bookings">
+      <li *ngIf="selectedState === 'all' || 
+                 (selectedState === 'active' && genBookingState(booking) === 'Reserva activa') || 
+                 (selectedState === 'inactive' && genBookingState(booking) === 'Reserva inactiva')"
+          class="booking-item">
+        <span class="booking-id">Reserva #{{ booking.id }}</span>
+        <span class="booking-dates">{{ booking.startDate }} - {{ booking.endDate }}</span>
+        <span class="booking-status">{{ genBookingState(booking) }}</span>
+      </li>
+    </ng-container>
   </ul>
 </div>
