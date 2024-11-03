@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { Booking } from '../../types/Booking'; // Ajusta la ruta a tu modelo Booking
+import { User, UserState } from '../../types';
 
 @Injectable({
   providedIn: 'root', // Esto hace que el servicio esté disponible en toda la aplicación

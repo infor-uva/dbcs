@@ -79,9 +79,63 @@ export class UserBookingListComponent {
     this.bookingClient.deleteBooking(bookingId).subscribe({
       next: () => {
         this.updateBookings();
+        this.updateUserStatus();
       },
       error: (err) => {
         console.error('Error al eliminar una reserva', err);
+      },
+    });
+  }
+
+  updateUserStatus() {
+    this.client.getUserBookings(this.userId).subscribe({
+      next: (bookings) => {
+        const withActive = bookings.find(
+          (booking) => this.genBookingState(booking) === 'Reserva activa'
+        );
+        const withInactive = bookings.find(
+          (booking) => this.genBookingState(booking) === 'Reserva inactiva'
+        );
+        if (withActive) {
+          this.client
+            .alterUserStatus(this.userId, 'WITH_ACTIVE_BOOKINGS')
+            .subscribe({
+              next: (response) => {
+                console.log('Cambio de estado en el usuario a activo correcto');
+              },
+              error: (err) => {
+                console.error('Error al cambiar de estado al usuario a activo');
+              },
+            });
+        } else if (withInactive) {
+          this.client
+            .alterUserStatus(this.userId, 'WITH_INACTIVE_BOOKINGS')
+            .subscribe({
+              next: (response) => {
+                console.log(
+                  'Cambio de estado en el usuario a inactivo correcto'
+                );
+              },
+              error: (err) => {
+                console.error(
+                  'Error al cambiar de estado al usuario a inactivo'
+                );
+              },
+            });
+        } else {
+          this.client.alterUserStatus(this.userId, 'NO_BOOKINGS').subscribe({
+            next: (response) => {
+              console.log(
+                'Cambio de estado en el usuario a sin reservas correcto'
+              );
+            },
+            error: (err) => {
+              console.error(
+                'Error al cambiar de estado al usuario sin reservas'
+              );
+            },
+          });
+        }
       },
     });
   }
