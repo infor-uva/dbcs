@@ -6,9 +6,9 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { BookingService } from '../shared/booking.service'; // Asegúrate de que el servicio exista
+import { BookingService } from '../../../../shared/booking.service'; // Asegúrate de que el servicio exista
 import { ActivatedRoute } from '@angular/router';
-import { Booking } from '../../types';
+import { Booking } from '../../../../../types';
 
 @Component({
   standalone: true,

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
-import { Hotel } from '../../types';
+import { Hotel } from '../../../../../types';
 import {
   MatAccordion,
   MatExpansionPanel,
@@ -12,7 +12,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatButton } from '@angular/material/button';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
-import { ClienteApiRestService } from '../shared/cliente-api-rest.service';
+import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
 
 @Component({
   selector: 'app-hotel-list',

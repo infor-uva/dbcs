@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
-import { HotelListComponent } from './hotel-list/hotel-list.component';
-import { BookingComponent } from './booking/booking.component';
-import { BookingListComponent } from './booking-list/booking-list.component';
-import { HotelRegisterComponent } from './hotel-register/hotel-register.component';
-import { MainPageComponent } from './main-page/main-page.component';
+import { HotelListComponent } from './core/features/hotel/hotel-list/hotel-list.component';
+import { BookingComponent } from './core/features/bookings/booking/booking.component';
+import { HotelRegisterComponent } from './core/features/hotel/hotel-register/hotel-register.component';
+import { MainPageComponent } from './core/features/user/main-page/main-page.component';
+import { BookingListComponent } from './core/features/bookings/booking-list/booking-list.component';
+import { UserBookingListComponent } from './core/features/user/user-booking-list/user-booking-list.component';
 
 export const routes: Routes = [
   {
@@ -11,8 +12,16 @@ export const routes: Routes = [
     component: MainPageComponent, // Componente de la página principal
   },
   {
-    path: 'booking/search',
+    path: 'bookings/search',
     component: BookingListComponent,
+  },
+  {
+    path: 'bookings/new',
+    component: BookingComponent,
+  },
+  {
+    path: 'users/:id/bookings',
+    component: UserBookingListComponent,
   },
   {
     path: 'hotels',
@@ -25,10 +34,6 @@ export const routes: Routes = [
   {
     path: 'hotels/:id',
     component: HotelRegisterComponent,
-  },
-  {
-    path: 'booking', // Añade la ruta para el componente de reservas
-    component: BookingComponent,
   },
   {
     path: '**',

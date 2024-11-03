@@ -7,10 +7,11 @@ import {
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { Hotel, Room, RoomType, roomTypeArray } from '../../types';
-import { ClienteApiRestService } from '../shared/cliente-api-rest.service';
+import { Hotel, Room, RoomType, roomTypeArray } from '../../../../../types';
+
 import { Router } from '@angular/router';
 import { MatCard, MatCardModule } from '@angular/material/card';
+import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
 
 type SelectableRoomType = 'All' | RoomType;
 const selectableRoomTypeArray: SelectableRoomType[] = ['All', ...roomTypeArray];
@@ -89,6 +90,7 @@ export class BookingListComponent {
   }
 
   bookingRoom(roomId: number) {
-    this.router.navigate(['/booking'], { queryParams: { roomId } });
+    // TODO plantear si se quiere mantener el query param o el rest param
+    this.router.navigate(['/bookings', 'new'], { queryParams: { roomId } });
   }
 }

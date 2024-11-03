@@ -13,8 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CommonModule } from '@angular/common';
-import { ClienteApiRestService } from '../shared/cliente-api-rest.service';
-import { Address, Hotel, Room } from '../../types';
+import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
+import { Address, Hotel, Room } from '../../../../../types';
 import { ActivatedRoute, Router } from '@angular/router';
 
 const emptyRoom: Room = {

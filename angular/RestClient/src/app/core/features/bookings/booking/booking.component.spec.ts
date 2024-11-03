@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BookingComponent } from './booking.component';
-import { BookingService } from '../shared/booking.service';
+import { BookingService } from '../../../../shared/booking.service';
 import { of } from 'rxjs';
 
 class MockBookingService {

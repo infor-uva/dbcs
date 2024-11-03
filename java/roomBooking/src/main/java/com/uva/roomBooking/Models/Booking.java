@@ -1,7 +1,5 @@
 package com.uva.roomBooking.Models;
 
-import java.util.Date;
-
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,8 +18,8 @@ import java.time.LocalDate;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
     private int id;
-    // TODO revisar si lo de cascade es estrictamente necesario
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private User userId;
