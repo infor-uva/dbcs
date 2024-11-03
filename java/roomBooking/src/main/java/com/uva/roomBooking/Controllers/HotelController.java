@@ -7,13 +7,16 @@ import java.time.LocalDate;
 import com.uva.roomBooking.Exceptions.HotelNotFoundException;
 import com.uva.roomBooking.Exceptions.InvalidDateRangeException;
 import com.uva.roomBooking.Exceptions.InvalidRequestException;
+import com.uva.roomBooking.Models.Booking;
 import com.uva.roomBooking.Models.Hotel;
 import com.uva.roomBooking.Models.Room;
+import com.uva.roomBooking.Repositories.BookingRepository;
 import com.uva.roomBooking.Repositories.HotelRepository;
 import com.uva.roomBooking.Repositories.RoomRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,10 +25,13 @@ import org.springframework.web.bind.annotation.*;
 public class HotelController {
     private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
+    private final BookingRepository bookingRepository;
 
-    public HotelController(HotelRepository hotelRepository, RoomRepository roomRepository) {
+    public HotelController(HotelRepository hotelRepository, RoomRepository roomRepository,
+            BookingRepository bookingRepository) {
         this.hotelRepository = hotelRepository;
         this.roomRepository = roomRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     // Obtener todos los hoteles
@@ -50,9 +56,11 @@ public class HotelController {
 
     // Borrar un hotel junto con sus habitaciones (borrado en cascada)
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<Void> deleteHotel(@PathVariable Integer id) {
         Hotel target = hotelRepository.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
+        bookingRepository.deleteAllByHotelId(id);
         hotelRepository.delete(target);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
