@@ -37,4 +37,15 @@ export class MainPageComponent implements OnInit {
       );
     }
   }
+
+  getState(user: User) {
+    switch (user.status) {
+      case 'NO_BOOKINGS':
+        return 'SIN RESERVAS';
+      case 'WITH_ACTIVE_BOOKINGS':
+        return 'CON RESERVAS ACTIVAS';
+      case 'WITH_INACTIVE_BOOKINGS':
+        return 'CON RESERVAS INACTIVAS';
+    }
+  }
 }

@@ -7,19 +7,28 @@
       <option value="All">Todos</option>
       <option value="NO_BOOKINGS">Sin reservas</option>
       <option value="WITH_ACTIVE_BOOKINGS">Con reservas activas</option>
-      <option value="WITH_INACTIVE_BOOKING">Con reservas inactivas</option>
+      <option value="WITH_INACTIVE_BOOKINGS">Con reservas inactivas</option>
     </select>
   </div>
 
   <ul class="user-list">
+    <li class="user-item">
+      <span class="user-name">Nombre</span>
+      <span class="user-email">Dirección de correo electronica</span>
+      <span class="user-status">Estado de usuario</span>
+      <span class="user-bookings">Reservas</span>
+    </li>
     @for (user of filteredUsers; track user.id) {
-    <a [routerLink]="['/users', user.id, 'bookings']">
-      <li class="user-item">
-        <span class="user-name">{{ user.name }}</span>
-        <span class="user-email">{{ user.email }}</span>
-        <span class="user-status">{{ user.status }}</span>
-      </li>
-    </a>
+    <li class="user-item">
+      <span class="user-name">{{ user.name }}</span>
+      <span class="user-email">{{ user.email }}</span>
+      <span class="user-status">{{ getState(user) }}</span>
+      <span class="user-bookings">
+        <a [routerLink]="['/users', user.id, 'bookings']">
+          <button>Reservas</button>
+        </a>
+      </span>
+    </li>
     }
   </ul>
 </div>

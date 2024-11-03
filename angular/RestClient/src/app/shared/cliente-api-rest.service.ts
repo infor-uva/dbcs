@@ -62,6 +62,10 @@ export class ClienteApiRestService {
     return this.http.get<Room[]>(url);
   }
 
+  getUser(userId: number) {
+    return this.http.get<User>(`http://localhost:8080/users/${userId}`);
+  }
+
   getAllUsers() {
     return this.http.get<User[]>('http://localhost:8080/users', {
       observe: 'body',

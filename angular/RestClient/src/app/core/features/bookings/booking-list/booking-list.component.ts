@@ -10,7 +10,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { Hotel, Room, RoomType, roomTypeArray } from '../../../../../types';
 
 import { Router } from '@angular/router';
-import { MatCard, MatCardModule } from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
 
 type SelectableRoomType = 'All' | RoomType;
@@ -20,6 +21,8 @@ const selectableRoomTypeArray: SelectableRoomType[] = ['All', ...roomTypeArray];
   selector: 'app-booking-list',
   standalone: true,
   imports: [
+    MatCardModule,
+    MatChipsModule,
     MatFormFieldModule,
     MatDatepickerModule,
     MatCardModule,
@@ -32,6 +35,7 @@ const selectableRoomTypeArray: SelectableRoomType[] = ['All', ...roomTypeArray];
   styleUrl: './booking-list.component.css',
 })
 export class BookingListComponent {
+  searched: boolean = false;
   start?: Date;
   end?: Date;
   hotels!: Hotel[];
@@ -83,6 +87,7 @@ export class BookingListComponent {
   }
 
   updateRooms() {
+    this.searched = true;
     this.trateRooms =
       this.roomTypeSelected && this.roomTypeSelected !== 'All'
         ? this.rooms.filter((room) => room.type === this.roomTypeSelected)
@@ -90,7 +95,14 @@ export class BookingListComponent {
   }
 
   bookingRoom(roomId: number) {
-    // TODO plantear si se quiere mantener el query param o el rest param
+    localStorage.setItem(
+      'booking-data',
+      JSON.stringify({
+        roomId,
+        startDate: this.start,
+        endDate: this.end,
+      })
+    );
     this.router.navigate(['/bookings', 'new'], { queryParams: { roomId } });
   }
 }

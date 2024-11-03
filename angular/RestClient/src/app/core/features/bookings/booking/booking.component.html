@@ -3,32 +3,26 @@
   <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
     <div class="form-group">
       <label for="userId">ID del Usuario:</label>
-      <input
+      <select
         type="number"
         id="userId"
         formControlName="userId"
         class="form-control"
-      />
+      >
+        @for(user of users; track user.id) {
+        <option value="{{ user.id }}">{{ user.name }}</option>
+        }
+      </select>
     </div>
 
     <div class="form-group">
-      <label for="roomId">ID del Hotel:</label>
+      <label for="roomId">ID del Habitación:</label>
       <input
         type="number"
         id="roomId"
         formControlName="roomId"
         class="form-control"
       />
-    </div>
-
-    <div class="form-group">
-      <label for="roomType">Tipo de Habitación:</label>
-      <select id="roomType" formControlName="roomType" class="form-control">
-        <option value="">Seleccione</option>
-        <option value="single">Individual</option>
-        <option value="double">Doble</option>
-        <option value="suite">Suite</option>
-      </select>
     </div>
 
     <div class="form-group">
@@ -51,6 +45,8 @@
       />
     </div>
 
-    <button type="submit" class="btn btn-primary">Reservar</button>
+    <button [disabled]="!isUserSelected" type="submit" class="btn btn-primary">
+      Reservar
+    </button>
   </form>
 </div>
