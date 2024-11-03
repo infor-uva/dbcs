@@ -1,0 +1,44 @@
+nav {
+  background-color: #333;
+  color: white;
+  padding: 1em;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+}
+
+li {
+  margin-right: 20px;
+}
+
+a,
+a:visited {
+  color: white;
+  text-decoration: none;
+  transform: scale(1);
+  transition: transform 0.3s ease;
+}
+
+a:hover {
+  font-weight: bold;
+  text-decoration: underline;
+  color: yellow;
+  transition: transform 0.3s ease;
+  transform: scale(1.5);
+}
+
+.active {
+  font-weight: bold;
+}
+
+@keyframes escalar {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.5);
+  }
+}

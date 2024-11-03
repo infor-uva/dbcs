@@ -1,0 +1,46 @@
+<div class="booking-container">
+  <h1>Listado de Reservas</h1>
+  <h3>para el usuario {{ user?.name }} (ID: {{ userId }})</h3>
+
+  <div class="filter-container">
+    <label for="filter">Filtrar por estado:</label>
+    <select id="filter" [(ngModel)]="selectedState" (change)="updateBookings()">
+      <option value="all">Todas</option>
+      <option value="active">Reservas activas</option>
+      <option value="inactive">Reservas inactivas</option>
+    </select>
+  </div>
+
+  @if (bookings.length > 0) {
+  <ul class="booking-list">
+    <li class="booking-item">
+      <span class="booking-id">Reservas</span>
+      <span class="booking-start">Comienzo de reserva</span>
+      <span class="booking-end">Fin de reserva</span>
+      <span class="booking-status">Estado de la reserva</span>
+      <span class="booking-delete">Eliminar</span>
+    </li>
+    @for (booking of bookings; track booking.id) {
+    <ng-container>
+      <li class="booking-item">
+        <span class="booking-id">Reserva #{{ booking.id }}</span>
+
+        <span class="booking-start">{{ booking.startDate }}</span>
+        <span class="booking-end">{{ booking.endDate }}</span>
+        <span class="booking-status">{{ genBookingState(booking) }}</span>
+        <span class="booking-delete">
+          <button (click)="deleteBooking(booking.id)">Eliminar</button>
+        </span>
+      </li>
+    </ng-container>
+    }
+  </ul>
+  } @else if (search) {
+  <div class="no-bookings-found">
+    <h3>
+      No se encontraron reservas @if (selectedState !== 'all') { con estado @if
+      (selectedState === 'active') { activo } @else {inactivo} } para el usuario
+    </h3>
+  </div>
+  }
+</div>
