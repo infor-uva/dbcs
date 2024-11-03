@@ -6,6 +6,8 @@ export interface User {
   status: UserState;
 }
 
+export type UserStateFilter = 'All' | UserState;
+
 export type UserState =
   | 'NO_BOOKINGS'
   | 'WITH_ACTIVE_BOOKINGS'

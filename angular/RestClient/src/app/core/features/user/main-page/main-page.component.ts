@@ -1,7 +1,7 @@
 // main-page.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
-import { User } from '../../../../../types';
+import { User, UserStateFilter } from '../../../../../types';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import users from '../../../../../mocks/users.json';
@@ -16,7 +16,7 @@ import { RouterModule } from '@angular/router';
 export class MainPageComponent implements OnInit {
   users: User[] = [];
   filteredUsers: User[] = [];
-  selectedStatus: string = 'all';
+  selectedStatus: UserStateFilter = 'All';
 
   constructor(private ClienteApiRestService: ClienteApiRestService) {}
 
@@ -29,7 +29,7 @@ export class MainPageComponent implements OnInit {
   }
 
   filterUsers(): void {
-    if (this.selectedStatus === 'all') {
+    if (this.selectedStatus === 'All') {
       this.filteredUsers = this.users;
     } else {
       this.filteredUsers = this.users.filter(
