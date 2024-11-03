@@ -8,6 +8,10 @@ import com.uva.roomBooking.Repositories.BookingRepository;
 import com.uva.roomBooking.Repositories.RoomRepository;
 import com.uva.roomBooking.Repositories.UserRepository;
 
+import jakarta.transaction.Transactional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,9 +57,32 @@ public class BookingController {
         return bookingRepository.save(booking);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteBooking(@PathVariable Integer id) {
-        bookingRepository.deleteById(id);
+    @GetMapping("/{id}")
+    public Booking getBookingById(@PathVariable Integer id) {
+        return bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<String> deleteBooking(@PathVariable Integer id) {
+        try {
+            if (!bookingRepository.existsById(id)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Booking not found with id: " + id);
+            }
+            
+            bookingRepository.deleteBookingById(id); 
+            
+            return ResponseEntity.ok("Booking deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error deleting booking: " + e.getMessage());
+        }
+    }
 }
+
+    
+
+
