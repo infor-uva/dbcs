@@ -1,1 +1,24 @@
-<p>user-booking-list works!</p>
+<div class="booking-container">
+  <h1>Listado de Reservas</h1>
+
+  <div class="filter-container">
+    <label for="filter">Filtrar por estado:</label>
+    <select id="filter" [(ngModel)]="selectedState" (change)="updateBookings()">
+      <option value="all">Todas</option>
+      <option value="active">Reservas activas</option>
+      <option value="inactive">Reservas inactivas</option>
+    </select>
+  </div>
+
+  <ul class="booking-list">
+    @for( booking of bookings; track booking.id) {
+    <li class="booking-item">
+      <span class="booking-id">Reserva #{{ booking.id }}</span>
+      <span class="booking-dates"
+        >{{ booking.startDate }} - {{ booking.endDate }}</span
+      >
+      <span class="booking-status">{{ genBookingState(booking) }}</span>
+    </li>
+    }
+  </ul>
+</div>

@@ -12,10 +12,14 @@
   </div>
 
   <ul class="user-list">
-    <li *ngFor="let user of filteredUsers" class="user-item">
-      <span class="user-name">{{ user.name }}</span>
-      <span class="user-email">{{ user.email }}</span>
-      <span class="user-status">{{ user.status }}</span>
-    </li>
+    @for (user of filteredUsers; track user.id) {
+    <a [routerLink]="['/users', user.id, 'bookings']">
+      <li class="user-item">
+        <span class="user-name">{{ user.name }}</span>
+        <span class="user-email">{{ user.email }}</span>
+        <span class="user-status">{{ user.status }}</span>
+      </li>
+    </a>
+    }
   </ul>
 </div>

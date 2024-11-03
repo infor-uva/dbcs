@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import { BookingService } from '../../../../shared/booking.service'; // Asegúrate de que el servicio exista
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Booking } from '../../../../../types';
 
 @Component({
@@ -22,6 +22,7 @@ export class BookingComponent implements OnInit {
   roomId: number = 0;
 
   constructor(
+    private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private bookingService: BookingService
@@ -45,9 +46,10 @@ export class BookingComponent implements OnInit {
   submitBooking() {
     if (this.bookingForm.valid) {
       const formValue = this.bookingForm.value;
+      const { userId } = formValue;
       const bookingRequest: Booking = {
         ...formValue,
-        userId: { id: formValue.userId },
+        userId: { id: userId },
         roomId: { id: formValue.roomId },
       };
       console.warn(bookingRequest);
@@ -56,8 +58,16 @@ export class BookingComponent implements OnInit {
       this.bookingService.createBooking(bookingRequest).subscribe(
         (response) => {
           console.log('Reserva creada con éxito', response);
-          // Aquí puedes redirigir al usuario o mostrar un mensaje de éxito
-          this.bookingForm.reset(); // Opcional: resetea el formulario después de una reserva exitosa
+          // Llama al servicio para actualizar el estado del usuario
+          this.bookingService.createBooking(bookingRequest).subscribe({
+            next: (response) => {
+              console.log('Reserva creada con éxito', response);
+            },
+            error: (error) => {
+              console.error('Error al crear la reserva', error);
+            },
+          });
+          this.router.navigate(['/user', userId, 'bookings']);
         },
         (error) => {
           console.error('Error al crear la reserva', error);

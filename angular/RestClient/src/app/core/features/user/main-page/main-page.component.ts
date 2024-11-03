@@ -5,9 +5,10 @@ import { User } from '../../../../../types';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import users from '../../../../../mocks/users.json';
+import { RouterModule } from '@angular/router';
 @Component({
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterModule],
   selector: 'app-main-page',
   templateUrl: './main-page.component.html',
   styleUrls: ['./main-page.component.css'],

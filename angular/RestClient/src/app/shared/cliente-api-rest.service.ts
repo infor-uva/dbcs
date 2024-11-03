@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Hotel, Booking, Room } from '../../types';
-import { Observable } from 'rxjs';
+import { Hotel, Booking, Room, UserState } from '../../types';
 import { User } from '../../types';
 
 @Injectable({
@@ -68,5 +67,24 @@ export class ClienteApiRestService {
     return this.http.get<User[]>('http://localhost:8080/users', {
       observe: 'body',
     });
+  }
+
+  getUserBookings(userId: number) {
+    return this.http.get<Booking[]>(
+      `${ClienteApiRestService.BASE_URI}/users/${userId}/bookings`
+    );
+  }
+
+  alterUserStatus(status: UserState) {
+    return this.http.patch(
+      `${ClienteApiRestService.BASE_URI}/users`,
+      {
+        status,
+      },
+      {
+        observe: 'response',
+        responseType: 'text',
+      }
+    );
   }
 }

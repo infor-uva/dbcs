@@ -5,6 +5,6 @@ export interface Booking {
   id: number;
   startDate: Date;
   endDate: Date;
-  user: User;
-  room: Room;
+  userId: User;
+  roomId: Room;
 }

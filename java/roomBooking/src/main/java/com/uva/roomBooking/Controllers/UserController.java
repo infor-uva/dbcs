@@ -1,5 +1,6 @@
 package com.uva.roomBooking.Controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uva.roomBooking.Models.UserStatus;
 import com.uva.roomBooking.Models.Booking;
 import com.uva.roomBooking.Models.User;
-import com.uva.roomBooking.Repositories.BookingRepository;
 import com.uva.roomBooking.Repositories.UserRepository;
 
 @RestController
@@ -25,11 +25,9 @@ import com.uva.roomBooking.Repositories.UserRepository;
 @CrossOrigin(origins = "*")
 public class UserController {
   private final UserRepository userRepository;
-  private final BookingRepository bookingRepository;
 
-  public UserController(UserRepository userRepository, BookingRepository bookingRepository) {
+  public UserController(UserRepository userRepository) {
     this.userRepository = userRepository;
-    this.bookingRepository = bookingRepository;
   }
 
   @GetMapping
@@ -71,17 +69,32 @@ public class UserController {
       throw new RuntimeException("Missing required fields");
     }
     UserStatus userStatus = UserStatus.valueOf(strStatus);
+
+    // TODO decicir cual va a ser nuestra politica
+    boolean activeBookings = target.getBookings().stream()
+        .anyMatch(booking -> booking.getEndDate().isAfter(LocalDate.now())); // reserva > ahora
+    // boolean activeBookings = target.getBookings().stream().anyMatch(booking ->
+    // !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
+    boolean inactiveBookings = target.getBookings().stream()
+        .anyMatch(booking -> booking.getStartDate().isBefore(LocalDate.now())); // reserva < ahora
+    // boolean inactiveBookings = target.getBookings().stream().anyMatch(booking ->
+    // !booking.getStartDate().isAfter(LocalDate.now())); // reserva <= ahora
+
     switch (userStatus) {
       // TODO Buscar como validar las (in)active bookings
       case NO_BOOKINGS:
         if (!target.getBookings().isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user have at least one booking");
+          throw new IllegalArgumentException("Invalid State: The user has at least one booking");
       case WITH_ACTIVE_BOOKINGS:
         if (target.getBookings().isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user don't have bookings");
+          throw new IllegalArgumentException("Invalid State: The user don't has bookings");
+        if (!activeBookings)
+          throw new IllegalArgumentException("Invalid State: The user don't has active bookings");
       case WITH_INACTIVE_BOOKINGS:
         if (target.getBookings().isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user don't have bookings");
+          throw new IllegalArgumentException("Invalid State: The user don't has bookings");
+        if (!inactiveBookings)
+          throw new IllegalArgumentException("Invalid State: The user don't has inactive bookings");
       default:
         break;
     }
@@ -101,6 +114,6 @@ public class UserController {
   @GetMapping("/{id}/bookings")
   public List<Booking> getUserBookingsById(@PathVariable int id) {
     User user = userRepository.findById(id).orElseThrow();
-    return bookingRepository.findByUserId(user);
+    return user.getBookings();
   }
 }
