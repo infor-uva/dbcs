@@ -18,8 +18,7 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
             @Param("endDate") LocalDate endDate);
 
     @Modifying
-    @Query("DELETE FROM Booking b WHERE b.id = :id")
+    @Query("DELETE FROM Booking b WHERE b.id = ?1")
     void deleteBookingById(@Param("id") Integer id);
 
-    
 }

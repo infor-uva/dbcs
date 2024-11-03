@@ -78,7 +78,6 @@ export class UserBookingListComponent {
   deleteBooking(bookingId: number) {
     this.bookingClient.deleteBooking(bookingId).subscribe({
       next: () => {
-        console.log('Actualizadas');
         this.updateBookings();
       },
       error: (err) => {

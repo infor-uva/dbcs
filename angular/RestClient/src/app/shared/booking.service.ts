@@ -33,7 +33,7 @@ export class BookingService {
   }
 
   // Método para eliminar una reserva
-  deleteBooking(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteBooking(id: number) {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }
