@@ -9,6 +9,7 @@ import {
 import { BookingService } from '../../../../shared/booking.service'; // Asegúrate de que el servicio exista
 import { ActivatedRoute, Router } from '@angular/router';
 import { Booking } from '../../../../../types';
+import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
 
 @Component({
   standalone: true,
@@ -25,7 +26,8 @@ export class BookingComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private client: ClienteApiRestService
   ) {
     // Inicialización del formulario con validaciones
     this.bookingForm = this.fb.group({
@@ -59,15 +61,20 @@ export class BookingComponent implements OnInit {
         (response) => {
           console.log('Reserva creada con éxito', response);
           // Llama al servicio para actualizar el estado del usuario
-          this.bookingService.createBooking(bookingRequest).subscribe({
-            next: (response) => {
-              console.log('Reserva creada con éxito', response);
-            },
-            error: (error) => {
-              console.error('Error al crear la reserva', error);
-            },
-          });
-          this.router.navigate(['/user', userId, 'bookings']);
+          this.client
+            .alterUserStatus(userId, 'WITH_ACTIVE_BOOKINGS')
+            .subscribe({
+              next: (response) => {
+                console.log(
+                  'Estado de usuario actualizado con exito',
+                  response
+                );
+                this.router.navigate(['/user', userId, 'bookings']);
+              },
+              error: (error) => {
+                console.error('Error al cambiar el estado del usuario', error);
+              },
+            });
         },
         (error) => {
           console.error('Error al crear la reserva', error);

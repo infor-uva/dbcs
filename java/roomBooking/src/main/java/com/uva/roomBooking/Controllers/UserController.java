@@ -70,31 +70,29 @@ public class UserController {
     }
     UserStatus userStatus = UserStatus.valueOf(strStatus);
 
-    // TODO decicir cual va a ser nuestra politica
     boolean activeBookings = target.getBookings().stream()
-        .anyMatch(booking -> booking.getEndDate().isAfter(LocalDate.now())); // reserva > ahora
-    // boolean activeBookings = target.getBookings().stream().anyMatch(booking ->
-    // !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
+        .anyMatch(booking -> !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
     boolean inactiveBookings = target.getBookings().stream()
         .anyMatch(booking -> booking.getStartDate().isBefore(LocalDate.now())); // reserva < ahora
-    // boolean inactiveBookings = target.getBookings().stream().anyMatch(booking ->
-    // !booking.getStartDate().isAfter(LocalDate.now())); // reserva <= ahora
 
     switch (userStatus) {
       // TODO Buscar como validar las (in)active bookings
       case NO_BOOKINGS:
         if (!target.getBookings().isEmpty())
           throw new IllegalArgumentException("Invalid State: The user has at least one booking");
+        break;
       case WITH_ACTIVE_BOOKINGS:
         if (target.getBookings().isEmpty())
           throw new IllegalArgumentException("Invalid State: The user don't has bookings");
         if (!activeBookings)
           throw new IllegalArgumentException("Invalid State: The user don't has active bookings");
+        break;
       case WITH_INACTIVE_BOOKINGS:
         if (target.getBookings().isEmpty())
           throw new IllegalArgumentException("Invalid State: The user don't has bookings");
         if (!inactiveBookings)
           throw new IllegalArgumentException("Invalid State: The user don't has inactive bookings");
+        break;
       default:
         break;
     }

@@ -59,7 +59,6 @@ export class ClienteApiRestService {
     const startStr = start.toISOString().split('T')[0];
     const endStr = end.toISOString().split('T')[0];
     const url = `${ClienteApiRestService.HOTEL_URI}/${hotelId}/rooms?start=${startStr}&end=${endStr}`;
-    console.warn(url);
     return this.http.get<Room[]>(url);
   }
 
@@ -75,9 +74,9 @@ export class ClienteApiRestService {
     );
   }
 
-  alterUserStatus(status: UserState) {
+  alterUserStatus(userId: number, status: UserState) {
     return this.http.patch(
-      `${ClienteApiRestService.BASE_URI}/users`,
+      `${ClienteApiRestService.BASE_URI}/users/${userId}`,
       {
         status,
       },
