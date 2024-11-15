@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
+
 import { Booking, User } from '../../../../../types';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BookingService } from '../../../../shared/booking.service';
+import { UserClientService } from '../../../../shared/user-client.service';
+import { BookingClientService } from '../../../../shared/booking-client.service';
 
 type state = 'all' | 'active' | 'inactive';
 
@@ -24,8 +24,8 @@ export class UserBookingListComponent {
   user?: User;
 
   constructor(
-    private client: ClienteApiRestService,
-    private bookingClient: BookingService,
+    private userClient: UserClientService,
+    private bookingClient: BookingClientService,
     private route: ActivatedRoute
   ) {
     this.route.paramMap.subscribe({
@@ -34,7 +34,7 @@ export class UserBookingListComponent {
         this.updateBookings();
       },
     });
-    this.client
+    this.userClient
       .getUser(this.userId)
       .subscribe({ next: (user) => (this.user = user) });
   }
@@ -44,7 +44,7 @@ export class UserBookingListComponent {
   }
 
   updateBookings() {
-    this.client.getUserBookings(this.userId).subscribe({
+    this.bookingClient.getUserBookings(this.userId).subscribe({
       next: (bookings) => {
         this.search = true;
         switch (this.selectedState) {
@@ -88,7 +88,7 @@ export class UserBookingListComponent {
   }
 
   updateUserStatus() {
-    this.client.getUserBookings(this.userId).subscribe({
+    this.bookingClient.getUserBookings(this.userId).subscribe({
       next: (bookings) => {
         const withActive = bookings.find(
           (booking) => this.genBookingState(booking) === 'Reserva activa'
@@ -97,7 +97,7 @@ export class UserBookingListComponent {
           (booking) => this.genBookingState(booking) === 'Reserva inactiva'
         );
         if (withActive) {
-          this.client
+          this.userClient
             .alterUserStatus(this.userId, 'WITH_ACTIVE_BOOKINGS')
             .subscribe({
               next: (response) => {
@@ -108,7 +108,7 @@ export class UserBookingListComponent {
               },
             });
         } else if (withInactive) {
-          this.client
+          this.userClient
             .alterUserStatus(this.userId, 'WITH_INACTIVE_BOOKINGS')
             .subscribe({
               next: (response) => {
@@ -123,18 +123,20 @@ export class UserBookingListComponent {
               },
             });
         } else {
-          this.client.alterUserStatus(this.userId, 'NO_BOOKINGS').subscribe({
-            next: (response) => {
-              console.log(
-                'Cambio de estado en el usuario a sin reservas correcto'
-              );
-            },
-            error: (err) => {
-              console.error(
-                'Error al cambiar de estado al usuario sin reservas'
-              );
-            },
-          });
+          this.userClient
+            .alterUserStatus(this.userId, 'NO_BOOKINGS')
+            .subscribe({
+              next: (response) => {
+                console.log(
+                  'Cambio de estado en el usuario a sin reservas correcto'
+                );
+              },
+              error: (err) => {
+                console.error(
+                  'Error al cambiar de estado al usuario sin reservas'
+                );
+              },
+            });
         }
       },
     });

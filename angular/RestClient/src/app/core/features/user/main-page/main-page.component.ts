@@ -1,11 +1,11 @@
 // main-page.component.ts
 import { Component, OnInit } from '@angular/core';
-import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
 import { User, UserStateFilter } from '../../../../../types';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import users from '../../../../../mocks/users.json';
 import { RouterModule } from '@angular/router';
+import { UserClientService } from '../../../../shared/user-client.service';
 @Component({
   standalone: true,
   imports: [FormsModule, CommonModule, RouterModule],
@@ -18,11 +18,11 @@ export class MainPageComponent implements OnInit {
   filteredUsers: User[] = [];
   selectedStatus: UserStateFilter = 'All';
 
-  constructor(private ClienteApiRestService: ClienteApiRestService) {}
+  constructor(private userClient: UserClientService) {}
 
   ngOnInit(): void {
     this.users = users as unknown as User[];
-    this.ClienteApiRestService.getAllUsers().subscribe((data: User[]) => {
+    this.userClient.getAllUsers().subscribe((data: User[]) => {
       this.users = data;
       this.filteredUsers = data; // Inicialmente, muestra todos los usuarios
     });
