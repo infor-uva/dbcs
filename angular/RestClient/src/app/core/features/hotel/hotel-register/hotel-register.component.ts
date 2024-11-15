@@ -13,9 +13,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CommonModule } from '@angular/common';
-import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
 import { Address, Hotel, Room } from '../../../../../types';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HotelClientService } from '../../../../shared/hotel-client.service';
 
 const emptyRoom: Room = {
   id: 0,
@@ -59,7 +59,7 @@ export class HotelRegisterComponent {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private client: ClienteApiRestService
+    private hotelClient: HotelClientService
   ) {
     this.hotelForm = this.setHotelForm();
     this.editMode = false;
@@ -68,7 +68,7 @@ export class HotelRegisterComponent {
         const id = Number(params.get('id'));
         this.editMode = id !== 0;
         if (this.editMode) {
-          this.client.getHotel(id).subscribe({
+          this.hotelClient.getHotel(id).subscribe({
             next: (h) => this.setHotelForm(h),
             error: (error) => {
               this.router.navigate(['/hotels/new']);
@@ -102,7 +102,7 @@ export class HotelRegisterComponent {
   onSubmit(): void {
     if (this.hotelForm.valid) {
       const hotel = this.hotelForm.value as Hotel;
-      this.client.addHotel(hotel).subscribe({
+      this.hotelClient.addHotel(hotel).subscribe({
         next: (resp) => {
           if (resp.status < 400) {
             alert('Hotel guardado correctamente');

@@ -6,10 +6,17 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { BookingService } from '../../../../shared/booking.service'; // Asegúrate de que el servicio exista
 import { ActivatedRoute, Router } from '@angular/router';
 import { Booking, User } from '../../../../../types';
-import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
+import { LocalStorageService } from '../../../../shared/local-storage.service';
+import { BookingClientService } from '../../../../shared/booking-client.service';
+import { UserClientService } from '../../../../shared/user-client.service';
+
+type communication = {
+  roomId: number;
+  startDate: Date;
+  endDate: Date;
+};
 
 @Component({
   standalone: true,
@@ -21,15 +28,20 @@ import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.servi
 export class BookingComponent implements OnInit {
   users: User[] = [];
   bookingForm: FormGroup;
-  bookingLocal: { roomId: number; startDate: Date; endDate: Date };
+  bookingLocal: { roomId: number; startDate: Date; endDate: Date } = {
+    roomId: 0,
+    endDate: new Date(),
+    startDate: new Date(),
+  };
   roomId: number = 0;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private bookingService: BookingService,
-    private client: ClienteApiRestService
+    private bookingClient: BookingClientService,
+    private userClient: UserClientService,
+    private storage: LocalStorageService
   ) {
     // Inicialización del formulario con validaciones
     this.bookingForm = this.fb.group({
@@ -38,21 +50,22 @@ export class BookingComponent implements OnInit {
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
     });
-    const localBookingStr = localStorage.getItem('booking-data');
-    if (localBookingStr === null) {
+    const localBooking = storage.read<communication | null>('booking-data');
+    if (localBooking === null) {
       this.router.navigate(['/booking', 'search']);
+      return;
     }
-    const localBooking = JSON.parse(localBookingStr!);
-    this.bookingLocal = localBooking;
+    this.bookingLocal = localBooking!;
     this.route.queryParams.subscribe((params) => {
       const roomId = Number(params['roomId']);
       this.roomId = roomId;
-      if (localBooking.roomId !== roomId) {
+      if (this.bookingLocal.roomId !== roomId) {
         this.router.navigate(['/bookings', 'search']);
-        this.loadBooking(localBooking);
+        return;
       }
+      this.loadBooking();
     });
-    this.client.getAllUsers().subscribe({
+    this.userClient.getAllUsers().subscribe({
       next: (resp) => {
         this.users = resp;
       },
@@ -67,10 +80,12 @@ export class BookingComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadBooking(this.bookingLocal);
+    this.loadBooking();
   }
 
-  loadBooking(booking: { roomId: number; startDate: Date; endDate: Date }) {
+  loadBooking() {
+    const booking = this.bookingLocal;
+    if (!booking) return;
     const start = new Date(booking.startDate).toISOString().split('T')[0];
     const end = new Date(booking.endDate).toISOString().split('T')[0];
     this.bookingForm = this.fb.group({
@@ -95,11 +110,11 @@ export class BookingComponent implements OnInit {
       };
 
       // Llama al servicio para crear una nueva reserva
-      this.bookingService.createBooking(bookingRequest).subscribe({
+      this.bookingClient.createBooking(bookingRequest).subscribe({
         next: (response) => {
           console.log('Reserva creada con éxito', response);
           // Llama al servicio para actualizar el estado del usuario
-          this.client
+          this.userClient
             .alterUserStatus(userId, 'WITH_ACTIVE_BOOKINGS')
             .subscribe({
               next: (response) => {
@@ -107,7 +122,7 @@ export class BookingComponent implements OnInit {
                   'Estado de usuario actualizado con exito',
                   response
                 );
-                localStorage.removeItem('booking-data');
+                this.storage.remove('booking-data');
                 this.router.navigate(['/user', userId, 'bookings']);
               },
               error: (error) => {

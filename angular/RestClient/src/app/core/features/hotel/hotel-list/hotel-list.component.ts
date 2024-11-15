@@ -12,7 +12,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatButton } from '@angular/material/button';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
-import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
+import { HotelClientService } from '../../../../shared/hotel-client.service';
 
 @Component({
   selector: 'app-hotel-list',
@@ -38,14 +38,17 @@ export class HotelListComponent {
   mostrarMensaje!: boolean;
   mensaje!: string;
 
-  constructor(private router: Router, private client: ClienteApiRestService) {}
+  constructor(
+    private router: Router,
+    private hotelClient: HotelClientService
+  ) {}
 
   ngOnInit() {
     this.getHotels();
   }
 
   getHotels() {
-    this.client.getAllHotels().subscribe({
+    this.hotelClient.getAllHotels().subscribe({
       next: (resp) => {
         if (!!resp || (resp as never[]).length != 0) this.hotels = [...resp];
       },
@@ -59,7 +62,7 @@ export class HotelListComponent {
   deleteHotel(id: number) {
     if (!confirm(`Borrar hotel con id ${id}. Continuar?`)) return;
 
-    this.client.deleteHotel(id).subscribe({
+    this.hotelClient.deleteHotel(id).subscribe({
       next: (resp) => {
         if (resp.status < 400) {
           this.mostrarMensaje = true;
@@ -82,23 +85,25 @@ export class HotelListComponent {
     roomId: number,
     availability: boolean
   ) {
-    this.client.alterRoomAvailability(hotelId, roomId, availability).subscribe({
-      next: (resp) => {
-        if (resp.status < 400) {
-          this.mostrarMensaje = true;
-          this.mensaje = resp.body as string;
-          this.getHotels();
-        } else {
-          this.mostrarMensaje = true;
-          this.mensaje = 'Error al cambiar disponibilidad';
-          console.error(this.mensaje);
-        }
-      },
-      error: (error) => {
-        console.log('Error al cambiar disponibilidad: ' + error.message);
-        throw error;
-      },
-    });
+    this.hotelClient
+      .alterRoomAvailability(hotelId, roomId, availability)
+      .subscribe({
+        next: (resp) => {
+          if (resp.status < 400) {
+            this.mostrarMensaje = true;
+            this.mensaje = resp.body as string;
+            this.getHotels();
+          } else {
+            this.mostrarMensaje = true;
+            this.mensaje = 'Error al cambiar disponibilidad';
+            console.error(this.mensaje);
+          }
+        },
+        error: (error) => {
+          console.log('Error al cambiar disponibilidad: ' + error.message);
+          throw error;
+        },
+      });
   }
 
   goToHotelDetails(hotelId: number): void {

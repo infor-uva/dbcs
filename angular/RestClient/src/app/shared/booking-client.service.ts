@@ -1,22 +1,20 @@
-// booking.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from '../../environments/environment';
 import { Booking } from '../../types/Booking'; // Ajusta la ruta a tu modelo Booking
-import { User, UserState } from '../../types';
 
 @Injectable({
-  providedIn: 'root', // Esto hace que el servicio esté disponible en toda la aplicación
+  providedIn: 'root',
 })
-export class BookingService {
-  private apiUrl = 'http://localhost:8080/bookings';
+export class BookingClientService {
+  private URI = environment.bookingAPI;
 
   constructor(private http: HttpClient) {}
 
   // Método para crear una nueva reserva
   createBooking(bookingRequest: Booking): Observable<Booking> {
-    return this.http.post<Booking>(this.apiUrl, bookingRequest, {
+    return this.http.post<Booking>(this.URI, bookingRequest, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
@@ -25,16 +23,21 @@ export class BookingService {
 
   // Método para obtener todas las reservas
   getAllBookings(): Observable<Booking[]> {
-    return this.http.get<Booking[]>(this.apiUrl);
+    return this.http.get<Booking[]>(this.URI);
   }
 
   // Método para obtener una reserva por ID
   getBookingById(id: number): Observable<Booking> {
-    return this.http.get<Booking>(`${this.apiUrl}/${id}`);
+    return this.http.get<Booking>(`${this.URI}/${id}`);
+  }
+
+  getUserBookings(userId: number) {
+    // TODO revisar tras división en microservicios
+    return this.http.get<Booking[]>(`${this.URI}/${userId}/bookings`);
   }
 
   // Método para eliminar una reserva
   deleteBooking(id: number) {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.URI}/${id}`);
   }
 }
