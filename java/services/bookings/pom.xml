@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.uva</groupId>
-	<artifactId>roomBooking</artifactId>
+	<artifactId>bookingService</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>roomBooking</name>
-	<description>Room Booking rest</description>
+	<name>bookingService</name>
+	<description>Booking Microservice</description>
 	<url/>
 	<licenses>
 		<license/>
