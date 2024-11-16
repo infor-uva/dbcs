@@ -1,0 +1,55 @@
+version: "3.7"
+
+volumes:
+  kong_data: {}
+  users_data: {}
+
+networks: #Red interna para comunicar los servicios (“Services on the same network can communicate with each other using their name”)
+  kong-net: {}
+
+services:
+  RoomsBooking-WEB:
+    image: roomsbooking-web-image
+    build:
+      context: ./angular/RestClient
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - 4221:80
+    networks: # Networks to join
+      - kong-net
+    depends_on:
+      - RoomsBooking-API
+  RoomsBooking-API:
+    image: roomsbooking-api-image
+    build:
+      context: ./java/roomBooking
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    networks: # Networks to join
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://RoomsBooking-database:3306/RoomsBooking?createDatabaseIfNotExist=true
+    depends_on:
+      - RoomsBooking-database
+
+  RoomsBooking-database:
+    image: mysql #Usamos imagen del respositorio ya creada
+    hostname: RoomsBooking-database
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    networks:
+      - kong-net
+    volumes:
+      - users_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ClaveRoot
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: RoomsBooking
+      MYSQL_ROOT_HOST: "%"
