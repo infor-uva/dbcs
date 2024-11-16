@@ -26,14 +26,18 @@ public class User {
   @Enumerated(EnumType.STRING)
   private UserStatus status = UserStatus.NO_BOOKINGS;
 
+  @Basic (optional = false)
+  private String password;
+
   public User() {
   }
 
-  public User(int id, String name, String email, UserStatus status) {
+  public User(int id, String name, String email, UserStatus status, String password) {
     setId(id);
     setName(name);
     setEmail(email);
     setStatus(status);
+    setPassword(password);
   }
 
   // Getters y setters
@@ -67,5 +71,13 @@ public class User {
 
   public void setStatus(UserStatus status) {
     this.status = status;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 }
