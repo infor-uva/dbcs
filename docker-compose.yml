@@ -1,43 +1,81 @@
-version: "3.7"
-
 volumes:
   kong_data: {}
   users_data: {}
 
-networks: #Red interna para comunicar los servicios (“Services on the same network can communicate with each other using their name”)
+networks:
   kong-net: {}
 
 services:
-  RoomsBooking-WEB:
-    image: roomsbooking-web-image
+  Auth-API:
+    image: auth-api-image
+    hostname: ${AUTH_SERVICE_HOSTNAME}
     build:
-      context: ./angular/RestClient
-      dockerfile: ./Dockerfile
+      context: ./java/services/auth
+      dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - 4221:80
-    networks: # Networks to join
-      - kong-net
-    depends_on:
-      - RoomsBooking-API
-  RoomsBooking-API:
-    image: roomsbooking-api-image
-    build:
-      context: ./java/roomBooking
-      dockerfile: ./Dockerfile
-    restart: unless-stopped
-    ports:
-      - 8080:8080
-    networks: # Networks to join
+      - 8101:8101
+    networks:
       - kong-net
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://RoomsBooking-database:3306/RoomsBooking?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
+    depends_on:
+      - RoomsBooking-database
+
+  Users-API:
+    image: users-api-image
+    hostname: "${USERS_SERVICE_HOSTNAME}"
+    build:
+      context: ./java/services/users
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8111:8111
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
+    depends_on:
+      - RoomsBooking-database
+
+  Hotels-API:
+    image: hotels-api-image
+    hostname: ${HOTELS_SERVICE_HOSTNAME}
+    build:
+      context: ./java/services/hotels
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8121:8121
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USER: ${USER_DATABASE}
+      SPRING_DATASOURCE_PASSWORD: ${}
+    depends_on:
+      - RoomsBooking-database
+      - Bookings-API
+
+  Bookings-API:
+    image: bookings-api-image
+    hostname: ${BOOKINGS_SERVICE_HOSTNAME}
+    build:
+      context: ./java/services/bookings
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8131:8131
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
     depends_on:
       - RoomsBooking-database
 
   RoomsBooking-database:
-    image: mysql #Usamos imagen del respositorio ya creada
-    hostname: RoomsBooking-database
+    image: mysql
+    hostname: ${DB_SERVICE_HOSTNAME}
     cap_add:
       - SYS_NICE
     restart: unless-stopped
@@ -53,3 +91,18 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: RoomsBooking
       MYSQL_ROOT_HOST: "%"
+
+  RoomsBooking-Web:
+    image: roomsbooking-web-image
+    build:
+      context: ./angular/RestClient
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - 3328:80
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
+    depends_on:
+      - RoomsBooking-database
