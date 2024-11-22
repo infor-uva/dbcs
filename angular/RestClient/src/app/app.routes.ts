@@ -6,6 +6,7 @@ import { MainPageComponent } from './core/features/user/main-page/main-page.comp
 import { BookingListComponent } from './core/features/bookings/booking-list/booking-list.component';
 import { UserBookingListComponent } from './core/features/user/user-booking-list/user-booking-list.component';
 import { LoginComponent } from './core/features/auth/login/login.component';
+import { RegisterComponent } from './core/features/auth/register/register.component';
 
 export const routes: Routes = [
   {
@@ -39,6 +40,10 @@ export const routes: Routes = [
   {
     path: 'auth/login',
     component: LoginComponent,
+  },
+  {
+    path: 'auth/register',
+    component: RegisterComponent,
   },
   {
     path: '**',
