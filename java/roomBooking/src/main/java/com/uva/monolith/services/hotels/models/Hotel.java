@@ -1,10 +1,6 @@
-package com.uva.roomBooking.models;
+package com.uva.monolith.services.hotels.models;
 
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

@@ -1,20 +1,20 @@
 // BookingController.java
-package com.uva.roomBooking.controllers;
-
-import com.uva.roomBooking.models.Booking;
-import com.uva.roomBooking.models.Room;
-import com.uva.roomBooking.models.User;
-import com.uva.roomBooking.repositories.BookingRepository;
-import com.uva.roomBooking.repositories.RoomRepository;
-import com.uva.roomBooking.repositories.UserRepository;
+package com.uva.monolith.services.bookings.controllers;
 
 import jakarta.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.uva.monolith.services.bookings.models.Booking;
+import com.uva.monolith.services.bookings.repositories.BookingRepository;
+import com.uva.monolith.services.hotels.models.Room;
+import com.uva.monolith.services.hotels.repositories.RoomRepository;
+import com.uva.monolith.services.users.models.User;
+import com.uva.monolith.services.users.repositories.UserRepository;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -33,9 +33,29 @@ public class BookingController {
         this.roomRepository = roomRepository;
     }
 
-    @GetMapping
-    public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
+    @GetMapping(params = { "start", "end", "roomId" })
+    public List<Booking> getAllBookings(
+            @RequestParam(required = false) LocalDate start,
+            @RequestParam(required = false) LocalDate end,
+            @RequestParam(required = false) Integer roomId) {
+
+        List<Booking> bookings = null;
+        if (start != null && end != null) {
+            bookings = bookingRepository.findByDateRange(start, end);
+        }
+        if (roomId != null) {
+            if (bookings == null) {
+                bookings = bookingRepository.findByRoomId(roomId);
+            } else {
+                bookings = bookings.stream()
+                        .filter(booking -> booking.getRoomId().getId() == roomId)
+                        .toList();
+            }
+        }
+        if (start == null & end == null && roomId == null) {
+            bookings = bookingRepository.findAll();
+        }
+        return bookings;
     }
 
     @PostMapping

@@ -1,9 +1,10 @@
-package com.uva.roomBooking.models;
+package com.uva.monolith.services.users.models;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.uva.monolith.services.bookings.models.Booking;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;

@@ -1,4 +1,4 @@
-package com.uva.roomBooking.controllers;
+package com.uva.monolith.services.users.controllers;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uva.roomBooking.models.Booking;
-import com.uva.roomBooking.models.User;
-import com.uva.roomBooking.models.UserStatus;
-import com.uva.roomBooking.repositories.UserRepository;
+import com.uva.monolith.services.bookings.models.Booking;
+import com.uva.monolith.services.users.models.User;
+import com.uva.monolith.services.users.models.UserStatus;
+import com.uva.monolith.services.users.repositories.UserRepository;
 
 @RestController
 @RequestMapping("users")

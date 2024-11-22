@@ -1,4 +1,4 @@
-package com.uva.roomBooking.exceptions;
+package com.uva.monolith.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
