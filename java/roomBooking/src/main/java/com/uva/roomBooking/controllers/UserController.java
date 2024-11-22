@@ -3,10 +3,8 @@ package com.uva.roomBooking.controllers;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,9 +49,7 @@ public class UserController {
 
   @PostMapping
   public User addUser(@RequestBody User user) {
-    // TODO revisar como se desea manejar estado por defecto
     user.setStatus(UserStatus.NO_BOOKINGS);
-    // Aunque se asegure a lo mejor no es la forma de manejo esperada
     return userRepository.save(user);
   }
 
