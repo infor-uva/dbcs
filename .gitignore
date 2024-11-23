@@ -2,3 +2,4 @@
 taller
 *.pdf
 **/target/
+**/.vscode
