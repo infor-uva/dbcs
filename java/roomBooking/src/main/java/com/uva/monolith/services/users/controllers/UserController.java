@@ -1,10 +1,9 @@
 package com.uva.monolith.services.users.controllers;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,114 +17,93 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
-import com.uva.monolith.services.bookings.models.Booking;
 import com.uva.monolith.services.users.models.User;
-import com.uva.monolith.services.users.models.UserRol;
 import com.uva.monolith.services.users.models.UserStatus;
-import com.uva.monolith.services.users.repositories.UserRepository;
+import com.uva.monolith.services.users.services.UserService;
 
 @RestController
 @RequestMapping("users")
 @CrossOrigin(origins = "*")
 public class UserController {
-  private final UserRepository userRepository;
 
-  public UserController(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+  @Autowired
+  private UserService userService;
 
   @GetMapping
-  public List<User> getAllUsers() {
-    return userRepository.findAll();
+  public ResponseEntity<List<User>> getAllUsers() {
+    List<User> users = userService.getAllUsers();
+    return ResponseEntity.ok(users);
   }
 
   @GetMapping(params = { "email" })
   public ResponseEntity<?> getUserByEmail(@RequestParam String email) {
     try {
-      return new ResponseEntity<User>(userRepository.findByEmail(email).orElseThrow(), HttpStatus.ACCEPTED);
-    } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return ResponseEntity.ok(userService.getUserByEmail(email));
+    } catch (HttpClientErrorException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+      throw e;
     }
   }
 
   @PostMapping
-  public User addUser(@RequestBody User user) {
-    user.setStatus(UserStatus.NO_BOOKINGS);
-    if (user.getRol() == null) // Rol por defecto
-      user.setRol(UserRol.CONSUMER);
-    return userRepository.save(user);
+  public ResponseEntity<?> addUser(@RequestBody User user) {
+    userService.addUser(user);
+    return new ResponseEntity<>(HttpStatus.ACCEPTED);
   }
 
   @GetMapping("/{id}")
-  public User getUserById(@PathVariable int id) {
-    return userRepository.findById(id).orElseThrow();
+  public ResponseEntity<?> getUserById(@PathVariable int id) {
+    return ResponseEntity.ok(userService.getUserById(id));
   }
 
   @PutMapping("/{id}")
-  public User updateUserData(@PathVariable int id, @RequestBody Map<String, String> json) {
-    User target = userRepository.findById(id).orElseThrow();
-    if (!json.containsKey("name") || !json.containsKey("email")) {
-      // TODO cambiar manejo
-      throw new RuntimeException("Missing required fields");
+  public ResponseEntity<?> updateUserData(@PathVariable int id, @RequestBody Map<String, String> json) {
+    String name = json.get("name");
+    String email = json.get("email");
+    if (name == null || email == null) {
+      return new ResponseEntity<String>("Missing required fields", HttpStatus.BAD_REQUEST);
     }
-    target.setName(json.get("name"));
-    target.setEmail(json.get("email"));
-    return userRepository.save(target);
+    try {
+      User user = userService.updateUserData(id, name, email);
+      return new ResponseEntity<User>(user, HttpStatus.OK);
+    } catch (HttpClientErrorException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+      throw e;
+    }
   }
 
   @PatchMapping("/{id}")
-  public User updateUserState(@PathVariable int id, @RequestBody Map<String, String> json) {
-    User target = userRepository.findById(id).orElseThrow();
+  public ResponseEntity<?> updateUserState(@PathVariable int id, @RequestBody Map<String, String> json) {
+
     String strStatus = json.get("status");
     if (strStatus == null) {
-      // TODO cambiar manejo
-      throw new RuntimeException("Missing required fields");
+      return new ResponseEntity<String>("Missing required fields", HttpStatus.BAD_REQUEST);
     }
-    UserStatus userStatus = UserStatus.valueOf(strStatus);
-
-    boolean activeBookings = target.getBookings().stream()
-        .anyMatch(booking -> !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
-    boolean inactiveBookings = target.getBookings().stream()
-        .anyMatch(booking -> booking.getStartDate().isBefore(LocalDate.now())); // reserva < ahora
-
-    switch (userStatus) {
-      // TODO Buscar como validar las (in)active bookings
-      case NO_BOOKINGS:
-        if (!target.getBookings().isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user has at least one booking");
-        break;
-      case WITH_ACTIVE_BOOKINGS:
-        if (target.getBookings().isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user don't has bookings");
-        if (!activeBookings)
-          throw new IllegalArgumentException("Invalid State: The user don't has active bookings");
-        break;
-      case WITH_INACTIVE_BOOKINGS:
-        if (target.getBookings().isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user don't has bookings");
-        if (!inactiveBookings)
-          throw new IllegalArgumentException("Invalid State: The user don't has inactive bookings");
-        break;
-      default:
-        break;
+    try {
+      UserStatus userStatus = UserStatus.valueOf(strStatus);
+      return ResponseEntity.ok(userService.updateUserStatus(id, userStatus));
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<String>("Unknown user state", HttpStatus.BAD_REQUEST);
+    } catch (HttpClientErrorException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+      throw e;
     }
-    target.setStatus(userStatus);
-    return userRepository.save(target);
+
   }
 
   @DeleteMapping("/{id}")
-  public User deleteUser(@PathVariable Integer id) {
-    User target;
-    if ((target = userRepository.findById(id).orElseThrow()) != null) {
-      userRepository.deleteById(id);
+  public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
+    try {
+      return ResponseEntity.ok(userService.deleteUserById(id));
+    } catch (HttpClientErrorException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+      throw e;
     }
-    return target;
-  }
-
-  @GetMapping("/{id}/bookings")
-  public List<Booking> getUserBookingsById(@PathVariable int id) {
-    User user = userRepository.findById(id).orElseThrow();
-    return user.getBookings();
   }
 }
