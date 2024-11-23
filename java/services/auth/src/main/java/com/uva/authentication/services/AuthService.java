@@ -31,8 +31,8 @@ public class AuthService {
     if (user == null)
       return false;
     String hashPass = hashPass(request.getPassword());
-    // System.err.println(request.getPassword() + " -> " + hashPass + " == " +
-    // user.getPassword());
+    System.err.println(request.getPassword() + " -> " + hashPass + " == " +
+        user.getPassword());
     return hashPass.equals(user.getPassword());
   }
 
@@ -55,6 +55,8 @@ public class AuthService {
     if (user != null)
       throw new HttpClientErrorException(HttpStatus.CONFLICT, "Email already in use");
 
+    String hashPass = hashPass(registerRequest.getPassword());
+    registerRequest.setPassword(hashPass);
     return userAPI.registerUser(registerRequest);
   }
 

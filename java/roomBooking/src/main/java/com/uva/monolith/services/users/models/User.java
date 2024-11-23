@@ -102,7 +102,7 @@ public class User {
   }
 
   public UserStatus getStatus() {
-    if (!getBookings().isEmpty())
+    if (getBookings() == null || getBookings().isEmpty())
       return UserStatus.NO_BOOKINGS;
     boolean activeBookings = getBookings().stream()
         .anyMatch(booking -> !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora

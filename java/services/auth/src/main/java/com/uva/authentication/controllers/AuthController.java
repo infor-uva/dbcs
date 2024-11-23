@@ -31,8 +31,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
         try {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setEmail(registerRequest.getEmail());
+            loginRequest.setPassword(registerRequest.getPassword());
+
             authService.register(registerRequest);
-            return login(registerRequest);
+            return login(loginRequest);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 // return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);

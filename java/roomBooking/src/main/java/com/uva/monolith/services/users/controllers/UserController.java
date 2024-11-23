@@ -1,6 +1,7 @@
 package com.uva.monolith.services.users.controllers;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uva.monolith.services.bookings.models.Booking;
 import com.uva.monolith.services.users.models.User;
+import com.uva.monolith.services.users.models.UserRol;
 import com.uva.monolith.services.users.models.UserStatus;
 import com.uva.monolith.services.users.repositories.UserRepository;
 
@@ -50,6 +52,8 @@ public class UserController {
   @PostMapping
   public User addUser(@RequestBody User user) {
     user.setStatus(UserStatus.NO_BOOKINGS);
+    if (user.getRol() == null) // Rol por defecto
+      user.setRol(UserRol.CONSUMER);
     return userRepository.save(user);
   }
 

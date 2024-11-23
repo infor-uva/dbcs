@@ -44,7 +44,7 @@ export class UserBookingListComponent {
   }
 
   updateBookings() {
-    this.bookingClient.getUserBookings(this.userId).subscribe({
+    this.bookingClient.getBookingsByUser(this.userId).subscribe({
       next: (bookings) => {
         this.search = true;
         switch (this.selectedState) {
@@ -88,7 +88,7 @@ export class UserBookingListComponent {
   }
 
   updateUserStatus() {
-    this.bookingClient.getUserBookings(this.userId).subscribe({
+    this.bookingClient.getBookingsByUser(this.userId).subscribe({
       next: (bookings) => {
         const withActive = bookings.find(
           (booking) => this.genBookingState(booking) === 'Reserva activa'

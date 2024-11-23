@@ -33,11 +33,12 @@ public class BookingController {
         this.roomRepository = roomRepository;
     }
 
-    @GetMapping(params = { "start", "end", "roomId" })
+    @GetMapping()
     public List<Booking> getAllBookings(
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end,
-            @RequestParam(required = false) Integer roomId) {
+            @RequestParam(required = false) Integer roomId,
+            @RequestParam(required = false) Integer userId) {
 
         List<Booking> bookings = null;
         if (start != null && end != null) {
@@ -52,7 +53,16 @@ public class BookingController {
                         .toList();
             }
         }
-        if (start == null & end == null && roomId == null) {
+        if (userId != null) {
+            if (bookings == null) {
+                bookings = bookingRepository.findByUserId(userId);
+            } else {
+                bookings = bookings.stream()
+                        .filter(booking -> booking.getUserId().getId() == userId)
+                        .toList();
+            }
+        }
+        if (start == null & end == null && roomId == null && userId == null) {
             bookings = bookingRepository.findAll();
         }
         return bookings;
