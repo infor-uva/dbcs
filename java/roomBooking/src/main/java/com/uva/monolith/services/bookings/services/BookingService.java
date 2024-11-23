@@ -1,0 +1,88 @@
+package com.uva.monolith.services.bookings.services;
+
+import com.uva.monolith.services.bookings.models.Booking;
+import com.uva.monolith.services.bookings.repositories.BookingRepository;
+import com.uva.monolith.services.hotels.models.Room;
+import com.uva.monolith.services.hotels.repositories.RoomRepository;
+import com.uva.monolith.services.users.models.User;
+import com.uva.monolith.services.users.repositories.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+public class BookingService {
+
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
+
+    public BookingService(BookingRepository bookingRepository, UserRepository userRepository, RoomRepository roomRepository) {
+        this.bookingRepository = bookingRepository;
+        this.userRepository = userRepository;
+        this.roomRepository = roomRepository;
+    }
+
+    public List<Booking> getBookings(LocalDate start, LocalDate end, Integer roomId, Integer userId) {
+        List<Booking> bookings = null;
+
+        if (start != null && end != null) {
+            bookings = bookingRepository.findByDateRange(start, end);
+        }
+        if (roomId != null) {
+            if (bookings == null) {
+                bookings = bookingRepository.findByRoomId(roomId);
+            } else {
+                bookings = bookings.stream()
+                        .filter(booking -> booking.getRoomId().getId() == roomId)
+                        .toList();
+            }
+        }
+        if (userId != null) {
+            if (bookings == null) {
+                bookings = bookingRepository.findByUserId(userId);
+            } else {
+                bookings = bookings.stream()
+                        .filter(booking -> booking.getUserId().getId() == userId)
+                        .toList();
+            }
+        }
+        if (start == null && end == null && roomId == null && userId == null) {
+            bookings = bookingRepository.findAll();
+        }
+
+        return bookings;
+    }
+
+    public Booking createBooking(Booking booking) {
+        User user = userRepository.findById(booking.getUserId().getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Room room = roomRepository.findById(booking.getRoomId().getId())
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        // Check availability
+        List<Booking> existingBookings = bookingRepository.findByRoomIdAndDateRange(
+                room.getId(), booking.getStartDate(), booking.getEndDate());
+
+        if (!existingBookings.isEmpty()) {
+            throw new RuntimeException("Room is not available for the selected dates");
+        }
+
+        booking.setUserId(user);
+        booking.setRoomId(room);
+        return bookingRepository.save(booking);
+    }
+
+    public Booking getBookingById(Integer id) {
+        return bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+    }
+
+    public void deleteBooking(Integer id) {
+        if (!bookingRepository.existsById(id)) {
+            throw new RuntimeException("Booking not found");
+        }
+        bookingRepository.deleteBookingById(id);
+    }
+}
