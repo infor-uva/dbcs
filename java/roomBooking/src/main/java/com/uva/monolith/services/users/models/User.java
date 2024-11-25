@@ -3,6 +3,8 @@ package com.uva.monolith.services.users.models;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uva.monolith.services.bookings.models.Booking;
 
@@ -89,8 +91,9 @@ public class User {
     return password;
   }
 
-  public void setPassword(String password) {
-    this.password = password;
+  public void setPassword(String rawPassword) {
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    this.password = encoder.encode(rawPassword);
   }
 
   public UserRol getRol() {
@@ -120,4 +123,5 @@ public class User {
   public void setBookings(List<Booking> bookings) {
     this.bookings = bookings;
   }
+
 }
