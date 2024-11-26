@@ -53,7 +53,8 @@ public class AuthService {
     String hashPass = hashPass(request.getPassword());
     System.err.println("PASSWORD: " + request.getPassword() + "\n" + hashPass + "\n" +
         user.getPassword());
-    return hashPass.equals(user.getPassword());
+    // return hashPass.equals(user.getPassword());
+    return SecurityUtils.checkPassword(request.getPassword(), user.getPassword());
   }
 
   public String login(LoginRequest loginRequest) {

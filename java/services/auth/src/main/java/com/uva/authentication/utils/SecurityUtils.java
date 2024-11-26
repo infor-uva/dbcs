@@ -9,4 +9,10 @@ public class SecurityUtils {
   public static String encrypt(String value) {
     return encoder.encode(value);
   }
+
+  // Método para comparar la contraseña ingresada con el hash almacenado
+  public static boolean checkPassword(String rawPassword, String encodedPassword) {
+    return encoder.matches(rawPassword, encodedPassword); // Comparar la contraseña con el hash
+  }
+  
 }
