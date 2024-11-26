@@ -1,14 +1,21 @@
 package com.uva.monolith.services.hotels.models;
 
 import java.util.List;
+
+import org.hibernate.annotations.ManyToAny;
+
+import com.uva.monolith.services.users.models.HotelManager;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -34,14 +41,19 @@ public class Hotel {
   @OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private List<Room> rooms;
 
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "hotel_manager", referencedColumnName = "id")
+  private HotelManager hotelManager;
+
   public Hotel() {
   }
 
-  public Hotel(int id, String name, Address address, List<Room> rooms) {
+  public Hotel(int id, String name, Address address, List<Room> rooms, HotelManager hotelManager) {
     setId(id);
     setName(name);
     setAddress(address);
     setRooms(rooms);
+    setHotelManager(hotelManager);
   }
 
   public int getId() {
@@ -77,4 +89,11 @@ public class Hotel {
     rooms.forEach(room -> room.setHotel(this));
   }
 
+  public void setHotelManager(HotelManager hotelManager) {
+    this.hotelManager = hotelManager;
+  }
+
+  public HotelManager getHotelManager() {
+    return hotelManager;
+  }
 }

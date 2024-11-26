@@ -42,6 +42,7 @@ public class AuthController {
                 // return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
                 return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
             }
+            e.fillInStackTrace();
         }
 
         return new ResponseEntity<String>("Algo no fue bien", HttpStatus.UNAUTHORIZED);

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,20 +22,23 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.uva.monolith.services.bookings.models.Booking;
+import com.uva.monolith.services.users.models.Client;
 import com.uva.monolith.services.users.models.User;
 import com.uva.monolith.services.users.models.UserRol;
 import com.uva.monolith.services.users.models.UserStatus;
+import com.uva.monolith.services.users.repositories.ClientRepository;
 import com.uva.monolith.services.users.repositories.UserRepository;
 
 @RestController
 @RequestMapping("users")
 @CrossOrigin(origins = "*")
 public class UserController {
-  private final UserRepository userRepository;
 
-  public UserController(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+  @Autowired
+  private UserRepository userRepository;
+
+  @Autowired
+  private ClientRepository clientRepository;
 
   @GetMapping
   public List<User> getAllUsers() {
@@ -52,9 +56,9 @@ public class UserController {
 
   @PostMapping
   public User addUser(@RequestBody User user) {
-    user.setStatus(UserStatus.NO_BOOKINGS);
+    // user.setStatus(UserStatus.NO_BOOKINGS);
     if (user.getRol() == null) // Rol por defecto
-      user.setRol(UserRol.CONSUMER);
+      user.setRol(UserRol.CLIENT);
     return userRepository.save(user);
   }
 
@@ -77,7 +81,7 @@ public class UserController {
 
   @PatchMapping("/{id}")
   public User updateUserState(@PathVariable int id, @RequestBody Map<String, String> json) {
-    User target = userRepository.findById(id).orElseThrow();
+    Client target = clientRepository.findById(id).orElseThrow();
     String strStatus = json.get("status");
     if (strStatus == null) {
       // TODO cambiar manejo
@@ -126,9 +130,8 @@ public class UserController {
 
   @GetMapping("/{id}/bookings")
   public List<Booking> getUserBookingsById(@PathVariable int id) {
-    User user = userRepository.findById(id).orElseThrow();
+    Client user = clientRepository.findById(id).orElseThrow();
     return user.getBookings();
   }
 
- 
 }
