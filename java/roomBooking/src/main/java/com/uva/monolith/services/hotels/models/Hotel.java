@@ -2,13 +2,10 @@ package com.uva.monolith.services.hotels.models;
 
 import java.util.List;
 
-import org.hibernate.annotations.ManyToAny;
-
 import com.uva.monolith.services.users.models.HotelManager;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

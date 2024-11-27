@@ -22,7 +22,6 @@ public class AuthController {
             return ResponseEntity.ok(token);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
-                // return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
                 return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
             }
         }
@@ -40,7 +39,6 @@ public class AuthController {
             return login(loginRequest);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
-                // return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
                 return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
             }
             e.fillInStackTrace();

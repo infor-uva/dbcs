@@ -4,8 +4,10 @@ import com.uva.monolith.services.bookings.models.Booking;
 import com.uva.monolith.services.bookings.repositories.BookingRepository;
 import com.uva.monolith.services.hotels.models.Room;
 import com.uva.monolith.services.hotels.repositories.RoomRepository;
-import com.uva.monolith.services.users.models.User;
-import com.uva.monolith.services.users.repositories.UserRepository;
+import com.uva.monolith.services.users.models.Client;
+import com.uva.monolith.services.users.repositories.ClientRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,15 +16,14 @@ import java.util.List;
 @Service
 public class BookingService {
 
-    private final BookingRepository bookingRepository;
-    private final UserRepository userRepository;
-    private final RoomRepository roomRepository;
+    @Autowired
+    private BookingRepository bookingRepository;
 
-    public BookingService(BookingRepository bookingRepository, UserRepository userRepository, RoomRepository roomRepository) {
-        this.bookingRepository = bookingRepository;
-        this.userRepository = userRepository;
-        this.roomRepository = roomRepository;
-    }
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
 
     public List<Booking> getBookings(LocalDate start, LocalDate end, Integer roomId, Integer userId) {
         List<Booking> bookings = null;
@@ -56,7 +57,7 @@ public class BookingService {
     }
 
     public Booking createBooking(Booking booking) {
-        User user = userRepository.findById(booking.getUserId().getId())
+        Client user = clientRepository.findById(booking.getUserId().getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Room room = roomRepository.findById(booking.getRoomId().getId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));

@@ -3,9 +3,7 @@ package com.uva.authentication.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -41,10 +39,11 @@ public class UserAPI {
 
   public User getUserByEmail(String email) {
 
-    String token = getAccessToken();
-    HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", "Bearer " + token);
-    HttpEntity<Void> entity = new HttpEntity<>(headers);
+    // Implementación para acceder con autentificación
+    // String token = getAccessToken();
+    // HttpHeaders headers = new HttpHeaders();
+    // headers.set("Authorization", "Bearer " + token);
+    // HttpEntity<Void> entity = new HttpEntity<>(headers);
 
     String url = USER_API_URL + "?email={" + email + "}";
     try {

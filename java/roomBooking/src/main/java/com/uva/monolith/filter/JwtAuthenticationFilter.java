@@ -1,4 +1,4 @@
-package com.uva.monolith.services.auth;
+package com.uva.monolith.filter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

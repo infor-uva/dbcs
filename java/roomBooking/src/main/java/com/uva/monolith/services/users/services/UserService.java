@@ -9,9 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.uva.monolith.services.users.models.Client;
 import com.uva.monolith.services.users.models.User;
-import com.uva.monolith.services.users.models.UserRol;
 import com.uva.monolith.services.users.models.UserStatus;
+import com.uva.monolith.services.users.repositories.ClientRepository;
 import com.uva.monolith.services.users.repositories.UserRepository;
 
 @Service
@@ -20,11 +21,14 @@ public class UserService {
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private ClientRepository clientRepository;
+
   public List<User> getAllUsers() {
     return userRepository.findAll();
   }
 
-  private User assertUser(Optional<User> opUser) {
+  private User assertUser(Optional<? extends User> opUser) {
     return opUser.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
   }
 
@@ -37,13 +41,14 @@ public class UserService {
   }
 
   public User addUser(User user) {
-    // TODO Introducir medidas de seguridad?
-    // Establecemos valores por defecto
-    user.setStatus(UserStatus.NO_BOOKINGS);
-    if (user.getRol() == null) // Rol por defecto
-      user.setRol(UserRol.CONSUMER);
-    // Guardamos
-    return userRepository.save(user);
+    // Actualmente está en el servicio AUTH
+    // TODO adaptar adecuadamente
+    throw new HttpClientErrorException(HttpStatus.MOVED_PERMANENTLY, "servicio actual en http://localhost:8101/login");
+    // user.setStatus(UserStatus.NO_BOOKINGS);
+    // if (user.getRol() == null) // Rol por defecto
+    // user.setRol(UserRol.CONSUMER);
+    // // Guardamos
+    // return userRepository.save(user);
   }
 
   public User updateUserData(int id, String name, String email) {
@@ -55,7 +60,7 @@ public class UserService {
 
   public User updateUserStatus(int id, UserStatus status) {
 
-    User user = getUserById(id);
+    Client user = (Client) assertUser(clientRepository.findById(id));
 
     boolean activeBookings = user.getBookings().stream()
         .anyMatch(booking -> !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
@@ -63,7 +68,6 @@ public class UserService {
         .anyMatch(booking -> booking.getStartDate().isBefore(LocalDate.now())); // reserva < ahora
 
     switch (status) {
-      // TODO Buscar como validar las (in)active bookings
       case NO_BOOKINGS:
         if (!user.getBookings().isEmpty())
           throw new IllegalArgumentException("Invalid State: The user has at least one booking");
