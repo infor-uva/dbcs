@@ -5,6 +5,7 @@ import { HotelRegisterComponent } from './core/features/hotel/hotel-register/hot
 import { MainPageComponent } from './core/features/user/main-page/main-page.component';
 import { BookingListComponent } from './core/features/bookings/booking-list/booking-list.component';
 import { UserBookingListComponent } from './core/features/user/user-booking-list/user-booking-list.component';
+import { UserFormComponent} from './core/features/user/user-form/user-form.component';
 
 export const routes: Routes = [
   {
@@ -34,6 +35,10 @@ export const routes: Routes = [
   {
     path: 'hotels/:id',
     component: HotelRegisterComponent,
+  },
+  {
+    path: 'users/:id',
+    component: UserFormComponent,
   },
   {
     path: '**',
