@@ -28,39 +28,28 @@ public class AuthService {
   private JwtUtil jwtUtil;
 
   @Autowired
-  private UserAPI userAPI;
-
-  @Autowired
   private HotelManagerRepository hotelManagerRepository;
 
   @Autowired
   private ClientRepository clientRepository;
 
   @Autowired
+  private UserAPI userAPI;
+
+  @Autowired
   private UserRepository userRepository;
 
-  private String hashPass(String password) {
-    // return String.valueOf(Objects.hashCode(password));
-    String hash = SecurityUtils.encrypt(password);
-    System.out.println(password + " --> " + hash);
-    return hash;
-  }
-
   private boolean authenticateUser(LoginRequest request, User user) {
-    System.err.println(user);
     if (user == null)
       return false;
-    String hashPass = hashPass(request.getPassword());
-    System.err.println("PASSWORD: " + request.getPassword() + "\n" + hashPass + "\n" +
-        user.getPassword());
-    // return hashPass.equals(user.getPassword());
     return SecurityUtils.checkPassword(request.getPassword(), user.getPassword());
   }
 
   public String login(LoginRequest loginRequest) {
     // User user = userAPI.getUserByEmail(loginRequest.getEmail());
     User user = userRepository.findByEmail(loginRequest.getEmail())
-        .orElseThrow(() -> new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials"));
+        .orElseThrow(() -> new HttpClientErrorException(HttpStatus.FORBIDDEN,
+            "Invalid credentials"));
     boolean isAuthenticated = authenticateUser(loginRequest, user);
 
     if (!isAuthenticated) {
@@ -75,29 +64,30 @@ public class AuthService {
 
   public User register(RegisterRequest registerRequest) {
     // User user = userAPI.getUserByEmail(registerRequest.getEmail());
-    Optional<User> user = userRepository.findByEmail(null);
+    Optional<User> user = userRepository.findByEmail(registerRequest.getEmail());
     if (user.isPresent())
       throw new HttpClientErrorException(HttpStatus.CONFLICT, "Email already in use");
 
-    String hashPass = hashPass(registerRequest.getPassword());
+    String hashPass = SecurityUtils.encrypt(registerRequest.getPassword());
     // return userAPI.registerUser(registerRequest);
     User newUser;
     if (registerRequest.getRol() == UserRol.HOTEL_ADMIN) {
       HotelManager hm = new HotelManager();
-      hm.setName(registerRequest.getName());
-      hm.setEmail(registerRequest.getEmail());
-      hm.setRol(registerRequest.getRol());
+      // hm.setName(registerRequest.getName());
+      // hm.setEmail(registerRequest.getEmail());
+      // hm.setRol(registerRequest.getRol());
+      BeanUtils.copyProperties(registerRequest, hm);
       hm.setPassword(hashPass);
       newUser = hotelManagerRepository.save(hm);
     } else {
       Client client = new Client();
-      client.setName(registerRequest.getName());
-      client.setEmail(registerRequest.getEmail());
+      // client.setName(registerRequest.getName());
+      // client.setEmail(registerRequest.getEmail());
+      BeanUtils.copyProperties(registerRequest, client);
       client.setRol(UserRol.CLIENT);
       client.setPassword(hashPass);
       newUser = clientRepository.save(client);
     }
-    System.out.println("<--\n" + hashPass + "\n" + newUser.getPassword() + "\n-->");
     return newUser;
   }
 

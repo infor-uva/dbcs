@@ -2,7 +2,6 @@ package com.uva.monolith.services.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,23 +23,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/users").access((authentication, context) -> {
-                            String method = context.getRequest().getMethod();
-                            String email = context.getRequest().getParameter("email");
-                            // Permitir POST a /users solo al rol ADMIN
-                            boolean register = method.equals("POST") && authentication.get().getAuthorities().stream()
-                                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-                            // Permitir GET a /users con parámetro email solo al rol ADMIN
-                            boolean access = method.equals("GET") && email != null && !email.isEmpty() &&
-                                    authentication.get().getAuthorities().stream()
-                                            .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-                            return new AuthorizationDecision(register || access);
-                        })
-                        .requestMatchers("/users/**").hasRole(UserRol.CLIENT.toString())
-                        .requestMatchers("/hotels/**", "/booking/**").permitAll() //
-                // .requestMatchers("/users/**", "/hotels/**", "/booking/**").authenticated() //
-                // Protegidas
-                )
+                        // Permitir todas las conexiones
+                        .requestMatchers("").permitAll()
+                        // Acceso restringido a usuarios y administradores
+                        .requestMatchers("users", "users/**")
+                        .hasAnyRole(UserRol.ADMIN.toString(), UserRol.CLIENT.toString())
+                        // Acceso restringido a gestores de hoteles y administradores
+                        .requestMatchers("hotels", "hotels/**")
+                        .hasAnyRole(UserRol.ADMIN.toString(), UserRol.HOTEL_ADMIN.toString())
+                        // Acceso restringido a cualquier usuario del sistema
+                        .requestMatchers("bookings", "bookings/**")
+                        .hasAnyRole(UserRol.ADMIN.toString(), UserRol.HOTEL_ADMIN.toString(), UserRol.CLIENT.toString())
+                        // Rechazar el resto
+                        .anyRequest().denyAll())
                 // Registra el filtro antes del filtro estándar de autenticación
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -1,3 +1,4 @@
+// TODO eliminar si realmente no necesitamos comunicar un servicio con otro
 package com.uva.authentication.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,8 @@ public class UserAPI {
 
     String url = USER_API_URL + "?email={" + email + "}";
     try {
-      ResponseEntity<User> userResponse = // restTemplate.getForEntity(url, User.class, email, headers);
-          restTemplate.exchange(url, HttpMethod.GET, entity, User.class);
+      ResponseEntity<User> userResponse = restTemplate.getForEntity(url, User.class, email);
+      // restTemplate.exchange(url, HttpMethod.GET, entity, User.class);
       return userResponse.getBody();
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() != HttpStatus.NOT_FOUND)

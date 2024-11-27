@@ -29,7 +29,6 @@ public class UserService {
         return passwordEncoder.encode(password);
     }
 
-     @GetMapping("/users")
     public User findByEmail(@RequestParam String email) {
         return userRepository.findByEmail(email)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
