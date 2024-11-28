@@ -1,64 +1,56 @@
 package com.uva.monolith.services.users.models;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.uva.monolith.services.bookings.models.Booking;
 
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "users")
 public class User {
-  // TODO extraer a dos clases hijas, una por cada tipo
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Basic(optional = false)
+  @Column(nullable = false)
   private int id;
 
   @Basic(optional = false)
+  @Column(nullable = false)
   private String name;
 
   @Basic(optional = false)
+  @Column(nullable = false, unique = true)
   private String email;
 
+  @JsonIgnore
   @Basic(optional = false)
+  @Column(nullable = false)
   private String password;
 
   @Basic(optional = false)
+  @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private UserRol rol = UserRol.CONSUMER;
-
-  @Basic(optional = false)
-  @Enumerated(EnumType.STRING)
-  private UserStatus status;
-
-  @JsonIgnore
-  @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  private List<Booking> bookings;
+  private UserRol rol = UserRol.CLIENT;
 
   public User() {
   }
 
-  public User(int id, String name, String email, String password, UserRol rol, UserStatus status,
-      List<Booking> bookings) {
+  public User(int id, String name, String email, String password, UserRol rol) {
     setId(id);
     setName(name);
     setEmail(email);
     setRol(rol);
-    setStatus(status);
-    setBookings(bookings);
   }
 
   public int getId() {
@@ -89,8 +81,8 @@ public class User {
     return password;
   }
 
-  public void setPassword(String password) {
-    this.password = password;
+  public void setPassword(String rawPassword) {
+    this.password = rawPassword;
   }
 
   public UserRol getRol() {
@@ -99,25 +91,5 @@ public class User {
 
   public void setRol(UserRol rol) {
     this.rol = rol;
-  }
-
-  public UserStatus getStatus() {
-    if (getBookings() == null || getBookings().isEmpty())
-      return UserStatus.NO_BOOKINGS;
-    boolean activeBookings = getBookings().stream()
-        .anyMatch(booking -> !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
-    return activeBookings ? UserStatus.WITH_ACTIVE_BOOKINGS : UserStatus.WITH_INACTIVE_BOOKINGS;
-  }
-
-  public void setStatus(UserStatus status) {
-    this.status = status;
-  }
-
-  public List<Booking> getBookings() {
-    return this.bookings;
-  }
-
-  public void setBookings(List<Booking> bookings) {
-    this.bookings = bookings;
   }
 }

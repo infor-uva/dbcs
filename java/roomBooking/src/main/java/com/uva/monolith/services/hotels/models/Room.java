@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uva.monolith.services.bookings.models.Booking;
-import com.uva.monolith.services.users.models.Tipo;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
@@ -36,7 +35,7 @@ public class Room {
     @Column(name = "room_number", nullable = false)
     private String roomNumber;
     @Column(name = "type", nullable = false)
-    private Tipo type;
+    private RoomType type;
     @Column(name = "available", nullable = false)
     private boolean available;
     @JsonIgnore
@@ -46,7 +45,7 @@ public class Room {
     public Room() {
     }
 
-    public Room(int id, Hotel hotelId, String roomNumber, Tipo type, boolean available, List<Booking> bookings) {
+    public Room(int id, Hotel hotelId, String roomNumber, RoomType type, boolean available, List<Booking> bookings) {
         this.id = id;
         this.hotel = hotelId;
         this.roomNumber = roomNumber;
@@ -79,11 +78,11 @@ public class Room {
         return this.roomNumber;
     }
 
-    public void setType(Tipo type) {
+    public void setType(RoomType type) {
         this.type = type;
     }
 
-    public Tipo getType() {
+    public RoomType getType() {
         return this.type;
     }
 

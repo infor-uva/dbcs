@@ -1,17 +1,24 @@
 package com.uva.authentication.services;
 
-import java.util.Objects;
+import java.util.Optional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.uva.authentication.api.UserAPI;
-import com.uva.authentication.jwt.JwtUtil;
+import com.uva.authentication.models.Client;
+import com.uva.authentication.models.HotelManager;
 import com.uva.authentication.models.LoginRequest;
 import com.uva.authentication.models.RegisterRequest;
 import com.uva.authentication.models.User;
+import com.uva.authentication.models.UserRol;
+import com.uva.authentication.repositories.ClientRepository;
+import com.uva.authentication.repositories.HotelManagerRepository;
+import com.uva.authentication.repositories.UserRepository;
+import com.uva.authentication.utils.JwtUtil;
+import com.uva.authentication.utils.SecurityUtils;
 
 @Service
 public class AuthService {
@@ -20,44 +27,72 @@ public class AuthService {
   private JwtUtil jwtUtil;
 
   @Autowired
-  private UserAPI userAPI;
+  private HotelManagerRepository hotelManagerRepository;
 
-  private String hashPass(String password) {
-    return String.valueOf(Objects.hashCode(password));
-  }
+  @Autowired
+  private ClientRepository clientRepository;
+
+  @Autowired
+  private UserRepository userRepository;
 
   private boolean authenticateUser(LoginRequest request, User user) {
-    System.err.println(user);
     if (user == null)
       return false;
-    String hashPass = hashPass(request.getPassword());
-    System.err.println(request.getPassword() + " -> " + hashPass + " == " +
-        user.getPassword());
-    return hashPass.equals(user.getPassword());
+    return SecurityUtils.checkPassword(request.getPassword(), user.getPassword());
   }
 
   public String login(LoginRequest loginRequest) {
-    User user = userAPI.getUserByEmail(loginRequest.getEmail());
-    boolean isAuthenticated = authenticateUser(loginRequest, user);
+    User user = userRepository.findByEmail(loginRequest.getEmail())
+        .orElseThrow(() -> new HttpClientErrorException(HttpStatus.FORBIDDEN,
+            "Invalid credentials"));
 
-    if (!isAuthenticated) {
+    if (!authenticateUser(loginRequest, user)) {
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials");
     }
 
-    // Generate a mock JWT token for simplicity
-    String jwtToken = "Bearer " + jwtUtil.generateToken(user);
-    return jwtToken;
-
+    return jwtUtil.generateToken(user);
   }
 
   public User register(RegisterRequest registerRequest) {
-    User user = userAPI.getUserByEmail(registerRequest.getEmail());
-    if (user != null)
+    Optional<User> user = userRepository.findByEmail(registerRequest.getEmail());
+    if (user.isPresent())
       throw new HttpClientErrorException(HttpStatus.CONFLICT, "Email already in use");
 
-    String hashPass = hashPass(registerRequest.getPassword());
-    registerRequest.setPassword(hashPass);
-    return userAPI.registerUser(registerRequest);
+    return registerNewUser(registerRequest);
   }
 
+  private User registerNewUser(RegisterRequest registerRequest) {
+    User newUser;
+
+    // Ciframos la contraseña
+    String hashPass = SecurityUtils.encrypt(registerRequest.getPassword());
+    registerRequest.setPassword(hashPass);
+
+    // Aseguramos que tenga un rol, por defecto es cliente
+    if (registerRequest.getRol() == null)
+      registerRequest.setRol(UserRol.CLIENT);
+
+    switch (registerRequest.getRol()) {
+      case HOTEL_ADMIN:
+        HotelManager hm = new HotelManager();
+        BeanUtils.copyProperties(registerRequest, hm);
+        newUser = hotelManagerRepository.save(hm);
+        break;
+
+      case ADMIN: // TODO revisar
+        User admin = new User();
+        BeanUtils.copyProperties(registerRequest, admin);
+        newUser = userRepository.save(admin);
+        break;
+
+      case CLIENT: // Por defecto cliente normal
+      default:
+        Client client = new Client();
+        BeanUtils.copyProperties(registerRequest, client);
+        client.setRol(UserRol.CLIENT);
+        newUser = clientRepository.save(client);
+        break;
+    }
+    return newUser;
+  }
 }

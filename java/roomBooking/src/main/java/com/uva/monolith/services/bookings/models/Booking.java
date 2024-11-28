@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 
 import com.uva.monolith.services.hotels.models.Room;
-import com.uva.monolith.services.users.models.User;
+import com.uva.monolith.services.users.models.Client;
 
 @Entity
 @Table(name = "bookings")
@@ -25,7 +25,7 @@ public class Booking {
     private int id;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    private User userId;
+    private Client userId;
     @JoinColumn(name = "room_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private Room roomId;
@@ -37,7 +37,7 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(int id, User userId, Room roomID, LocalDate startDate, LocalDate endDate) {
+    public Booking(int id, Client userId, Room roomID, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.userId = userId;
         this.roomId = roomID;
@@ -53,11 +53,11 @@ public class Booking {
         return this.id;
     }
 
-    public void setUserId(User userId) {
+    public void setUserId(Client userId) {
         this.userId = userId;
     }
 
-    public User getUserId() {
+    public Client getUserId() {
         return this.userId;
     }
 

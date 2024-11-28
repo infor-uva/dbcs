@@ -1,4 +1,4 @@
-package com.uva.authentication.jwt;
+package com.uva.authentication.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -41,8 +41,8 @@ public class JwtUtil {
 
   public String generateToken(User user) {
     Map<String, Object> extraClaims = new HashMap<>();
-    // extraClaims.put("role", user.getRole());
     extraClaims.put("email", user.getEmail());
+    extraClaims.put("rol", user.getRol());
     extraClaims.put("user", user);
     long expiration = jwtExpiration;
 
@@ -80,8 +80,6 @@ public class JwtUtil {
 
   private Key getSignInKey() {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-    // byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8); // for secret
-    // key
     return Keys.hmacShaKeyFor(keyBytes);
   }
 }
