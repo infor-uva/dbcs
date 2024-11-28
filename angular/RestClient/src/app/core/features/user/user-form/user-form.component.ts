@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { UserClientService } from '../../../../shared/user-client.service';
 
 @Component({
+  standalone: true,
   selector: 'app-user-form',
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.css'],
+  imports: [ReactiveFormsModule, FormsModule],
 })
 export class UserFormComponent implements OnInit {
   userForm!: FormGroup;
@@ -15,7 +17,7 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
-    this.loadUserData();
+    // this.loadUserData();
   }
 
   private initializeForm(): void {
