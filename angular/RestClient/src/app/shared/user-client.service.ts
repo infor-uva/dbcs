@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { User, UserState } from '../../types';
+import { Client, User, UserState } from '../../types';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +18,7 @@ export class UserClientService {
 
   // Obtener todos los usuarios
   getAllUsers() {
-    return this.http.get<User[]>(this.URI, {
+    return this.http.get<Client[]>(this.URI, {
       observe: 'body',
     });
   }

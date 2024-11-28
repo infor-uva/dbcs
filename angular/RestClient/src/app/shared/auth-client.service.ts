@@ -13,17 +13,17 @@ export class AuthClientService {
   login(email: String, password: String) {
     return this.http.post(
       `${this.URI}/login`,
-      { email, password },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods':
-            'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-          'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-          'Access-Control-Allow-Credentials': 'true',
-        },
-      }
+      { email, password }
+      // {
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Access-Control-Allow-Origin': '*',
+      //     'Access-Control-Allow-Methods':
+      //       'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+      //     'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
+      //     'Access-Control-Allow-Credentials': 'true',
+      //   },
+      // }
     );
   }
 

@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { User, UserStateFilter } from '../../../../../types';
+import { Client, User, UserStateFilter } from '../../../../../types';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { UserClientService } from '../../../../shared/user-client.service';
-import mockUsers from '../../../../../mocks/users.json'; // Renombrado para claridad
+import { users } from '../../../../../mocks/users'; // Renombrado para claridad
 
 @Component({
   standalone: true,
@@ -14,21 +14,22 @@ import mockUsers from '../../../../../mocks/users.json'; // Renombrado para clar
   styleUrls: ['./main-page.component.css'],
 })
 export class MainPageComponent implements OnInit {
-  users: User[] = [];
-  filteredUsers: User[] = [];
+  users: Client[] = [];
+  filteredUsers: Client[] = [];
   selectedStatus: UserStateFilter = 'All';
 
   constructor(private userClient: UserClientService) {}
 
   ngOnInit(): void {
     // Validar que el mock sea del tipo correcto
-    const isValidMock = Array.isArray(mockUsers) && mockUsers.every(user => 'id' in user && 'name' in user && 'status' in user);
-    this.users = isValidMock ? (mockUsers as User[]) : [];
+    // const isValidMock = Array.isArray(mockUsers) && mockUsers.every(user => 'id' in user && 'name' in user && 'status' in user);
+    // this.users = isValidMock ? (mockUsers as User[]) : [];
+    this.users = users;
     this.filteredUsers = [...this.users];
 
     // Sobrescribir con datos reales si están disponibles
     this.userClient.getAllUsers().subscribe({
-      next: (data: User[]) => {
+      next: (data: Client[]) => {
         this.users = data;
         this.filteredUsers = [...data];
       },
@@ -46,7 +47,7 @@ export class MainPageComponent implements OnInit {
     }
   }
 
-  getState(user: User): string {
+  getState(user: Client): string {
     switch (user.status) {
       case 'NO_BOOKINGS':
         return 'SIN RESERVAS';

@@ -9,6 +9,7 @@ import com.uva.authentication.models.*;
 import com.uva.authentication.services.AuthService;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     @Autowired
