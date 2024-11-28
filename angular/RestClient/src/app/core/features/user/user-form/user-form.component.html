@@ -1,0 +1,75 @@
+<div class="form-container">
+  <h2>Perfil de Usuario</h2>
+  <form [formGroup]="userForm" (ngSubmit)="saveChanges()">
+    <!-- Campo Nombre -->
+    <div class="form-group">
+      <label for="name">Nombre:</label>
+      <input
+        id="name"
+        type="text"
+        class="form-control"
+        formControlName="name"
+        [readonly]="!isEditing"
+      />
+    </div>
+
+    <!-- Campo Email -->
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input
+        id="email"
+        type="email"
+        class="form-control"
+        formControlName="email"
+        [readonly]="!isEditing"
+      />
+    </div>
+
+    @if (isEditing) {
+    <!-- Campo Contraseña Actual (solo en edición) -->
+    <div class="form-group">
+      <label for="currentPassword">Contraseña actual:</label>
+      <input
+        id="currentPassword"
+        type="password"
+        class="form-control"
+        formControlName="currentPassword"
+        placeholder="Introduce tu contraseña actual"
+      />
+    </div>
+
+    <!-- Campo Nueva Contraseña (solo en edición) -->
+    <div class="form-group">
+      <label for="newPassword">Nueva contraseña:</label>
+      <input
+        id="newPassword"
+        type="password"
+        class="form-control"
+        formControlName="newPassword"
+        placeholder="Introduce tu nueva contraseña"
+      />
+    </div>
+    }
+
+    <!-- Grupo de Botones -->
+    <div class="button-group">
+      @if (!isEditing) {
+      <button type="button" class="btn btn-primary" (click)="toggleEdit()">
+        Editar
+      </button>
+      } @else {
+      <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-success"
+        [disabled]="!userForm.valid"
+      >
+        Guardar
+      </button>
+      }
+    </div>
+  </form>
+</div>

@@ -3,7 +3,8 @@ taller
 *.pdf
 **/target/
 **/.vscode
-*.ln
-*.tmp
 **/tmp
+**/*.tmp
+*.ln
 *.log
+
