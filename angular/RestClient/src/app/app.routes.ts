@@ -7,6 +7,9 @@ import { BookingListComponent } from './core/features/bookings/booking-list/book
 import { UserBookingListComponent } from './core/features/user/user-booking-list/user-booking-list.component';
 import { UserFormComponent } from './core/features/user/user-form/user-form.component';
 
+import { LoginComponent } from './core/features/auth/login/login.component';
+import { UserFormComponent } from './core/features/user/user-form/user-form.component';
+
 export const routes: Routes = [
   {
     path: '', // Ruta principal
@@ -15,6 +18,7 @@ export const routes: Routes = [
   // auth
   {
     path: 'login',
+    component: LoginComponent,
   },
   {
     path: 'register',
