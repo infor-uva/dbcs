@@ -5,47 +5,55 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "users")
 public class User {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Basic(optional = false)
+  @Column(nullable = false)
   private int id;
 
   @Basic(optional = false)
+  @Column(nullable = false)
   private String name;
 
   @Basic(optional = false)
+  @Column(nullable = false, unique = true)
   private String email;
 
+  @JsonIgnore
   @Basic(optional = false)
-  @Enumerated(EnumType.STRING)
-  private UserStatus status = UserStatus.NO_BOOKINGS;
-
+  @Column(nullable = false)
   private String password;
 
-
+  @Basic(optional = false)
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private UserRol rol = UserRol.CLIENT;
 
   public User() {
   }
 
-  public User(int id, String name, String email, UserStatus status, String password) {
+  public User(int id, String name, String email, String password, UserRol rol) {
     setId(id);
+    setName(name);
     setEmail(email);
-    setStatus(status);
     setPassword(password);
+    setRol(rol);
   }
 
   public int getId() {
@@ -70,14 +78,6 @@ public class User {
 
   public void setEmail(String email) {
     this.email = email;
-  }
-
-  public UserStatus getStatus() {
-    return this.status;
-  }
-
-  public void setStatus(UserStatus status) {
-    this.status = status;
   }
 
   public String getPassword() {
