@@ -34,9 +34,6 @@ public class User {
   @Enumerated(EnumType.STRING)
   private UserStatus status = UserStatus.NO_BOOKINGS;
 
-  @Basic(optional = false)
-  private String password;
-
   @JsonIgnore
   @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private List<Booking> bookings;
@@ -44,12 +41,11 @@ public class User {
   public User() {
   }
 
-  public User(int id, String name, String email, UserStatus status, List<Booking> bookings, String password) {
+  public User(int id, String name, String email, UserStatus status, List<Booking> bookings) {
     setId(id);
     setEmail(email);
     setStatus(status);
     setBookings(bookings);
-    setPassword(password);
   }
 
   public int getId() {
@@ -90,13 +86,5 @@ public class User {
 
   public void setBookings(List<Booking> bookings) {
     this.bookings = bookings;
-  }
-
-  public String getPassword() {
-    return this.password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
   }
 }
