@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { Booking, User } from '../../../../../types';
+import { Booking, User } from '../../../../types';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -44,7 +44,7 @@ export class UserBookingListComponent {
   }
 
   updateBookings() {
-    this.bookingClient.getUserBookings(this.userId).subscribe({
+    this.bookingClient.getBookingsByUser(this.userId).subscribe({
       next: (bookings) => {
         this.search = true;
         switch (this.selectedState) {
@@ -88,7 +88,7 @@ export class UserBookingListComponent {
   }
 
   updateUserStatus() {
-    this.bookingClient.getUserBookings(this.userId).subscribe({
+    this.bookingClient.getBookingsByUser(this.userId).subscribe({
       next: (bookings) => {
         const withActive = bookings.find(
           (booking) => this.genBookingState(booking) === 'Reserva activa'

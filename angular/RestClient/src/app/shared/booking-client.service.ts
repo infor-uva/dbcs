@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { Booking } from '../../types/Booking'; // Ajusta la ruta a tu modelo Booking
+import { environment } from '../../../environments/environment';
+import { Booking } from '../types/Booking'; // Ajusta la ruta a tu modelo Booking
 
 @Injectable({
   providedIn: 'root',
@@ -31,9 +31,8 @@ export class BookingClientService {
     return this.http.get<Booking>(`${this.URI}/${id}`);
   }
 
-  getUserBookings(userId: number) {
-    // TODO revisar tras división en microservicios
-    return this.http.get<Booking[]>(`${this.URI}/${userId}/bookings`);
+  getBookingsByUser(userId: number) {
+    return this.http.get<Booking[]>(`${this.URI}?userId=${userId}`);
   }
 
   // Método para eliminar una reserva

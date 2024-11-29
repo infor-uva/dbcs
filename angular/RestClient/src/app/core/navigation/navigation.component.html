@@ -1,12 +1,72 @@
 <nav>
-  <ul>
-    <li><a class="btn" [routerLink]="['/']">Home - Usuarios</a></li>
+  <ul class="nav">
+    <li><a class="btn nav-link" [routerLink]="['/']">Home - Usuarios</a></li>
     <li>
-      <a class="btn" [routerLink]="['/hotels', 'new']">Registrar Hotel</a>
+      <a class="btn nav-link" [routerLink]="['/hotels', 'new']"
+        >Registrar Hotel</a
+      >
     </li>
-    <li><a class="btn" [routerLink]="['/hotels']">Hoteles</a></li>
+    <li><a class="btn nav-link" [routerLink]="['/hotels']">Hoteles</a></li>
     <li>
-      <a class="btn" [routerLink]="['/bookings', 'search']">Nueva Reserva</a>
+      <a class="btn nav-link" [routerLink]="['/bookings', 'search']"
+        >Nueva Reserva</a
+      >
+    </li>
+    <!-- Solucionar que no va -->
+    <!-- <li class="ml-auto"> -->
+    <li style="margin-left: auto">
+      @if (isLogged){
+      <!-- Dropdown para usuario registrado -->
+
+      <div class="btn bg-blue-500 text-white rounded hover:bg-blue-600">
+        <!-- mat-icon-button -->
+        <button
+          [matMenuTriggerFor]="sessionOptions"
+          class="flex items-center gap-3"
+        >
+          <span class="text-4xl">{{ user.name }}</span>
+
+          @if (trigger?.menuOpen) {
+          <mat-icon class="text-4xl">arrow_drop_up</mat-icon>
+          }@else {
+          <mat-icon class="text-4xl">arrow_drop_down</mat-icon>
+          }
+        </button>
+      </div>
+      <mat-menu #sessionOptions="matMenu" xPosition="before">
+        @for (section of sections; track section.id) { @if (section.link) {
+        <a [routerLink]="section.link" class="simple">
+          <button mat-menu-item>
+            <mat-icon>{{ section.icon }}</mat-icon>
+            <span class="text-2xl">{{ section.text }}</span>
+          </button>
+        </a>
+        } @else {
+        <button mat-menu-item>
+          <mat-icon>{{ section.icon }}</mat-icon>
+          <span class="text-2xl">{{ section.text }}</span>
+        </button>
+        } }
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span class="text-2xl">Cerrar sesión</span>
+        </button>
+      </mat-menu>
+
+      } @else {
+      <div
+        class="btn bg-blue-500 text-white hover:bg-blue-600 ml-auto"
+        (click)="login()"
+      >
+        <!-- <a class="simple" [routerLink]="['/login']"> -->
+        <a class="simple">
+          <button class="flex items-center gap-3">
+            <span class="text-4xl">Login</span>
+            <mat-icon>login</mat-icon>
+          </button>
+        </a>
+      </div>
+      }
     </li>
   </ul>
 </nav>

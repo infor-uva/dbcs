@@ -7,7 +7,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { Hotel, Room, RoomType, roomTypeArray } from '../../../../../types';
+import { Hotel, Room, RoomType, roomTypeArray } from '../../../../types';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
