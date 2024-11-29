@@ -16,10 +16,10 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             String token = authService.login(loginRequest);
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(new JwtAuthResponse(token));
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
                 return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
         try {
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setEmail(registerRequest.getEmail());

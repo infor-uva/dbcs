@@ -8,12 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.uva.authentication.models.Client;
-import com.uva.authentication.models.HotelManager;
 import com.uva.authentication.models.LoginRequest;
 import com.uva.authentication.models.RegisterRequest;
-import com.uva.authentication.models.User;
-import com.uva.authentication.models.UserRol;
+import com.uva.authentication.models.remote.Client;
+import com.uva.authentication.models.remote.HotelManager;
+import com.uva.authentication.models.remote.User;
+import com.uva.authentication.models.remote.UserRol;
 import com.uva.authentication.repositories.ClientRepository;
 import com.uva.authentication.repositories.HotelManagerRepository;
 import com.uva.authentication.repositories.UserRepository;

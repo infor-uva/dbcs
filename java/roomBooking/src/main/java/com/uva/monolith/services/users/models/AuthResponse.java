@@ -1,6 +1,4 @@
-package com.uva.authentication.models;
-
-import com.uva.authentication.models.remote.UserRol;
+package com.uva.monolith.services.users.models;
 
 public class AuthResponse {
 

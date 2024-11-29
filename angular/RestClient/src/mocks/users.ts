@@ -1,4 +1,4 @@
-import { Client, User } from '../types';
+import { Client, User } from '../app/types';
 
 export const users: Client[] = [
   {

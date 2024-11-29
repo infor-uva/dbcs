@@ -15,7 +15,7 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.uva.authentication.models.User;
+import com.uva.authentication.models.remote.User;
 
 @Component
 public class JwtUtil {

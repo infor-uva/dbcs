@@ -13,7 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CommonModule } from '@angular/common';
-import { Address, Hotel, Room } from '../../../../../types';
+import { Address, Hotel, Room } from '../../../../types';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotelClientService } from '../../../../shared/hotel-client.service';
 

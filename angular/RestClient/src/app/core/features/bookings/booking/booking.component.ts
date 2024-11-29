@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { Booking, User } from '../../../../../types';
+import { Booking, User } from '../../../../types';
 import { LocalStorageService } from '../../../../shared/local-storage.service';
 import { BookingClientService } from '../../../../shared/booking-client.service';
 import { UserClientService } from '../../../../shared/user-client.service';

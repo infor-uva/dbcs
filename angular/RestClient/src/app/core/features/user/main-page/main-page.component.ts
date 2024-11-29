@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Client, User, UserStateFilter } from '../../../../../types';
+import { Client, User, UserStateFilter } from '../../../../types';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';

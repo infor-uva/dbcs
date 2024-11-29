@@ -10,40 +10,109 @@ import { UserFormComponent } from './core/features/user/user-form/user-form.comp
 export const routes: Routes = [
   {
     path: '', // Ruta principal
-    component: MainPageComponent, // Componente de la página principal
+    component: MainPageComponent,
   },
+  // auth
   {
-    path: 'bookings/search',
-    component: BookingListComponent,
-  },
-  {
-    path: 'bookings/new',
-    component: BookingComponent,
-  },
-  {
-    path: 'users/:id/bookings',
-    component: UserBookingListComponent,
-  },
-  {
-    path: 'hotels',
-    component: HotelListComponent,
-  },
-  {
-    path: 'hotels/new',
-    component: HotelRegisterComponent,
-  },
-  {
-    path: 'hotels/:id',
-    component: HotelRegisterComponent,
-  },
-  {
-    path: 'users/:id',
-    component: UserFormComponent,
+    path: 'login',
   },
   {
     path: 'register',
-    component: UserFormComponent,
   },
+  // Hoteles
+  {
+    path: 'hotels', // Ruta para la lista de hoteles
+  },
+  {
+    path: 'hotels/register', // Registrar nuevo hotel
+  },
+  {
+    path: 'hotels/:id', // Hotel concreto
+  },
+  {
+    path: 'hotels/:id/edit', // Modificar hotel
+  },
+  // Usuario
+  {
+    path: 'me', // Main
+  },
+  {
+    path: 'me/edit', // Main
+  },
+  // Usuario HOTEL admin
+  {
+    path: 'me/hotels',
+  },
+  {
+    path: 'me/hotels/:id',
+  },
+  {
+    path: 'me/hotels/:id/bookings',
+  },
+  {
+    path: 'me/hotels/:id/rooms',
+  },
+  {
+    path: 'me/hotels/:id/rooms/:id',
+  },
+  {
+    path: 'me/hotels/:id/rooms/:id/bookings',
+  },
+  // Usuario Cliente
+  {
+    path: 'me/bookings',
+  },
+  {
+    path: 'me/bookings/:id',
+  },
+  {
+    path: 'me/bookings/new',
+  },
+  // Administrador
+  {
+    path: 'admin', // Main
+  },
+  {
+    path: 'admin/users', // Main
+  },
+  {
+    path: 'admin/users/:id', // Main
+  },
+
+  // ! OTRO // NO MIRAR
+
+  // {
+  //   path: 'bookings/search',
+  //   component: BookingListComponent,
+  // },
+  // {
+  //   path: 'bookings/new',
+  //   component: BookingComponent,
+  // },
+  // {
+  //   path: 'users/:id/bookings',
+  //   component: UserBookingListComponent,
+  // },
+  // {
+  //   path: 'hotels',
+  //   component: HotelListComponent,
+  // },
+  // {
+  //   path: 'hotels/new',
+  //   component: HotelRegisterComponent,
+  // },
+  // {
+  //   path: 'hotels/:id',
+  //   component: HotelRegisterComponent,
+  // },
+  // {
+  //   path: 'users/:id',
+  //   component: UserFormComponent,
+  // },
+  // {
+  //   path: 'register',
+  //   component: UserFormComponent,
+  // },
   {
     path: '**',
     redirectTo: '',

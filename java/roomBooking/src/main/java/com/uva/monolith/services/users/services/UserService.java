@@ -4,11 +4,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.uva.monolith.services.users.models.AuthResponse;
 import com.uva.monolith.services.users.models.Client;
 import com.uva.monolith.services.users.models.User;
 import com.uva.monolith.services.users.models.UserStatus;
@@ -36,8 +38,12 @@ public class UserService {
     return assertUser(userRepository.findById(id));
   }
 
-  public User getUserByEmail(String email) {
-    return assertUser(userRepository.findByEmail(email));
+  public AuthResponse getUserByEmail(String email) {
+    User u = assertUser(userRepository.findByEmail(email));
+    AuthResponse auth = new AuthResponse();
+    BeanUtils.copyProperties(u, auth);
+    auth.setUsername(u.getName());
+    return auth;
   }
 
   public User addUser(User user) {

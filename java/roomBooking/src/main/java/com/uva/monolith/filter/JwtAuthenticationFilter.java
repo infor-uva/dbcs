@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.Filter;
 import java.io.IOException;
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 
@@ -63,15 +64,15 @@ public class JwtAuthenticationFilter implements Filter {
             // Verifica que el token no esté expirado
             return claims.getExpiration().after(new Date());
         } catch (ExpiredJwtException e) {
-            System.out.println("Token expirado: " + e.getMessage());
+            System.out.println("[" + LocalDateTime.now().toString() + "] Token expirado: " + e.getMessage());
         } catch (UnsupportedJwtException e) {
-            System.out.println("Token no soportado: " + e.getMessage());
+            System.out.println("[" + LocalDateTime.now().toString() + "] Token no soportado: " + e.getMessage());
         } catch (MalformedJwtException e) {
-            System.out.println("Token malformado: " + e.getMessage());
+            System.out.println("[" + LocalDateTime.now().toString() + "] Token malformado: " + e.getMessage());
         } catch (SignatureException e) {
-            System.out.println("Firma inválida: " + e.getMessage());
+            System.out.println("[" + LocalDateTime.now().toString() + "] Firma inválida: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            System.out.println("Token vacío o nulo: " + e.getMessage());
+            System.out.println("[" + LocalDateTime.now().toString() + "] Token vacío o nulo: " + e.getMessage());
         }
         return false; // Si ocurre cualquier excepción, el token es inválido
 
@@ -95,6 +96,8 @@ public class JwtAuthenticationFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String token = getTokenFromRequest(httpRequest);
+
+        System.out.println("[" + LocalDateTime.now().toString() + "] TOKEN " + token);
 
         if (validateToken(token)) {
 

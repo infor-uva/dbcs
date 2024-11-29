@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { Booking, User } from '../../../../../types';
+import { Booking, User } from '../../../../types';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

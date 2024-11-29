@@ -11,8 +11,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.uva.authentication.models.RegisterRequest;
-import com.uva.authentication.models.User;
-import com.uva.authentication.models.UserRol;
+import com.uva.authentication.models.remote.User;
+import com.uva.authentication.models.remote.UserRol;
 import com.uva.authentication.utils.JwtUtil;
 
 @Component

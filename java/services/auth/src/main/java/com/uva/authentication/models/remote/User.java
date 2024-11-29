@@ -1,4 +1,4 @@
-package com.uva.authentication.models;
+package com.uva.authentication.models.remote;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

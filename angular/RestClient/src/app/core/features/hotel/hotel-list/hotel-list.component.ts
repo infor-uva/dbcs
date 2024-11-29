@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
-import { Hotel } from '../../../../../types';
+import { Hotel } from '../../../../types';
 import {
   MatAccordion,
   MatExpansionPanel,

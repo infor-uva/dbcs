@@ -1,5 +1,7 @@
 package com.uva.authentication.models;
 
+import com.uva.authentication.models.remote.UserRol;
+
 public class RegisterRequest extends LoginRequest {
   private UserRol rol;
   private String name;
