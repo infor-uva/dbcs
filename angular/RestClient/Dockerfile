@@ -19,6 +19,7 @@ FROM nginx:alpine AS production
 
 # Copiar los archivos de construcción generados en la etapa anterior a la carpeta de Nginx
 COPY --from=build /app/dist/app/browser /usr/share/nginx/html
+COPY --from=build-step /app/*.conf /etc/nginx/sites-available/default
 
 # Exponer el puerto 80 para Nginx
 EXPOSE 80

@@ -93,6 +93,13 @@ export class NavigationComponent implements OnInit {
     },
     {
       id: genId(),
+      icon: 'fiber_new',
+      text: 'Registrar hotel',
+      allowRoles: ['HOTEL_ADMIN'],
+      link: '/hotels/register',
+    },
+    {
+      id: genId(),
       icon: 'settings',
       text: 'Admin Zone',
       allowRoles: ['ADMIN'],

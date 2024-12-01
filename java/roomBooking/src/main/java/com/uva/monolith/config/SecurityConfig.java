@@ -28,8 +28,8 @@ public class SecurityConfig {
                         // Permitir OPTIONS sin autenticación
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Acceso restringido a usuarios y administradores
-                        .requestMatchers("users", "users/**")
-                        .hasAnyRole(UserRol.ADMIN.toString(), UserRol.CLIENT.toString())
+                        .requestMatchers("users", "users/**").hasAnyRole(
+                                UserRol.CLIENT.toString(), UserRol.HOTEL_ADMIN.toString(), UserRol.ADMIN.toString())
                         // Acceso restringido a gestores de hoteles y administradores
                         .requestMatchers(HttpMethod.GET, "hotels", "hotels/*").hasAnyRole(
                                 UserRol.CLIENT.toString(), UserRol.HOTEL_ADMIN.toString(), UserRol.ADMIN.toString())
