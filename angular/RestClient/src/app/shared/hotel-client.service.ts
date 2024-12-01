@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { Hotel, Room } from '../types';
 import { SessionService } from './session.service';
 import { catchError, map, switchMap, throwError } from 'rxjs';
-import { log } from 'console';
 
 @Injectable({
   providedIn: 'root',
@@ -21,9 +20,12 @@ export class HotelClientService {
     return this.http.get<Hotel>(url);
   }
 
-  getAllHotels() {
+  getAllHotels(startDate?: Date, endDate?: Date) {
     const url = `${this.URI}`;
-    return this.http.get<Hotel[]>(url);
+    if (!startDate || !endDate) return this.http.get<Hotel[]>(url);
+    const start = new Date(startDate).toISOString().split('T')[0];
+    const end = new Date(endDate).toISOString().split('T')[0];
+    return this.http.get<Hotel[]>(url, { params: { start, end } });
   }
 
   deleteHotel(id: number) {

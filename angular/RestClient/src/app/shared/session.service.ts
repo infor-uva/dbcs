@@ -104,7 +104,9 @@ export class SessionService {
   updateData(data: Partial<Session>) {
     // const session: Session = { ...this.session$.getValue() } as Session;
     const saved = this.getSaved();
-    if (!saved) return;
+    console.log({ saved, data });
+
+    if (!saved || data.id !== saved.session?.id) return;
     const session = { ...saved.session, ...data } as Session;
     this.storage.save(this.tokenKey, {
       ...saved,

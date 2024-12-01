@@ -96,7 +96,7 @@
   <div class="form-group text-xl flex justify-center gap-20">
     <mat-form-field>
       <mat-label class="text-2xl">Enter a date range</mat-label>
-      <form [formGroup]="dateRangeForm" (change)="update()">
+      <form [formGroup]="dateRangeForm">
         <mat-date-range-input [rangePicker]="picker" formGroupName="dateRange">
           <input
             matStartDate
@@ -111,11 +111,6 @@
         ></mat-datepicker-toggle>
         <mat-date-range-picker #picker></mat-date-range-picker>
       </form>
-      <!-- (dateInput)="updateStart($event)"
-          (dateChange)="updateStart($event)" -->
-
-      <!-- (dateInput)="updateEnd($event)"
-          (dateChange)="updateEnd($event)" -->
     </mat-form-field>
     <mat-form-field>
       <mat-label class="text-2xl">Hotel</mat-label>
@@ -124,6 +119,7 @@
         class="text-2xl"
         (selectionChange)="update()"
       >
+        <mat-option [value]="undefined" class="text-3xl">All</mat-option>
         @for (hotel of _hotels; track hotel.id) {
         <mat-option [value]="hotel" class="text-3xl">{{
           hotel.name
@@ -133,7 +129,7 @@
     </mat-form-field>
     <mat-form-field>
       <mat-label>Filter by Room Type</mat-label>
-      <mat-select [(value)]="roomTypeSelected">
+      <mat-select [(value)]="roomTypeSelected" (selectionChange)="update()">
         @for (type of roomTypes; track type) {
         <mat-option [value]="type">{{ type }}</mat-option>
         }

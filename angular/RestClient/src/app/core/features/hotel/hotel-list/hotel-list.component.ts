@@ -61,7 +61,7 @@ export class HotelListComponent {
   isEditing = false;
   isManaging = false;
   dateRangeForm: FormGroup;
-  hotelSelected?: Hotel;
+  hotelSelected?: Hotel = undefined;
   roomTypeSelected: SelectableRoomType = 'All';
   roomTypes = selectableRoomTypeArray;
   rooms: Room[] = [];
@@ -99,13 +99,28 @@ export class HotelListComponent {
 
   ngOnInit(): void {
     this.getHotels();
+    this.dateRangeForm.get('dateRange')?.valueChanges.subscribe(() => {
+      this.getHotels();
+    });
   }
 
   update() {
-    // TODO completar
-    this.hotels = !!this.hotelSelected
-      ? this._hotels.filter((h) => h.id === this.hotelSelected!.id)
-      : [...this._hotels];
+    this.hotels = (
+      !!this.hotelSelected
+        ? [...this._hotels].filter((h) => h.id === this.hotelSelected!.id)
+        : [...this._hotels]
+    )
+      .map((h) => {
+        h = { ...h, rooms: [...h.rooms] };
+        h.rooms = h.rooms.filter(
+          (r) =>
+            r.available &&
+            (this.roomTypeSelected === 'All' ||
+              (r.type as SelectableRoomType) === this.roomTypeSelected)
+        );
+        return h;
+      })
+      .filter((h) => h.rooms.length > 0);
   }
 
   showRequested(room: Room) {
@@ -126,7 +141,10 @@ export class HotelListComponent {
   }
 
   getHotels() {
-    this.hotelClient.getAllHotels().subscribe({
+    const { start, end } = this.dateRangeForm.value.dateRange;
+    console.log({ start, end });
+
+    this.hotelClient.getAllHotels(start, end).subscribe({
       next: (resp) => {
         if (!!resp && (resp as never[]).length >= 0) {
           this._hotels = resp;

@@ -41,8 +41,21 @@ public class HotelController {
 
     // Obtener todos los hoteles
     @GetMapping
-    public List<Hotel> getAllHotels() {
-        return hotelRepository.findAll();
+    public List<Hotel> getAllHotels(
+            @RequestParam(required = false) LocalDate start,
+            @RequestParam(required = false) LocalDate end) {
+        List<Hotel> hotels = hotelRepository.findAll();
+        if (start != null && end != null) {
+            // Filtramos para los hoteles que
+            // tengan habitaciones disponibles para ese rango de fechas
+            hotels = hotels.stream().map(h -> {
+                if (h.getRooms().size() == 0)
+                    return h;
+                h.setRooms(roomRepository.findAvailableRoomsByHotelAndDates(h.getId(), start, end));
+                return h;
+            }).filter(h -> h.getRooms().size() >= 0).toList();
+        }
+        return hotels;
     }
 
     // Añadir un hotel con sus habitaciones

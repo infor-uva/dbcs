@@ -46,7 +46,10 @@ export class UserClientService {
   updateUser(userId: number, user: Partial<User>) {
     return this.http.put(`${this.URI}/${userId}`, user).pipe(
       tap(() => {
-        this.sessionService.updateData(user as Partial<Session>);
+        this.sessionService.updateData({
+          id: userId,
+          ...user,
+        } as Partial<Session>);
       })
     );
   }

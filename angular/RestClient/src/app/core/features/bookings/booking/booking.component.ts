@@ -81,8 +81,8 @@ export class BookingComponent {
   loadBooking() {
     const booking = this.bookingLocal;
     if (!booking) return;
-    const start = new Date(booking.startDate).toISOString().split('T')[0];
-    const end = new Date(booking.endDate).toISOString().split('T')[0];
+    const start = new Date(booking.startDate).toISOString();
+    const end = new Date(booking.endDate).toISOString();
     this.bookingForm = this.fb.group({
       roomId: [{ value: booking.roomId, disabled: true }, Validators.required],
       startDate: [{ value: start, disabled: true }, Validators.required],
