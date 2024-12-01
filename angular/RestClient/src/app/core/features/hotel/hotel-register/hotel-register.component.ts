@@ -111,7 +111,7 @@ export class HotelRegisterComponent {
           if (resp) {
             console.log({ resp });
             alert('Hotel guardado correctamente');
-            // this.router.navigate(['/hotels']);
+            this.router.navigate(['/hotels']);
           }
         },
         error: (err) => {

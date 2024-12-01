@@ -28,6 +28,15 @@ export class HotelClientService {
     return this.http.get<Hotel[]>(url, { params: { start, end } });
   }
 
+  getAllHotelsByUser(userId:number, startDate?: Date, endDate?: Date) {
+    const url = `${this.URI}`;
+    if (!startDate || !endDate)
+      return this.http.get<Hotel[]>(url, { params: { managerId:userId } });
+    const start = new Date(startDate).toISOString().split('T')[0];
+    const end = new Date(endDate).toISOString().split('T')[0];
+    return this.http.get<Hotel[]>(url, { params: { managerId:userId, start, end } });
+  }
+
   deleteHotel(id: number) {
     const url = `${this.URI}/${id}`;
     return this.http.delete(url);

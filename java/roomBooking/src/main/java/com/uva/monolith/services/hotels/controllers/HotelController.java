@@ -42,12 +42,17 @@ public class HotelController {
     // Obtener todos los hoteles
     @GetMapping
     public List<Hotel> getAllHotels(
+            @RequestParam(required = false) Integer managerId,
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end) {
-        List<Hotel> hotels = hotelRepository.findAll();
+        List<Hotel> hotels = (managerId != null)
+                ? hotelRepository.findAllByHotelManager(managerId)
+                : hotelRepository.findAll();
         if (start != null && end != null) {
             // Filtramos para los hoteles que
             // tengan habitaciones disponibles para ese rango de fechas
+            System.out.println(start);
+            System.out.println(end);
             hotels = hotels.stream().map(h -> {
                 if (h.getRooms().size() == 0)
                     return h;

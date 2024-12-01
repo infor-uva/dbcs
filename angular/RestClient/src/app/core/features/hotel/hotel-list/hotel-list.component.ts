@@ -66,6 +66,7 @@ export class HotelListComponent {
   roomTypes = selectableRoomTypeArray;
   rooms: Room[] = [];
   trateRooms: Room[] = [];
+  userId = 0
 
   constructor(
     private fb: FormBuilder,
@@ -75,9 +76,9 @@ export class HotelListComponent {
     private storage: LocalStorageService,
     private sessionService: SessionService
   ) {
-    this.isManaging =
-      this.route.snapshot.url[0].path === 'me' ||
-      this.route.snapshot.url[0].path === 'admin';
+    const isHotelManger = this.route.snapshot.url[0].path === 'me'
+    const isAdmin = this.route.snapshot.url[0].path === 'admin'
+    this.isManaging = isHotelManger || isAdmin;
     const today = new Date();
 
     // Inicializa el formulario con las fechas predefinidas
@@ -92,6 +93,9 @@ export class HotelListComponent {
       next: (session) => {
         if (session && session.rol !== 'CLIENT') {
           this.isEditing = true;
+          this.userId = isHotelManger 
+            ? session.id
+            : Number(this.route.snapshot.paramMap.get('id'));
         }
       },
     });
@@ -142,9 +146,12 @@ export class HotelListComponent {
 
   getHotels() {
     const { start, end } = this.dateRangeForm.value.dateRange;
-    console.log({ start, end });
-
-    this.hotelClient.getAllHotels(start, end).subscribe({
+    
+    const observable = this.isManaging
+      ? this.hotelClient.getAllHotelsByUser(this.userId, start, end)
+      : this.hotelClient.getAllHotels(start, end)
+    console.log({...this})
+    observable.subscribe({
       next: (resp) => {
         if (!!resp && (resp as never[]).length >= 0) {
           this._hotels = resp;

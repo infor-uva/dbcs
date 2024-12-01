@@ -25,9 +25,9 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
                     SELECT b FROM Booking b
                     WHERE b.roomId.id = r.id
                     AND (
-                        b.endDate > ?2
+                        b.endDate >= ?2
                         OR
-                        b.startDate > ?3
+                        ?3 >= b.startDate
                     )
                 )
             """)
