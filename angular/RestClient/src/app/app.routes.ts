@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { Route, Routes } from '@angular/router';
 import { HotelListComponent } from './core/features/hotel/hotel-list/hotel-list.component';
 import { BookingComponent } from './core/features/bookings/booking/booking.component';
 import { HotelRegisterComponent } from './core/features/hotel/hotel-register/hotel-register.component';
@@ -6,120 +6,179 @@ import { MainPageComponent } from './core/features/user/main-page/main-page.comp
 import { BookingListComponent } from './core/features/bookings/booking-list/booking-list.component';
 import { UserBookingListComponent } from './core/features/user/user-booking-list/user-booking-list.component';
 import { UserFormComponent } from './core/features/user/user-form/user-form.component';
+import { UnauthorizedComponent } from './page/unauthorized/unauthorized.component';
+import { rolGuard } from './security/rol.guard';
+import { UserRol, UserRolesArray } from './types';
 
-import { LoginComponent } from './core/features/auth/login/login.component';
-import { UserFormComponent } from './core/features/user/user-form/user-form.component';
+interface RouteData {
+  expectedRole: UserRol | UserRol[];
+}
 
-export const routes: Routes = [
-  {
-    path: '', // Ruta principal
-    component: MainPageComponent,
-  },
-  // auth
+type AppRoute = Omit<Route, 'data'> & {
+  data?: RouteData;
+};
+
+export const routes: AppRoute[] = [
+  // Auth
   {
     path: 'login',
-    component: LoginComponent,
+    component: UserFormComponent,
   },
   {
     path: 'register',
+    component: UserFormComponent,
   },
+
   // Hoteles
   {
     path: 'hotels', // Ruta para la lista de hoteles
+    component: HotelListComponent,
   },
   {
     path: 'hotels/register', // Registrar nuevo hotel
+    component: HotelRegisterComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'HOTEL_ADMIN' },
   },
   {
     path: 'hotels/:id', // Hotel concreto
+    component: HotelRegisterComponent,
   },
-  {
-    path: 'hotels/:id/edit', // Modificar hotel
-  },
+
   // Usuario
   {
     path: 'me', // Main
+    canActivate: [rolGuard],
+    data: { expectedRole: UserRolesArray },
+    component: UserFormComponent,
   },
   {
     path: 'me/edit', // Main
+    component: UserFormComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: UserRolesArray },
+  },
+  {
+    path: 'me/change-passwd', // Main
+    component: UserFormComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: UserRolesArray },
   },
   // Usuario HOTEL admin
   {
     path: 'me/hotels',
+    component: HotelListComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'HOTEL_ADMIN' },
   },
   {
     path: 'me/hotels/:id',
+    component: HotelRegisterComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'HOTEL_ADMIN' },
   },
-  {
-    path: 'me/hotels/:id/bookings',
-  },
-  {
-    path: 'me/hotels/:id/rooms',
-  },
-  {
-    path: 'me/hotels/:id/rooms/:id',
-  },
-  {
-    path: 'me/hotels/:id/rooms/:id/bookings',
-  },
-  // Usuario Cliente
-  {
-    path: 'me/bookings',
-  },
-  {
-    path: 'me/bookings/:id',
-  },
-  {
-    path: 'me/bookings/new',
-  },
-  // Administrador
-  {
-    path: 'admin', // Main
-  },
-  {
-    path: 'admin/users', // Main
-  },
-  {
-    path: 'admin/users/:id', // Main
-  },
-
-  // ! OTRO // NO MIRAR
-
   // {
-  //   path: 'bookings/search',
+  //   path: 'me/hotels/:id/bookings',
   //   component: BookingListComponent,
   // },
   // {
-  //   path: 'bookings/new',
+  //   path: 'me/hotels/:id/rooms/:id/bookings',
+  //   component: BookingListComponent,
+  // },
+
+  // Usuario Cliente
+  {
+    path: 'me/bookings',
+    component: UserBookingListComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'CLIENT' },
+  },
+  {
+    path: 'me/bookings/:id',
+    component: BookingComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'CLIENT' },
+  },
+  {
+    path: 'me/bookings/new',
+    component: BookingComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'CLIENT' },
+  },
+
+  // Administrador
+  {
+    path: 'admin', // Main
+    component: UserFormComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'ADMIN' },
+  },
+  {
+    path: 'admin/users', // Main
+    component: MainPageComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'ADMIN' },
+  },
+  {
+    path: 'admin/users/:id', // Main
+    component: UserFormComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'ADMIN' },
+  },
+  {
+    path: 'admin/users/:id/edit', // Main
+    component: UserFormComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'ADMIN' },
+  },
+  {
+    path: 'admin/users/:id/change-passwd', // Main
+    component: UserFormComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'ADMIN' },
+  },
+  {
+    path: 'admin/users/:id/bookings',
+    component: UserBookingListComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'ADMIN' },
+  },
+  // {
+  //   path: 'admin/users/:id/bookings/:bookingId',
   //   component: BookingComponent,
   // },
+  {
+    path: 'admin/users/:id/hotels',
+    component: HotelListComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'ADMIN' },
+  },
+  {
+    path: 'admin/users/:userId/hotels/:id',
+    component: HotelRegisterComponent,
+    canActivate: [rolGuard],
+    data: { expectedRole: 'ADMIN' },
+  },
   // {
-  //   path: 'users/:id/bookings',
-  //   component: UserBookingListComponent,
+  //   path: 'admin/users/:userId/hotels/:id/bookings',
+  //   component: BookingListComponent,
+  //   canActivate: [rolGuard],
+  //   data: { expectedRole: 'ADMIN' },
   // },
   // {
-  //   path: 'hotels',
-  //   component: HotelListComponent,
+  //   path: 'admin/users/:userId/hotels/:hotelId/rooms/:id/bookings',
+  //   component: BookingListComponent,
+  //   canActivate: [rolGuard],
+  //   data: { expectedRole: 'ADMIN' },
   // },
-  // {
-  //   path: 'hotels/new',
-  //   component: HotelRegisterComponent,
-  // },
-  // {
-  //   path: 'hotels/:id',
-  //   component: HotelRegisterComponent,
-  // },
-  // {
-  //   path: 'users/:id',
-  //   component: UserFormComponent,
-  // },
-  // {
-  //   path: 'register',
-  //   component: UserFormComponent,
-  // },
+
+  {
+    path: 'unauthorized',
+    component: UnauthorizedComponent,
+  },
   {
     path: '**',
-    redirectTo: '',
+    redirectTo: '/login',
     pathMatch: 'full',
   },
 ];

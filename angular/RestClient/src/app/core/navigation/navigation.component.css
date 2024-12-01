@@ -25,7 +25,7 @@ a.nav-link:visited {
 a.nav-link:hover {
   font-weight: bold;
   text-decoration: underline;
-  color: yellow;
+  color: rgb(112, 112, 112);
   transition: transform 0.3s ease;
   transform: scale(1.5);
 }

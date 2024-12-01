@@ -1,14 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Client, User, UserStateFilter } from '../../../../types';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { UserClientService } from '../../../../shared/user-client.service';
 import { users } from '../../../../../mocks/users'; // Renombrado para claridad
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule],
+  imports: [
+    FormsModule,
+    CommonModule,
+    RouterModule,
+    MatTableModule,
+    MatCardModule,
+    MatPaginatorModule,
+  ],
   selector: 'app-main-page',
   templateUrl: './main-page.component.html',
   styleUrls: ['./main-page.component.css'],
@@ -17,13 +27,12 @@ export class MainPageComponent implements OnInit {
   users: Client[] = [];
   filteredUsers: Client[] = [];
   selectedStatus: UserStateFilter = 'All';
+  displayedColumns: string[] = ['id', 'name', 'email', 'rol'];
+  dataSource = new MatTableDataSource<User>();
 
-  constructor(private userClient: UserClientService) {}
+  constructor(private userClient: UserClientService, private router: Router) {}
 
   ngOnInit(): void {
-    // Validar que el mock sea del tipo correcto
-    // const isValidMock = Array.isArray(mockUsers) && mockUsers.every(user => 'id' in user && 'name' in user && 'status' in user);
-    // this.users = isValidMock ? (mockUsers as User[]) : [];
     this.users = users;
     this.filteredUsers = [...this.users];
 
@@ -31,11 +40,13 @@ export class MainPageComponent implements OnInit {
     this.userClient.getAllUsers().subscribe({
       next: (data: Client[]) => {
         this.users = data;
-        this.filteredUsers = [...data];
+        this.filterUsers();
       },
       error: (err) => console.error('Error al cargar usuarios:', err),
     });
   }
+
+  @ViewChild(MatPaginator) paginator?: MatPaginator;
 
   filterUsers(): void {
     if (this.selectedStatus === 'All') {
@@ -45,6 +56,8 @@ export class MainPageComponent implements OnInit {
         (user) => user.status === this.selectedStatus
       );
     }
+    this.dataSource = new MatTableDataSource<User>(this.filteredUsers);
+    this.dataSource.paginator = this.paginator!;
   }
 
   getState(user: Client): string {
@@ -58,5 +71,9 @@ export class MainPageComponent implements OnInit {
       default:
         return 'ESTADO DESCONOCIDO';
     }
+  }
+
+  userDetails(id: number) {
+    this.router.navigate(['/admin', 'users', id]);
   }
 }

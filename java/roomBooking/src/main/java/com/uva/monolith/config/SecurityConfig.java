@@ -31,6 +31,9 @@ public class SecurityConfig {
                         .requestMatchers("users", "users/**")
                         .hasAnyRole(UserRol.ADMIN.toString(), UserRol.CLIENT.toString())
                         // Acceso restringido a gestores de hoteles y administradores
+                        .requestMatchers(HttpMethod.GET, "hotels", "hotels/*").hasAnyRole(
+                                UserRol.CLIENT.toString(), UserRol.HOTEL_ADMIN.toString(), UserRol.ADMIN.toString())
+
                         .requestMatchers("hotels", "hotels/**")
                         .hasAnyRole(UserRol.ADMIN.toString(), UserRol.HOTEL_ADMIN.toString())
                         // Acceso restringido a cualquier usuario del sistema

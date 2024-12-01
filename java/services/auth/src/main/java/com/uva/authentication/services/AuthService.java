@@ -79,7 +79,7 @@ public class AuthService {
         newUser = hotelManagerRepository.save(hm);
         break;
 
-      case ADMIN: // TODO revisar
+      case ADMIN:
         User admin = new User();
         BeanUtils.copyProperties(registerRequest, admin);
         newUser = userRepository.save(admin);

@@ -36,9 +36,9 @@ const selectableRoomTypeArray: SelectableRoomType[] = ['All', ...roomTypeArray];
 })
 export class BookingListComponent {
   searched: boolean = false;
+  hotels!: Hotel[];
   start?: Date;
   end?: Date;
-  hotels!: Hotel[];
   hotelSelected?: Hotel;
   roomTypeSelected?: SelectableRoomType;
   roomTypes = selectableRoomTypeArray;

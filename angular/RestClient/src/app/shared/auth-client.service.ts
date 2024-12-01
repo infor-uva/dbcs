@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -35,12 +35,12 @@ export class AuthClientService {
         email,
         password,
         rol,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
       }
+      // {
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // }
     );
   }
 }

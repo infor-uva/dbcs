@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 import { Booking } from '../types/Booking'; // Ajusta la ruta a tu modelo Booking
 
 @Injectable({
@@ -14,11 +14,11 @@ export class BookingClientService {
 
   // Método para crear una nueva reserva
   createBooking(bookingRequest: Booking): Observable<Booking> {
-    return this.http.post<Booking>(this.URI, bookingRequest, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-    });
+    const { startDate, endDate } = bookingRequest;
+    const end = endDate.toISOString();
+    console.log({ bookingRequest, end });
+
+    return this.http.post<Booking>(this.URI, bookingRequest);
   }
 
   // Método para obtener todas las reservas

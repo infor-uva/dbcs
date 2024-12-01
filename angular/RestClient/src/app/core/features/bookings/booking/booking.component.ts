@@ -11,6 +11,7 @@ import { Booking, User } from '../../../../types';
 import { LocalStorageService } from '../../../../shared/local-storage.service';
 import { BookingClientService } from '../../../../shared/booking-client.service';
 import { UserClientService } from '../../../../shared/user-client.service';
+import { SessionService } from '../../../../shared/session.service';
 
 type communication = {
   roomId: number;
@@ -25,8 +26,8 @@ type communication = {
   templateUrl: './booking.component.html',
   styleUrls: ['./booking.component.css'],
 })
-export class BookingComponent implements OnInit {
-  users: User[] = [];
+export class BookingComponent {
+  user: User = { id: 0, email: '', name: '', rol: 'CLIENT' };
   bookingForm: FormGroup;
   bookingLocal: { roomId: number; startDate: Date; endDate: Date } = {
     roomId: 0,
@@ -39,16 +40,16 @@ export class BookingComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
+    private sessionService: SessionService,
     private bookingClient: BookingClientService,
     private userClient: UserClientService,
     private storage: LocalStorageService
   ) {
     // Inicialización del formulario con validaciones
     this.bookingForm = this.fb.group({
-      userId: ['', Validators.required],
-      roomId: ['', Validators.required],
-      startDate: ['', Validators.required],
-      endDate: ['', Validators.required],
+      roomId: [{ value: '', disabled: true }, Validators.required],
+      startDate: [{ value: '', disabled: true }, Validators.required],
+      endDate: [{ value: '', disabled: true }, Validators.required],
     });
     const localBooking = storage.read<communication | null>('booking-data');
     if (localBooking === null) {
@@ -63,24 +64,18 @@ export class BookingComponent implements OnInit {
         this.router.navigate(['/bookings', 'search']);
         return;
       }
+      this.bookingLocal = {
+        ...this.bookingLocal,
+        startDate: new Date(this.bookingLocal.startDate),
+        endDate: new Date(this.bookingLocal.endDate),
+      };
       this.loadBooking();
     });
-    this.userClient.getAllUsers().subscribe({
-      next: (resp) => {
-        this.users = resp;
+    this.sessionService.getSession().subscribe({
+      next: (session) => {
+        if (session) this.user = session;
       },
     });
-  }
-
-  get userId() {
-    return this.bookingForm.get('userId')!.value;
-  }
-  get isUserSelected() {
-    return !isNaN(this.userId);
-  }
-
-  ngOnInit() {
-    this.loadBooking();
   }
 
   loadBooking() {
@@ -89,55 +84,40 @@ export class BookingComponent implements OnInit {
     const start = new Date(booking.startDate).toISOString().split('T')[0];
     const end = new Date(booking.endDate).toISOString().split('T')[0];
     this.bookingForm = this.fb.group({
-      userId: [Validators.required],
-      roomId: [booking.roomId, Validators.required],
-      startDate: [start, Validators.required],
-      endDate: [end, Validators.required],
+      roomId: [{ value: booking.roomId, disabled: true }, Validators.required],
+      startDate: [{ value: start, disabled: true }, Validators.required],
+      endDate: [{ value: end, disabled: true }, Validators.required],
     });
-    this.bookingForm.get('roomId')?.disable();
-    this.bookingForm.get('startDate')?.disable();
-    this.bookingForm.get('endDate')?.disable();
   }
 
   submitBooking() {
-    if (this.bookingForm.valid) {
-      const formValue = this.bookingForm.value;
-      const userId = Number(formValue.userId);
-      const bookingRequest: any = {
-        ...this.bookingLocal,
-        userId: { id: userId },
-        roomId: { id: this.roomId },
-      };
+    const { id } = this.user;
+    const bookingRequest: any = {
+      ...this.bookingLocal,
+      userId: { id },
+      roomId: { id: this.roomId },
+    };
 
-      // Llama al servicio para crear una nueva reserva
-      this.bookingClient.createBooking(bookingRequest).subscribe({
-        next: (response) => {
-          console.log('Reserva creada con éxito', response);
-          // Llama al servicio para actualizar el estado del usuario
-          this.userClient
-            .alterUserStatus(userId, 'WITH_ACTIVE_BOOKINGS')
-            .subscribe({
-              next: (response) => {
-                console.log(
-                  'Estado de usuario actualizado con exito',
-                  response
-                );
-                this.storage.remove('booking-data');
-                this.router.navigate(['/user', userId, 'bookings']);
-              },
-              error: (error) => {
-                console.error('Error al cambiar el estado del usuario', error);
-              },
-            });
-        },
-        error: (error) => {
-          console.error('Error al crear la reserva', error);
-          // Manejo de errores
-        },
-      });
-    } else {
-      console.warn('El formulario no es válido');
-      // Puedes mostrar un mensaje al usuario sobre la validez del formulario
-    }
+    // Llama al servicio para crear una nueva reserva
+    this.bookingClient.createBooking(bookingRequest).subscribe({
+      next: (response) => {
+        console.log('Reserva creada con éxito', response);
+        // Llama al servicio para actualizar el estado del usuario
+        this.userClient.alterUserStatus(id, 'WITH_ACTIVE_BOOKINGS').subscribe({
+          next: (response) => {
+            console.log('Estado de usuario actualizado con exito', response);
+            this.storage.remove('booking-data');
+            this.router.navigate(['/me', 'bookings']);
+          },
+          error: (error) => {
+            console.error('Error al cambiar el estado del usuario', error);
+          },
+        });
+      },
+      error: (error) => {
+        console.error('Error al crear la reserva', error);
+        // Manejo de errores
+      },
+    });
   }
 }

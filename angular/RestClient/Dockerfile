@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Compilar la aplicación Angular para producción
-RUN npm run build -- --output-path=dist/app --configuration production
+RUN npm run build -- --output-path=dist/app --c production
 
 # Etapa 2: Servidor Nginx para producción
 FROM nginx:alpine AS production
@@ -21,7 +21,7 @@ FROM nginx:alpine AS production
 COPY --from=build /app/dist/app/browser /usr/share/nginx/html
 
 # Exponer el puerto 80 para Nginx
-EXPOSE 7920
+EXPOSE 80
 
 # Iniciar Nginx
 CMD ["nginx", "-g", "daemon off;"]

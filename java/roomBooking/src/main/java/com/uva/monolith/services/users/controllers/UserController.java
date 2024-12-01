@@ -61,6 +61,8 @@ public class UserController {
 
   @PutMapping("/{id}")
   public ResponseEntity<?> updateUserData(@PathVariable int id, @RequestBody Map<String, String> json) {
+    System.err.println(json.entrySet().size());
+    json.keySet().forEach(k -> System.err.println(k));
     String name = json.get("name");
     String email = json.get("email");
     if (name == null || email == null) {

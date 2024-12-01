@@ -16,6 +16,7 @@ import { CommonModule } from '@angular/common';
 import { Address, Hotel, Room } from '../../../../types';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotelClientService } from '../../../../shared/hotel-client.service';
+import { MatIconModule } from '@angular/material/icon';
 
 const emptyRoom: Room = {
   id: 0,
@@ -66,12 +67,15 @@ export class HotelRegisterComponent {
     this.route.paramMap.subscribe({
       next: (params) => {
         const id = Number(params.get('id'));
+        if (!id) {
+          this.router.navigateByUrl('/hotels/register');
+        }
         this.editMode = id !== 0;
         if (this.editMode) {
           this.hotelClient.getHotel(id).subscribe({
             next: (h) => this.setHotelForm(h),
             error: (error) => {
-              this.router.navigate(['/hotels/new']);
+              this.router.navigateByUrl('/hotels/register');
             },
           });
         }
@@ -104,10 +108,10 @@ export class HotelRegisterComponent {
       const hotel = this.hotelForm.value as Hotel;
       this.hotelClient.addHotel(hotel).subscribe({
         next: (resp) => {
-          if (resp.status < 400) {
+          if (resp) {
+            console.log({ resp });
             alert('Hotel guardado correctamente');
-            this.router.navigate(['/hotels']);
-          } else {
+            // this.router.navigate(['/hotels']);
           }
         },
         error: (err) => {

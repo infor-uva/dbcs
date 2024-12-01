@@ -1,7 +1,7 @@
 <div class="container">
-  <h2>Crear Reserva</h2>
+  <h2><strong class="text-5xl font-bold">Confirmar reserva</strong></h2>
   <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
-    <div class="form-group">
+    <!-- <div class="form-group">
       <label for="userId">ID del Usuario:</label>
       <select
         type="number"
@@ -13,7 +13,7 @@
         <option value="{{ user.id }}">{{ user.name }}</option>
         }
       </select>
-    </div>
+    </div> -->
 
     <div class="form-group">
       <label for="roomId">ID del Habitación:</label>
@@ -26,7 +26,7 @@
     </div>
 
     <div class="form-group">
-      <label for="startDate">Fecha de Inicio:</label>
+      <label for="startDate">Fecha de Inicio (MM/dd/YYYY):</label>
       <input
         type="date"
         id="startDate"
@@ -36,7 +36,7 @@
     </div>
 
     <div class="form-group">
-      <label for="endDate">Fecha de Fin:</label>
+      <label for="endDate">Fecha de Fin (MM/dd/YYYY):</label>
       <input
         type="date"
         id="endDate"
@@ -45,8 +45,6 @@
       />
     </div>
 
-    <button [disabled]="!isUserSelected" type="submit" class="btn btn-primary">
-      Reservar
-    </button>
+    <button type="submit" class="btn btn-primary">Reservar</button>
   </form>
 </div>

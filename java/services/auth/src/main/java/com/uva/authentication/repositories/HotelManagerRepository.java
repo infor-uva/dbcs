@@ -4,8 +4,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.uva.authentication.models.remote.HotelManager;
-import com.uva.authentication.models.remote.User;
 
-public interface HotelManagerRepository extends JpaRepository<User, Integer> {
+public interface HotelManagerRepository extends JpaRepository<HotelManager, Integer> {
   Optional<HotelManager> findByEmail(String email);
 }

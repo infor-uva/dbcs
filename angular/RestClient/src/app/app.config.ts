@@ -9,7 +9,7 @@ import {
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { ReactiveFormsModule } from '@angular/forms'; // Added import for ReactiveFormsModule
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { authRequest } from './auth/auth.interceptor';
+import { authRequest } from './security/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [

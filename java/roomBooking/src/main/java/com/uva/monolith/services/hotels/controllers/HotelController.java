@@ -2,8 +2,10 @@ package com.uva.monolith.services.hotels.controllers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.time.LocalDate;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +19,15 @@ import com.uva.monolith.services.hotels.models.Hotel;
 import com.uva.monolith.services.hotels.models.Room;
 import com.uva.monolith.services.hotels.repositories.HotelRepository;
 import com.uva.monolith.services.hotels.repositories.RoomRepository;
+import com.uva.monolith.services.users.models.HotelManager;
+import com.uva.monolith.services.users.repositories.HotelManagerRepository;
 
 @RestController
 @RequestMapping("hotels")
 @CrossOrigin(origins = "*")
 public class HotelController {
+    @Autowired
+    private HotelManagerRepository hotelManagerRepository;
     private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
     private final BookingRepository bookingRepository;
@@ -42,6 +48,11 @@ public class HotelController {
     // Añadir un hotel con sus habitaciones
     @PostMapping
     public ResponseEntity<Hotel> addHotel(@RequestBody Hotel hotel) {
+        Optional<HotelManager> hm = hotelManagerRepository.findById(hotel.getHotelManager().getId());
+        if (!hm.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        hotel.setHotelManager(hm.get());
         Hotel savedHotel = hotelRepository.save(hotel);
         return new ResponseEntity<>(savedHotel, HttpStatus.CREATED);
     }
@@ -60,6 +71,10 @@ public class HotelController {
         Hotel target = hotelRepository.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
         bookingRepository.deleteAllByHotelId(id);
+        HotelManager hm = target.getHotelManager();
+        hm.getHotels().removeIf(h -> h.getId() == target.getId());
+        hotelManagerRepository.save(hm);
+        bookingRepository.flush();
         hotelRepository.delete(target);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

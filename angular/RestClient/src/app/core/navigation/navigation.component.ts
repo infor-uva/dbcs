@@ -3,10 +3,11 @@ import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-import { User, UserRol } from '../../types';
-import { AuthInstance, SessionService } from '../../shared/session.service';
+import { Session, User, UserRol } from '../../types';
+import { SessionService } from '../../shared/session.service';
 import { UserClientService } from '../../shared/user-client.service';
 import { AuthClientService } from '../../shared/auth-client.service';
+import { Observable } from 'rxjs';
 
 var comp_id = 0;
 
@@ -34,7 +35,7 @@ export class NavigationComponent implements OnInit {
   @ViewChild(MatMenuTrigger)
   trigger?: MatMenuTrigger;
   isLogged = false;
-  user: AuthInstance = {
+  user: Session = {
     id: 0,
     name: '',
     email: '',
@@ -42,23 +43,24 @@ export class NavigationComponent implements OnInit {
   };
   sections: Section[] = [];
 
-  constructor(
-    private sessionService: SessionService,
-    private auth: AuthClientService
-  ) {}
+  constructor(private sessionService: SessionService) {}
 
   ngOnInit() {
     this.loadUser();
   }
 
   loadUser() {
-    const isLogged = this.sessionService.isValid();
-    if (isLogged) {
-      this.user = this.sessionService.getSession();
-      console.log({ user: this.user });
-      this.sections = this.genSections();
-    }
-    this.isLogged = isLogged;
+    this.sessionService.getSession().subscribe({
+      next: (session) => {
+        if (session) {
+          this.user = session;
+          this.isLogged = true;
+          this.sections = this.genSections();
+        } else {
+          this.isLogged = false;
+        }
+      },
+    });
   }
 
   toggleDropdown() {
@@ -80,43 +82,45 @@ export class NavigationComponent implements OnInit {
       icon: 'calendar_today',
       text: 'Reservas',
       allowRoles: ['CLIENT'],
-      link: '/users/1/bookings',
-      // link: '/bookings',
+      link: '/me/bookings',
     },
     {
       id: genId(),
       icon: 'hotel',
       text: 'Hoteles',
       allowRoles: ['HOTEL_ADMIN'],
-      link: '/hotels',
+      link: '/me/hotels',
+    },
+    {
+      id: genId(),
+      icon: 'settings',
+      text: 'Admin Zone',
+      allowRoles: ['ADMIN'],
+      link: '/admin',
+    },
+    {
+      id: genId(),
+      icon: 'group',
+      text: 'Users',
+      allowRoles: ['ADMIN'],
+      link: '/admin/users',
     },
   ];
 
   genSections() {
     return this.schemaSections.filter(
       (section) =>
-        this.user.rol === 'ADMIN' || // Es administrador del sistema
         !section.allowRoles ||
         section.allowRoles.length === 0 || // No tiene limitación
         section.allowRoles.includes(this.user.rol) // El rol del usuario es aceptado
     );
   }
 
-  login() {
-    const email = 'client@dev.com';
-    this.auth.login(email, 'NQSASorry').subscribe({
-      next: (data: any) => {
-        console.log(email, data);
-        this.sessionService.login(data);
-        this.loadUser();
-      },
-    });
-  }
+  login() {}
 
   logout() {
-    if (confirm('You are trying to logout')) {
-      this.sessionService.logout();
-      this.loadUser();
-    }
+    // if (confirm('You are trying to logout'))
+    this.sessionService.logout();
+    this.loadUser();
   }
 }

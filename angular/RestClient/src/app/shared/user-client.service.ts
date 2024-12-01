@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
-import { Client, User, UserState } from '../types';
+import { environment } from '../../environments/environment';
+import { Client, Session, User, UserState } from '../types';
+import { SessionService } from './session.service';
+import { tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +11,10 @@ import { Client, User, UserState } from '../types';
 export class UserClientService {
   private readonly URI = environment.userAPI;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private sessionService: SessionService
+  ) {}
 
   // Obtener un usuario por ID
   getUser(userId: number) {
@@ -37,17 +42,13 @@ export class UserClientService {
     );
   }
 
-  // Obtener el usuario actual (autenticado)
-  getCurrentUser() {
-    return this.http.get<User>(`${this.URI}/me`);
-  }
-
   // Actualizar los datos del usuario
-  updateUser(user: Partial<User>) {
-    return this.http.patch(`${this.URI}/me`, user, {
-      observe: 'response',
-      responseType: 'text',
-    });
+  updateUser(userId: number, user: Partial<User>) {
+    return this.http.put(`${this.URI}/${userId}`, user).pipe(
+      tap(() => {
+        this.sessionService.updateData(user as Partial<Session>);
+      })
+    );
   }
 
   // Cambiar la contraseña del usuario

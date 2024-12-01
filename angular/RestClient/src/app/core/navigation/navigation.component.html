@@ -1,20 +1,7 @@
 <nav>
   <ul class="nav">
-    <li><a class="btn nav-link" [routerLink]="['/']">Home - Usuarios</a></li>
-    <li>
-      <a class="btn nav-link" [routerLink]="['/hotels', 'new']"
-        >Registrar Hotel</a
-      >
-    </li>
     <li><a class="btn nav-link" [routerLink]="['/hotels']">Hoteles</a></li>
-    <li>
-      <a class="btn nav-link" [routerLink]="['/bookings', 'search']"
-        >Nueva Reserva</a
-      >
-    </li>
-    <!-- Solucionar que no va -->
-    <!-- <li class="ml-auto"> -->
-    <li style="margin-left: auto">
+    <li class="ml-auto">
       @if (isLogged){
       <!-- Dropdown para usuario registrado -->
 
@@ -58,8 +45,8 @@
         class="btn bg-blue-500 text-white hover:bg-blue-600 ml-auto"
         (click)="login()"
       >
-        <!-- <a class="simple" [routerLink]="['/login']"> -->
-        <a class="simple">
+        <a class="simple" [routerLink]="['/login']">
+          <!-- <a class="simple"> -->
           <button class="flex items-center gap-3">
             <span class="text-4xl">Login</span>
             <mat-icon>login</mat-icon>
