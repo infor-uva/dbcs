@@ -1,0 +1,159 @@
+import { Injectable } from '@angular/core';
+import { LocalStorageService } from './local-storage.service';
+import { PersistenToken, Session, UserRol } from '../types';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
+import { AuthClientService } from './auth-client.service';
+import { Router } from '@angular/router';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class SessionService {
+  private tokenKey = 'token';
+  private session$: BehaviorSubject<Session | null>;
+  mainPage = '/me';
+
+  constructor(
+    private router: Router,
+    private storage: LocalStorageService,
+    private authService: AuthClientService
+  ) {
+    // Inicializar el estado de sesión desde el token almacenado
+    const initialSession = this.loadSessionFromToken();
+    console.log({ initialSession });
+
+    this.session$ = new BehaviorSubject<Session | null>(initialSession);
+  }
+
+  getMainPage(rol: UserRol) {
+    return rol === 'ADMIN' ? '/admin' : '/me';
+  }
+
+  private setSession(resp: any) {
+    const decoded = jwtDecode<{ user: Session }>(resp.token);
+    this.session$.next(decoded.user);
+    this.storage.save(this.tokenKey, { ...resp, session: decoded.user });
+    const mainPage = this.getMainPage(decoded.user.rol as UserRol);
+    return { ...resp, mainPage };
+  }
+
+  /**
+   * Realiza el login y actualiza el estado de la sesión.
+   */
+  login(email: string, password: string): Observable<any> {
+    return this.authService.login(email, password).pipe(
+      map((r) => this.setSession(r)),
+      catchError((error) => {
+        console.error('Login failed', error);
+        return throwError(() => new Error('Login failed'));
+      })
+    );
+  }
+
+  /**
+   * Realiza el registro, guarda el token y actualiza el estado de la sesión.
+   */
+  register(
+    name: string,
+    email: string,
+    password: string,
+    rol: UserRol
+  ): Observable<any> {
+    return this.authService.register(name, email, password, rol).pipe(
+      map((r) => this.setSession(r)),
+      catchError((error) => {
+        console.error('Registration failed', error);
+        return throwError(() => new Error('Registration failed'));
+      })
+    );
+  }
+
+  /**
+   * Realiza el logout, elimina el token y limpia el estado de sesión.
+   */
+  logout(): void {
+    this.storage.remove(this.tokenKey);
+    this.session$.next(null);
+    this.router.navigate(['/login']);
+  }
+
+  getSaved() {
+    return this.storage.read<PersistenToken>(this.tokenKey);
+  }
+
+  /**
+   * Obtiene el token almacenado. Lanza un error si no hay sesión activa.
+   */
+  getToken(): string {
+    const saved = this.getSaved();
+    if (!saved) {
+      throw new Error('No session');
+    }
+    return saved.token;
+  }
+
+  /**
+   * Proporciona un Observable del estado de la sesión.
+   */
+  getSession(): Observable<Session | null> {
+    return this.session$.asObservable();
+  }
+
+  updateData(data: Partial<Session>) {
+    // const session: Session = { ...this.session$.getValue() } as Session;
+    const saved = this.getSaved();
+    console.log({ saved, data });
+
+    if (!saved || data.id !== saved.session?.id) return;
+    const session = { ...saved.session, ...data } as Session;
+    this.storage.save(this.tokenKey, {
+      ...saved,
+      session,
+    });
+    this.session$.next(session);
+  }
+
+  /**
+   * Verifica si el usuario está logueado.
+   */
+  isLogged(): boolean {
+    return !!this.session$.getValue();
+  }
+
+  /**
+   * Valida si el token almacenado es válido (no expirado).
+   */
+  isValid(): boolean {
+    if (!this.isLogged()) return false;
+
+    try {
+      const token = this.getToken();
+      const decoded = jwtDecode<{ exp: number }>(token);
+      const valid = decoded.exp > Math.floor(Date.now() / 1000);
+      console.log({ valid, rem: decoded.exp - Math.floor(Date.now() / 1000) });
+      if (!valid) {
+        this.logout();
+      }
+      return valid;
+    } catch (error) {
+      console.error('Token validation failed', error);
+      return false;
+    }
+  }
+
+  /**
+   * Carga la sesión desde el token almacenado.
+   */
+  private loadSessionFromToken(): Session | null {
+    try {
+      // const token = this.getToken();
+      // const decoded = jwtDecode<{ user: Session }>(token);
+      // return decoded.user;
+      return this.getSaved()!.session!;
+    } catch {
+      return null; // Retornar null si no hay token válido.
+    }
+  }
+}

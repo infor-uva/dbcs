@@ -1,0 +1,148 @@
+<div class="container">
+  <mat-card>
+    <mat-card-title class="flex text-center p-4">
+      <strong class="text-5xl">{{ titleText }}</strong>
+    </mat-card-title>
+    <mat-card-content>
+      @if (!isAuth) {
+      <div class="grid grid-flow-col mb-5">
+        @if (!isEditing) {
+        <div>
+          @if (isHotelManager) {
+          <a [routerLink]="[getHotelsUri()]">
+            <button class="btn btn-primary">Mis hoteles</button>
+          </a>
+          }@else if(!isAdmin){
+          <a [routerLink]="[getBookingsUri()]">
+            <button class="btn btn-primary">Mis Reservas</button>
+          </a>
+          }
+        </div>
+        }
+        <div>
+          <div class="flex items-center gap-5">
+            <span class="text-3xl font-bold ml-auto"> Is Editing </span>
+            <mat-slide-toggle
+              [(ngModel)]="isEditing"
+              (toggleChange)="switchMode()"
+            />
+          </div>
+          @if (isEditing) {
+          <div class="flex items-center gap-5 mt-3">
+            <span class="text-3xl font-bold ml-auto"> Change password </span>
+            <mat-slide-toggle
+              [(ngModel)]="isChangePassword"
+              (toggleChange)="togglePassword()"
+            />
+          </div>
+          }
+        </div>
+      </div>
+      }
+      <form [formGroup]="userForm" (submit)="onSubmit()">
+        @if (!isChangePassword) { @if (!isLogin){
+        <!-- Campo Nombre -->
+        <div class="form-group">
+          <label for="name">Nombre:</label>
+          <input
+            id="name"
+            type="text"
+            class="form-control"
+            autocomplete="name"
+            formControlName="name"
+            placeholder="Introduce tu nombre"
+          />
+        </div>
+        }
+        <!-- Campo Email -->
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input
+            id="email"
+            type="email"
+            autocomplete="email"
+            class="form-control"
+            formControlName="email"
+            placeholder="Introduce tu email"
+          />
+        </div>
+        } @if ((isChangePassword || isAuth) && (isMeRoute || isAuth)) {
+        <!-- Campo Contraseña Actual (solo en edición) -->
+        <div class="form-group">
+          <label for="currentPassword">{{ currentPasswordText }}:</label>
+          <input
+            id="currentPassword"
+            type="password"
+            class="form-control"
+            formControlName="currentPassword"
+            autocomplete="current-password"
+            placeholder="Introduce tu {{ currentPasswordText }}"
+          />
+        </div>
+        } @if (isChangePassword) {
+        <!-- Campo Nueva Contraseña (solo en edición) -->
+        <div class="form-group">
+          <label for="newPassword">Nueva contraseña:</label>
+          <input
+            id="newPassword"
+            type="password"
+            class="form-control"
+            formControlName="newPassword"
+            autocomplete="new-password"
+            placeholder="Introduce la nueva contraseña"
+          />
+        </div>
+        }@if (isChangePassword || isRegister) {
+        <!-- Campo Contraseña Actual (solo en edición) -->
+        <div class="form-group">
+          <label for="confirmPassword">Confirma contraseña:</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            class="form-control"
+            formControlName="confirmPassword"
+            autocomplete="current-password"
+            placeholder="Confirma {{
+              isChangePassword ? 'tu nueva contraseña' : 'la contraseña'
+            }}"
+          />
+        </div>
+        } @if (isRegister) {
+        <div class="form-group text-2xl">
+          <label class="text-2xl" for="rol">Rol:</label>
+          <mat-form-field class="w-full">
+            <mat-label class="text-2xl">Seleccione un rol</mat-label>
+            <mat-select name="rol" formControlName="rol">
+              @for (rol of rolOptions; track rol) {
+              <mat-option [value]="rol">
+                <span class="text-2xl">{{ rol }}</span>
+              </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        } @if (!isViewUser) { @if (isAuth) {
+        <p class="text-right">
+          @if (isLogin) {
+          <a [routerLink]="['/register']">¿No tienes cuenta?</a>
+          }@else {
+          <a [routerLink]="['/login']">¿Ya tienes cuenta?</a>
+          }
+        </p>
+        }
+        <!-- Grupo de Botones -->
+        <mat-card-actions class="flex justify-center mb-5">
+          <!-- [disabled]="registerForm.invalid" -->
+          <button
+            type="submit"
+            class="btn btn-success text-4xl"
+            [disabled]="!validForm()"
+          >
+            {{ submitButtonText }}
+          </button>
+        </mat-card-actions>
+        }
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

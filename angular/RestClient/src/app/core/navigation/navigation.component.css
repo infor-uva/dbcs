@@ -4,7 +4,7 @@ nav {
   padding: 1em;
 }
 
-ul {
+ul.nav {
   list-style: none;
   padding: 0;
   display: flex;
@@ -14,24 +14,30 @@ li {
   margin-right: 20px;
 }
 
-a,
-a:visited {
+a.nav-link,
+a.nav-link:visited {
   color: white;
   text-decoration: none;
   transform: scale(1);
   transition: transform 0.3s ease;
 }
 
-a:hover {
+a.nav-link:hover {
   font-weight: bold;
   text-decoration: underline;
-  color: yellow;
+  color: rgb(112, 112, 112);
   transition: transform 0.3s ease;
   transform: scale(1.5);
 }
 
 .active {
   font-weight: bold;
+}
+
+a.simple,
+a.simple:visited {
+  color: white;
+  text-decoration: none;
 }
 
 @keyframes escalar {

@@ -7,12 +7,12 @@ import {
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { Hotel, Room, RoomType, roomTypeArray } from '../../../../../types';
-
+import { Hotel, Room, RoomType, roomTypeArray } from '../../../../types';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
-import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
+import { LocalStorageService } from '../../../../shared/local-storage.service';
+import { HotelClientService } from '../../../../shared/hotel-client.service';
 
 type SelectableRoomType = 'All' | RoomType;
 const selectableRoomTypeArray: SelectableRoomType[] = ['All', ...roomTypeArray];
@@ -36,23 +36,27 @@ const selectableRoomTypeArray: SelectableRoomType[] = ['All', ...roomTypeArray];
 })
 export class BookingListComponent {
   searched: boolean = false;
+  hotels!: Hotel[];
   start?: Date;
   end?: Date;
-  hotels!: Hotel[];
   hotelSelected?: Hotel;
   roomTypeSelected?: SelectableRoomType;
   roomTypes = selectableRoomTypeArray;
   rooms: Room[] = [];
   trateRooms: Room[] = [];
 
-  constructor(private router: Router, private client: ClienteApiRestService) {}
+  constructor(
+    private router: Router,
+    private hotelClient: HotelClientService,
+    private storage: LocalStorageService
+  ) {}
 
   ngOnInit() {
     this.getHotels();
   }
 
   getHotels() {
-    this.client.getAllHotels().subscribe({
+    this.hotelClient.getAllHotels().subscribe({
       next: (resp) => {
         if (resp != null) this.hotels = [...resp];
       },
@@ -72,7 +76,7 @@ export class BookingListComponent {
   }
 
   search() {
-    this.client
+    this.hotelClient
       .getRoomsAvailableInDateRange(
         this.hotelSelected!.id,
         this.start!,
@@ -95,14 +99,11 @@ export class BookingListComponent {
   }
 
   bookingRoom(roomId: number) {
-    localStorage.setItem(
-      'booking-data',
-      JSON.stringify({
-        roomId,
-        startDate: this.start,
-        endDate: this.end,
-      })
-    );
+    this.storage.save('booking-data', {
+      roomId,
+      startDate: this.start,
+      endDate: this.end,
+    });
     this.router.navigate(['/bookings', 'new'], { queryParams: { roomId } });
   }
 }

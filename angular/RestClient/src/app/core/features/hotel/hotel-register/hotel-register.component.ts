@@ -13,9 +13,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CommonModule } from '@angular/common';
-import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
-import { Address, Hotel, Room } from '../../../../../types';
+import { Address, Hotel, Room } from '../../../../types';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HotelClientService } from '../../../../shared/hotel-client.service';
+import { MatIconModule } from '@angular/material/icon';
 
 const emptyRoom: Room = {
   id: 0,
@@ -59,19 +60,22 @@ export class HotelRegisterComponent {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private client: ClienteApiRestService
+    private hotelClient: HotelClientService
   ) {
     this.hotelForm = this.setHotelForm();
     this.editMode = false;
     this.route.paramMap.subscribe({
       next: (params) => {
         const id = Number(params.get('id'));
+        if (!id) {
+          this.router.navigateByUrl('/hotels/register');
+        }
         this.editMode = id !== 0;
         if (this.editMode) {
-          this.client.getHotel(id).subscribe({
+          this.hotelClient.getHotel(id).subscribe({
             next: (h) => this.setHotelForm(h),
             error: (error) => {
-              this.router.navigate(['/hotels/new']);
+              this.router.navigateByUrl('/hotels/register');
             },
           });
         }
@@ -102,12 +106,12 @@ export class HotelRegisterComponent {
   onSubmit(): void {
     if (this.hotelForm.valid) {
       const hotel = this.hotelForm.value as Hotel;
-      this.client.addHotel(hotel).subscribe({
+      this.hotelClient.addHotel(hotel).subscribe({
         next: (resp) => {
-          if (resp.status < 400) {
+          if (resp) {
+            console.log({ resp });
             alert('Hotel guardado correctamente');
             this.router.navigate(['/hotels']);
-          } else {
           }
         },
         error: (err) => {

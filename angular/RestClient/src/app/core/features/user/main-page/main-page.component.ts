@@ -1,44 +1,66 @@
-// main-page.component.ts
-import { Component, OnInit } from '@angular/core';
-import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
-import { User, UserStateFilter } from '../../../../../types';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Client, User, UserStateFilter } from '../../../../types';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import users from '../../../../../mocks/users.json';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { UserClientService } from '../../../../shared/user-client.service';
+import { users } from '../../../../../mocks/users'; // Renombrado para claridad
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatCardModule } from '@angular/material/card';
+
 @Component({
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule],
+  imports: [
+    FormsModule,
+    CommonModule,
+    RouterModule,
+    MatTableModule,
+    MatCardModule,
+    MatPaginatorModule,
+  ],
   selector: 'app-main-page',
   templateUrl: './main-page.component.html',
   styleUrls: ['./main-page.component.css'],
 })
 export class MainPageComponent implements OnInit {
-  users: User[] = [];
-  filteredUsers: User[] = [];
+  users: Client[] = [];
+  filteredUsers: Client[] = [];
   selectedStatus: UserStateFilter = 'All';
+  displayedColumns: string[] = ['id', 'name', 'email', 'rol'];
+  dataSource = new MatTableDataSource<User>();
 
-  constructor(private ClienteApiRestService: ClienteApiRestService) {}
+  constructor(private userClient: UserClientService, private router: Router) {}
 
   ngOnInit(): void {
-    this.users = users as unknown as User[];
-    this.ClienteApiRestService.getAllUsers().subscribe((data: User[]) => {
-      this.users = data;
-      this.filteredUsers = data; // Inicialmente, muestra todos los usuarios
+    this.users = users;
+    this.filteredUsers = [...this.users];
+
+    // Sobrescribir con datos reales si están disponibles
+    this.userClient.getAllUsers().subscribe({
+      next: (data: Client[]) => {
+        this.users = data;
+        this.filterUsers();
+      },
+      error: (err) => console.error('Error al cargar usuarios:', err),
     });
   }
 
+  @ViewChild(MatPaginator) paginator?: MatPaginator;
+
   filterUsers(): void {
     if (this.selectedStatus === 'All') {
-      this.filteredUsers = this.users;
+      this.filteredUsers = [...this.users];
     } else {
       this.filteredUsers = this.users.filter(
         (user) => user.status === this.selectedStatus
       );
     }
+    this.dataSource = new MatTableDataSource<User>(this.filteredUsers);
+    this.dataSource.paginator = this.paginator!;
   }
 
-  getState(user: User) {
+  getState(user: Client): string {
     switch (user.status) {
       case 'NO_BOOKINGS':
         return 'SIN RESERVAS';
@@ -46,6 +68,12 @@ export class MainPageComponent implements OnInit {
         return 'CON RESERVAS ACTIVAS';
       case 'WITH_INACTIVE_BOOKINGS':
         return 'CON RESERVAS INACTIVAS';
+      default:
+        return 'ESTADO DESCONOCIDO';
     }
+  }
+
+  userDetails(id: number) {
+    this.router.navigate(['/admin', 'users', id]);
   }
 }

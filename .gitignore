@@ -1,3 +1,10 @@
 ### Own ###
 taller
 *.pdf
+**/target/
+**/.vscode
+**/tmp
+**/*.tmp
+*.ln
+*.log
+

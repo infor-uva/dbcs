@@ -1,0 +1,73 @@
+volumes:
+  kong_data: {}
+  users_data: {}
+
+networks:
+  kong-net: {}
+
+services:
+  Auth-API:
+    image: auth-api-image
+    hostname: ${AUTH_SERVICE_HOSTNAME}
+    build:
+      context: ./java/services/auth
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8101:8101
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
+    depends_on:
+      - RoomsBooking-database
+
+  RoomsBooking-API:
+    image: rooms-booking-api-image
+    hostname: ${ROOMS_BOOKING_SERVICE_HOSTNAME}
+    build:
+      context: ./java/roomBooking
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
+    depends_on:
+      - RoomsBooking-database
+
+  RoomsBooking-database:
+    image: mysql
+    hostname: ${DB_SERVICE_HOSTNAME}
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    networks:
+      - kong-net
+    volumes:
+      - users_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ClaveRoot
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: RoomsBooking
+      MYSQL_ROOT_HOST: "%"
+
+  RoomsBooking-Web:
+    image: roomsbooking-web-image
+    build:
+      context: ./angular/RestClient
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - 4200:80
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
+    depends_on:
+      - RoomsBooking-database

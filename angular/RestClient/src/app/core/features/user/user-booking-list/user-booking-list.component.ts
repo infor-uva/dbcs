@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
-import { ClienteApiRestService } from '../../../../shared/cliente-api-rest.service';
-import { Booking, User } from '../../../../../types';
+
+import { Booking, User } from '../../../../types';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BookingService } from '../../../../shared/booking.service';
+import { UserClientService } from '../../../../shared/user-client.service';
+import { BookingClientService } from '../../../../shared/booking-client.service';
+import { SessionService } from '../../../../shared/session.service';
+import { Observable } from 'rxjs';
 
 type state = 'all' | 'active' | 'inactive';
 
@@ -20,31 +22,35 @@ export class UserBookingListComponent {
   selectedState: state = 'all';
   search = false;
   bookings: Booking[] = [];
-  userId: number = 0;
-  user?: User;
+  user: User = { id: 0, name: '', email: '', rol: 'CLIENT' };
 
   constructor(
-    private client: ClienteApiRestService,
-    private bookingClient: BookingService,
+    private userClient: UserClientService,
+    private bookingClient: BookingClientService,
+    private sessionService: SessionService,
     private route: ActivatedRoute
   ) {
-    this.route.paramMap.subscribe({
-      next: (params) => {
-        this.userId = Number(params.get('id'));
+    this.loadUser();
+  }
+
+  resolve(): Observable<any> {
+    const id = this.route.snapshot.paramMap.get('id');
+    return id
+      ? this.userClient.getUser(Number(id))
+      : this.sessionService.getSession();
+  }
+
+  loadUser() {
+    this.resolve().subscribe({
+      next: (user) => {
+        this.user = user;
         this.updateBookings();
       },
     });
-    this.client
-      .getUser(this.userId)
-      .subscribe({ next: (user) => (this.user = user) });
-  }
-
-  ngOnInit() {
-    this.updateBookings();
   }
 
   updateBookings() {
-    this.client.getUserBookings(this.userId).subscribe({
+    this.bookingClient.getBookingsByUser(this.user.id).subscribe({
       next: (bookings) => {
         this.search = true;
         switch (this.selectedState) {
@@ -70,9 +76,10 @@ export class UserBookingListComponent {
   }
 
   genBookingState(booking: Booking) {
-    return new Date(booking.endDate).getTime() < Date.now()
-      ? 'Reserva inactiva'
-      : 'Reserva activa';
+    return new Date().setHours(0, 0, 0, 0) <=
+      new Date(booking.endDate).getTime()
+      ? 'Reserva activa'
+      : 'Reserva inactiva';
   }
 
   deleteBooking(bookingId: number) {
@@ -88,7 +95,7 @@ export class UserBookingListComponent {
   }
 
   updateUserStatus() {
-    this.client.getUserBookings(this.userId).subscribe({
+    this.bookingClient.getBookingsByUser(this.user.id).subscribe({
       next: (bookings) => {
         const withActive = bookings.find(
           (booking) => this.genBookingState(booking) === 'Reserva activa'
@@ -97,8 +104,8 @@ export class UserBookingListComponent {
           (booking) => this.genBookingState(booking) === 'Reserva inactiva'
         );
         if (withActive) {
-          this.client
-            .alterUserStatus(this.userId, 'WITH_ACTIVE_BOOKINGS')
+          this.userClient
+            .alterUserStatus(this.user.id, 'WITH_ACTIVE_BOOKINGS')
             .subscribe({
               next: (response) => {
                 console.log('Cambio de estado en el usuario a activo correcto');
@@ -108,8 +115,8 @@ export class UserBookingListComponent {
               },
             });
         } else if (withInactive) {
-          this.client
-            .alterUserStatus(this.userId, 'WITH_INACTIVE_BOOKINGS')
+          this.userClient
+            .alterUserStatus(this.user.id, 'WITH_INACTIVE_BOOKINGS')
             .subscribe({
               next: (response) => {
                 console.log(
@@ -123,18 +130,20 @@ export class UserBookingListComponent {
               },
             });
         } else {
-          this.client.alterUserStatus(this.userId, 'NO_BOOKINGS').subscribe({
-            next: (response) => {
-              console.log(
-                'Cambio de estado en el usuario a sin reservas correcto'
-              );
-            },
-            error: (err) => {
-              console.error(
-                'Error al cambiar de estado al usuario sin reservas'
-              );
-            },
-          });
+          this.userClient
+            .alterUserStatus(this.user.id, 'NO_BOOKINGS')
+            .subscribe({
+              next: (response) => {
+                console.log(
+                  'Cambio de estado en el usuario a sin reservas correcto'
+                );
+              },
+              error: (err) => {
+                console.error(
+                  'Error al cambiar de estado al usuario sin reservas'
+                );
+              },
+            });
         }
       },
     });
