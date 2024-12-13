@@ -1,62 +1,239 @@
 volumes:
   kong_data: {}
   users_data: {}
+  hotels_data: {}
+  bookings_data: {}
 
-networks:
-  kong-net: {}
+networks: #Red interna para comunicar los servicios
+  kong-net:
 
 services:
+  #######################################
+  # Kong
+  #######################################
+
+  # Postgres: The database used by Kong
+  kong-database:
+    image: postgres:9.6
+    container_DATABASE: kong-postgres
+    restart: on-failure
+    networks:
+      - kong-net
+    volumes:
+      - kong_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: ${KONG_PG_PASSWORD:-kong}
+      POSTGRES_DB: kong
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: [CMD, pg_isready, -U, kong]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  # Kong database migration
+  kong-migration:
+    image: ${KONG_DOCKER_TAG:-kong:latest}
+    command: kong migrations bootstrap
+    networks:
+      - kong-net
+    restart: on-failure
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD:-kong}
+    depends_on:
+      kong-database:
+        condition: service_healthy
+
+  # Kong: The API Gateway
+  kong:
+    image: ${KONG_DOCKER_TAG:-kong:latest}
+    restart: on-failure
+    networks:
+      - kong-net
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD:-kong}
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_PROXY_LISTEN_SSL: 0.0.0.0:8443
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, kong, health]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    ports:
+      - 8000:8000
+      - 8001:8001
+      - 8443:8443
+      - 8444:8444
+
+  #######################################
+  # Konga
+  #######################################
+
+  # Konga database prepare
+  konga-prepare:
+    image: pantsel/konga:latest
+    command: "-c prepare -a postgres -u postgresql://kong:${KONG_PG_PASSWORD:-kong}@kong-database:5432/konga"
+    networks:
+      - kong-net
+    restart: on-failure
+    depends_on:
+      kong-database:
+        condition: service_healthy
+
+  # Konga: Kong GUI
+  konga:
+    image: pantsel/konga:latest
+    restart: always
+    networks:
+      - kong-net
+    environment:
+      DB_ADAPTER: postgres
+      DB_URI: postgresql://kong:${KONG_PG_PASSWORD:-kong}@kong-database:5432/konga
+      NODE_ENV: production
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    ports:
+      - 1337:133
+
+  #######################################
+  # APIs
+  #######################################
+
   Auth-API:
     image: auth-api-image
-    hostname: ${AUTH_SERVICE_HOSTNAME}
+    hostname: ${API_AUTH_HOSTNAME}
     build:
       context: ./java/services/auth
       dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-      - 8101:8101
     networks:
       - kong-net
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
+      # TODO Meter kid y secret key
+      KID: ${JWT_KID}
+      SECRET_KEY: ${JWT_KID}
+      EXTERNAL_SERVICE_USERS_URL: ${API_USERS_URL}${API_USERS_ENDPOINT}
     depends_on:
-      - RoomsBooking-database
+      - Users-API
 
-  RoomsBooking-API:
-    image: rooms-booking-api-image
-    hostname: ${ROOMS_BOOKING_SERVICE_HOSTNAME}
+  Users-API:
+    image: users-api-image
+    hostname: ${API_USERS_HOSTNAME}
     build:
-      context: ./java/roomBooking
+      context: ./java/services/user
       dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-      - 8080:8080
     networks:
       - kong-net
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_USERS_HOSTNAME}:${DB_USERS_PORT:-3306}/${DB_USERS_DATABASE}?createDatabaseIfNotExist=true
+      EXTERNAL_SERVICE_USERS_URL: ${API_USERS_URL}${API_USERS_ENDPOINT}
     depends_on:
-      - RoomsBooking-database
+      - Users-DB
 
-  RoomsBooking-database:
+  Hotels-API:
+    image: hotels-api-image
+    hostname: ${API_HOTELS_HOSTNAME}
+    build:
+      context: ./java/services/hotels
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_HOTELS_HOSTNAME}:${DB_HOTELS_PORT:-3306}/${DB_HOTELS_DATABASE}?createDatabaseIfNotExist=true
+    depends_on:
+      - Hotels-DB
+
+  Bookings-API:
+    image: bookings-api-image
+    hostname: ${API_BOOKINGS_HOSTNAME}
+    build:
+      context: ./java/services/bookings
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - kong-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_BOOKINGS_HOSTNAME}:${DB_BOOKINGS_PORT:-3306}/${DB_BOOKINGS_DATABASE}?createDatabaseIfNotExist=true
+    depends_on:
+      - Users-API
+      - Hotels-API
+      - Bookings-DB
+
+  #######################################
+  # Databases
+  #######################################
+
+  Users-DB:
     image: mysql
-    hostname: ${DB_SERVICE_HOSTNAME}
+    hostname: ${DB_USERS_HOSTNAME}
     cap_add:
       - SYS_NICE
     restart: unless-stopped
-    ports:
-      - "3307:3306"
     networks:
       - kong-net
     volumes:
       - users_data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ClaveRoot
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: RoomsBooking
+      MYSQL_ROOT_PASSWORD: ${DB_CREDENTIALS_ROOT_PASSWORD:-ClaveRoot}
+      MYSQL_USER: ${DB_CREDENTIALS_USER:-user}
+      MYSQL_PASSWORD: ${DB_CREDENTIALS_PASSWORD:-password}
+      MYSQL_DATABASE: ${DB_USERS_DATABASE}
       MYSQL_ROOT_HOST: "%"
 
+  Hotels-DB:
+    image: mysql
+    hostname: ${DB_HOTELS_HOSTNAME}
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+    networks:
+      - kong-net
+    volumes:
+      - hotels_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_CREDENTIALS_ROOT_PASSWORD:-ClaveRoot}
+      MYSQL_USER: ${DB_CREDENTIALS_USER:-user}
+      MYSQL_PASSWORD: ${DB_CREDENTIALS_PASSWORD:-password}
+      MYSQL_DATABASE: ${DB_HOTELS_DATABASE}
+      MYSQL_ROOT_HOST: "%"
+
+  Bookings-DB:
+    image: mysql
+    hostname: ${DB_BOOKINGS_HOSTNAME}
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+    networks:
+      - kong-net
+    volumes:
+      - hotels_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_CREDENTIALS_ROOT_PASSWORD:-ClaveRoot}
+      MYSQL_USER: ${DB_CREDENTIALS_USER:-user}
+      MYSQL_PASSWORD: ${DB_CREDENTIALS_PASSWORD:-password}
+      MYSQL_DATABASE: ${DB_BOOKINGS_DATABASE}
+      MYSQL_ROOT_HOST: "%"
+
+  #######################################
+  # Cliente Angular
+  #######################################
   RoomsBooking-Web:
     image: roomsbooking-web-image
     build:
@@ -67,7 +244,5 @@ services:
       - 4200:80
     networks:
       - kong-net
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_SERVICE_HOSTNAME}:3306/${DB_DATABASE_NAME}?createDatabaseIfNotExist=true
     depends_on:
       - RoomsBooking-database

@@ -31,7 +31,7 @@ public class UserAPI {
   private final User USER = new User(-1, "admin", null, null, UserRol.ADMIN);
 
   private String getAccessToken() {
-    if (token == null || token.isEmpty() || jwtUtil.isTokenValid(token, USER)) {
+    if (token == null || token.isEmpty()) {
       token = jwtUtil.generateToken(USER);
     }
     return token;
