@@ -1,11 +1,20 @@
 import { Injectable } from '@angular/core';
 import { LocalStorageService } from './local-storage.service';
-import { PersistenToken, Session, UserRol } from '../types';
+import { PersistenToken, Session, User, UserRol } from '../types';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { AuthClientService } from './auth-client.service';
 import { Router } from '@angular/router';
+
+interface JWTDecoded {
+  userId: number;
+  rol: UserRol;
+  name: string;
+  email: string;
+  iat: number;
+  exp: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +31,6 @@ export class SessionService {
   ) {
     // Inicializar el estado de sesión desde el token almacenado
     const initialSession = this.loadSessionFromToken();
-    console.log({ initialSession });
 
     this.session$ = new BehaviorSubject<Session | null>(initialSession);
   }
@@ -32,9 +40,10 @@ export class SessionService {
   }
 
   private setSession(resp: any) {
-    const decoded = jwtDecode<{ user: Session }>(resp.token);
-    this.session$.next(decoded.user);
-    this.storage.save(this.tokenKey, { ...resp, session: decoded.user });
+    const decoded = jwtDecode<JWTDecoded>(resp.token);
+    const user: User = { ...decoded, id: decoded.userId };
+    this.session$.next(user);
+    this.storage.save(this.tokenKey, { ...resp, session: user });
     const mainPage = this.getMainPage(decoded.user.rol as UserRol);
     return { ...resp, mainPage };
   }
@@ -44,7 +53,7 @@ export class SessionService {
    */
   login(email: string, password: string): Observable<any> {
     return this.authService.login(email, password).pipe(
-      map((r) => this.setSession(r)),
+      map((response) => this.setSession(response)),
       catchError((error) => {
         console.error('Login failed', error);
         return throwError(() => new Error('Login failed'));
@@ -148,9 +157,6 @@ export class SessionService {
    */
   private loadSessionFromToken(): Session | null {
     try {
-      // const token = this.getToken();
-      // const decoded = jwtDecode<{ user: Session }>(token);
-      // return decoded.user;
       return this.getSaved()!.session!;
     } catch {
       return null; // Retornar null si no hay token válido.
