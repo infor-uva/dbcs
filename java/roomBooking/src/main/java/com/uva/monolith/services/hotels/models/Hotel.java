@@ -1,8 +1,8 @@
-package com.uva.monolith.services.hotels.models;
+package com.uva.api.services.hotels.models;
 
 import java.util.List;
 
-import com.uva.monolith.services.users.models.HotelManager;
+import com.uva.api.services.users.models.HotelManager;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;

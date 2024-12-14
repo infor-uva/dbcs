@@ -1,15 +1,13 @@
 package com.uva.authentication.utils;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.uva.authentication.models.remote.User;
+import com.uva.authentication.models.remote.Response;
 
 @Component
 public class JwtUtil {
@@ -27,7 +25,7 @@ public class JwtUtil {
     return jwtExpiration;
   }
 
-  public String generateToken(User user) {
+  public String generateToken(Response user) {
     Algorithm algorithm = Algorithm.HMAC256(secretKey);
     return JWT
         .create()
@@ -40,4 +38,7 @@ public class JwtUtil {
         .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpiration * 1000))
         .sign(algorithm);
   }
+
+  // TODO estaría guapo recuperar métodos de validación para el token de petición
+  // para este servicio
 }

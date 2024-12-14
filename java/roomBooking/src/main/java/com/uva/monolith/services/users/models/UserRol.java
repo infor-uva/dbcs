@@ -1,4 +1,4 @@
-package com.uva.monolith.services.users.models;
+package com.uva.api.services.users.models;
 
 public enum UserRol {
   ADMIN, HOTEL_ADMIN, CLIENT

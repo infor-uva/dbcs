@@ -1,22 +1,16 @@
 package com.uva.authentication.services;
 
-import java.util.Optional;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.uva.authentication.api.UserAPI;
 import com.uva.authentication.models.LoginRequest;
 import com.uva.authentication.models.RegisterRequest;
-import com.uva.authentication.models.remote.Client;
-import com.uva.authentication.models.remote.HotelManager;
+import com.uva.authentication.models.remote.Response;
 import com.uva.authentication.models.remote.User;
-import com.uva.authentication.models.remote.UserRol;
-import com.uva.authentication.repositories.ClientRepository;
-import com.uva.authentication.repositories.HotelManagerRepository;
-import com.uva.authentication.repositories.UserRepository;
 import com.uva.authentication.utils.JwtUtil;
 import com.uva.authentication.utils.SecurityUtils;
 
@@ -27,24 +21,26 @@ public class AuthService {
   private JwtUtil jwtUtil;
 
   @Autowired
-  private HotelManagerRepository hotelManagerRepository;
+  private UserAPI userAPI;
 
-  @Autowired
-  private ClientRepository clientRepository;
-
-  @Autowired
-  private UserRepository userRepository;
-
-  private boolean authenticateUser(LoginRequest request, User user) {
-    if (user == null)
-      return false;
-    return SecurityUtils.checkPassword(request.getPassword(), user.getPassword());
+  private boolean authenticateUser(LoginRequest request, Response user) {
+    System.err.println(user.getPassword() + " " + request.getPassword());
+    return (user != null)
+        ? SecurityUtils.checkPassword(request.getPassword(), user.getPassword())
+        : false;
   }
 
+  /**
+   * Log the user
+   * 
+   * @param loginRequest
+   * @return token for identify the user
+   * @throws HttpClientErrorException(FORBIDDEN) if the credentials are invalid
+   */
   public String login(LoginRequest loginRequest) {
-    User user = userRepository.findByEmail(loginRequest.getEmail())
-        .orElseThrow(() -> new HttpClientErrorException(HttpStatus.FORBIDDEN,
-            "Invalid credentials"));
+    Response user = userAPI.getUserByEmail(loginRequest.getEmail());
+    System.err.println(user.getName() + ", " + user.getEmail() + ", " +
+        user.getRol() + ", " + user.getPassword());
 
     if (!authenticateUser(loginRequest, user)) {
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials");
@@ -53,46 +49,15 @@ public class AuthService {
     return jwtUtil.generateToken(user);
   }
 
-  public User register(RegisterRequest registerRequest) {
-    Optional<User> user = userRepository.findByEmail(registerRequest.getEmail());
-    if (user.isPresent())
-      throw new HttpClientErrorException(HttpStatus.CONFLICT, "Email already in use");
-
-    return registerNewUser(registerRequest);
-  }
-
-  private User registerNewUser(RegisterRequest registerRequest) {
-    User newUser;
-
+  public String register(RegisterRequest registerRequest) {
     // Ciframos la contraseña
     String hashPass = SecurityUtils.encrypt(registerRequest.getPassword());
     registerRequest.setPassword(hashPass);
+    // Registramos el usuario
+    User user = userAPI.registerUser(registerRequest);
+    LoginRequest logReq = new LoginRequest();
+    BeanUtils.copyProperties(user, logReq);
 
-    // Aseguramos que tenga un rol, por defecto es cliente
-    if (registerRequest.getRol() == null)
-      registerRequest.setRol(UserRol.CLIENT);
-
-    switch (registerRequest.getRol()) {
-      case HOTEL_ADMIN:
-        HotelManager hm = new HotelManager();
-        BeanUtils.copyProperties(registerRequest, hm);
-        newUser = hotelManagerRepository.save(hm);
-        break;
-
-      case ADMIN:
-        User admin = new User();
-        BeanUtils.copyProperties(registerRequest, admin);
-        newUser = userRepository.save(admin);
-        break;
-
-      case CLIENT: // Por defecto cliente normal
-      default:
-        Client client = new Client();
-        BeanUtils.copyProperties(registerRequest, client);
-        client.setRol(UserRol.CLIENT);
-        newUser = clientRepository.save(client);
-        break;
-    }
-    return newUser;
+    return login(logReq);
   }
 }

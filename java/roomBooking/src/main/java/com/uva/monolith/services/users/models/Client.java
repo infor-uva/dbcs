@@ -1,11 +1,11 @@
-package com.uva.monolith.services.users.models;
+package com.uva.api.services.users.models;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.uva.monolith.services.bookings.models.Booking;
+import com.uva.api.services.bookings.models.Booking;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;

@@ -1,7 +1,7 @@
-package com.uva.monolith.services.bookings.controllers;
+package com.uva.api.services.bookings.controllers;
 
-import com.uva.monolith.services.bookings.models.Booking;
-import com.uva.monolith.services.bookings.services.BookingService;
+import com.uva.api.services.bookings.models.Booking;
+import com.uva.api.services.bookings.services.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

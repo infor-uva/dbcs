@@ -1,4 +1,4 @@
-package com.uva.monolith.services.hotels.models;
+package com.uva.api.services.hotels.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

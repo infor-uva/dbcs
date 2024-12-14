@@ -1,4 +1,4 @@
-package com.uva.monolith.services.users.services;
+package com.uva.api.services.users.services;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,12 +10,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.uva.monolith.services.users.models.AuthResponse;
-import com.uva.monolith.services.users.models.Client;
-import com.uva.monolith.services.users.models.User;
-import com.uva.monolith.services.users.models.UserStatus;
-import com.uva.monolith.services.users.repositories.ClientRepository;
-import com.uva.monolith.services.users.repositories.UserRepository;
+import com.uva.api.services.users.models.AuthResponse;
+import com.uva.api.services.users.models.Client;
+import com.uva.api.services.users.models.HotelManager;
+import com.uva.api.services.users.models.User;
+import com.uva.api.services.users.models.UserRol;
+import com.uva.api.services.users.models.UserStatus;
+import com.uva.api.services.users.repositories.ClientRepository;
+import com.uva.api.services.users.repositories.HotelManagerRepository;
+import com.uva.api.services.users.repositories.UserRepository;
 
 @Service
 public class UserService {
@@ -25,6 +28,9 @@ public class UserService {
 
   @Autowired
   private ClientRepository clientRepository;
+
+  @Autowired
+  private HotelManagerRepository hotelManagerRepository;
 
   public List<User> getAllUsers() {
     return userRepository.findAll();
@@ -42,19 +48,38 @@ public class UserService {
     User u = assertUser(userRepository.findByEmail(email));
     AuthResponse auth = new AuthResponse();
     BeanUtils.copyProperties(u, auth);
-    auth.setUsername(u.getName());
     return auth;
   }
 
-  public User addUser(User user) {
-    // Actualmente está en el servicio AUTH
-    // TODO adaptar adecuadamente
-    throw new HttpClientErrorException(HttpStatus.MOVED_PERMANENTLY, "servicio actual en http://localhost:8101/login");
-    // user.setStatus(UserStatus.NO_BOOKINGS);
-    // if (user.getRol() == null) // Rol por defecto
-    // user.setRol(UserRol.CONSUMER);
-    // // Guardamos
-    // return userRepository.save(user);
+  public User registerNewUser(User registerRequest) {
+    User newUser;
+
+    // Aseguramos que tenga un rol, por defecto es cliente
+    if (registerRequest.getRol() == null)
+      registerRequest.setRol(UserRol.CLIENT);
+
+    switch (registerRequest.getRol()) {
+      case HOTEL_ADMIN:
+        HotelManager hm = new HotelManager();
+        BeanUtils.copyProperties(registerRequest, hm);
+        newUser = hotelManagerRepository.save(hm);
+        break;
+
+      case ADMIN:
+        User admin = new User();
+        BeanUtils.copyProperties(registerRequest, admin);
+        newUser = admin; // userAPI.save(admin);
+        break;
+
+      case CLIENT: // Por defecto cliente normal
+      default:
+        Client client = new Client();
+        BeanUtils.copyProperties(registerRequest, client);
+        client.setRol(UserRol.CLIENT);
+        newUser = clientRepository.save(client);
+        break;
+    }
+    return newUser;
   }
 
   public User updateUserData(int id, String name, String email) {

@@ -1,4 +1,4 @@
-package com.uva.monolith.services.hotels.controllers;
+package com.uva.api.services.hotels.controllers;
 
 import java.util.List;
 import java.util.Map;
@@ -11,16 +11,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import com.uva.monolith.exceptions.HotelNotFoundException;
-import com.uva.monolith.exceptions.InvalidDateRangeException;
-import com.uva.monolith.exceptions.InvalidRequestException;
-import com.uva.monolith.services.bookings.repositories.BookingRepository;
-import com.uva.monolith.services.hotels.models.Hotel;
-import com.uva.monolith.services.hotels.models.Room;
-import com.uva.monolith.services.hotels.repositories.HotelRepository;
-import com.uva.monolith.services.hotels.repositories.RoomRepository;
-import com.uva.monolith.services.users.models.HotelManager;
-import com.uva.monolith.services.users.repositories.HotelManagerRepository;
+import com.uva.api.exceptions.HotelNotFoundException;
+import com.uva.api.exceptions.InvalidDateRangeException;
+import com.uva.api.exceptions.InvalidRequestException;
+import com.uva.api.services.bookings.repositories.BookingRepository;
+import com.uva.api.services.hotels.models.Hotel;
+import com.uva.api.services.hotels.models.Room;
+import com.uva.api.services.hotels.repositories.HotelRepository;
+import com.uva.api.services.hotels.repositories.RoomRepository;
+import com.uva.api.services.users.models.HotelManager;
+import com.uva.api.services.users.repositories.HotelManagerRepository;
 
 @RestController
 @RequestMapping("hotels")

@@ -1,9 +1,7 @@
-// TODO eliminar si realmente no necesitamos comunicar un servicio con otro
 package com.uva.authentication.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -11,9 +9,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.uva.authentication.models.RegisterRequest;
+import com.uva.authentication.models.remote.Response;
 import com.uva.authentication.models.remote.User;
-import com.uva.authentication.models.remote.UserRol;
-import com.uva.authentication.utils.JwtUtil;
 
 @Component
 public class UserAPI {
@@ -21,34 +18,32 @@ public class UserAPI {
   @Autowired
   private RestTemplate restTemplate;
 
-  @Value("${external.services.users.baseurl}")
+  @Value("${external.services.users.url}")
   private String USER_API_URL;
 
-  @Autowired
-  private JwtUtil jwtUtil;
-
-  private String token;
-  private final User USER = new User(-1, "admin", null, null, UserRol.ADMIN);
-
-  private String getAccessToken() {
-    if (token == null || token.isEmpty()) {
-      token = jwtUtil.generateToken(USER);
-    }
-    return token;
+  /**
+   * Check if the email it's already register
+   *
+   * @param email
+   * @return email is register
+   * @throws HttpClientErrorException
+   */
+  public boolean isEmailInUse(String email) {
+    return getUserByEmail(email) != null;
   }
 
-  public User getUserByEmail(String email) {
-
-    // Implementación para acceder con autentificación
-    // String token = getAccessToken();
-    // HttpHeaders headers = new HttpHeaders();
-    // headers.set("Authorization", "Bearer " + token);
-    // HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-    String url = USER_API_URL + "?email={" + email + "}";
+  /**
+   * Get the user by email
+   *
+   * @param email
+   * @return User or null if not exists
+   * @throws HttpClientErrorException
+   */
+  public Response getUserByEmail(String email) {
+    String url = USER_API_URL + "?email={email}";
+    System.err.println(url);
     try {
-      ResponseEntity<User> userResponse = restTemplate.getForEntity(url, User.class, email);
-      // restTemplate.exchange(url, HttpMethod.GET, entity, User.class);
+      ResponseEntity<Response> userResponse = restTemplate.getForEntity(url, Response.class, email);
       return userResponse.getBody();
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() != HttpStatus.NOT_FOUND)
@@ -57,16 +52,21 @@ public class UserAPI {
     }
   }
 
+  /**
+   * Register the user if isn't register yet
+   *
+   * @param registerRequest
+   * @return register result
+   * @throws HttpClientErrorException
+   * @throws HttpClientErrorException
+   */
   public User registerUser(RegisterRequest registerRequest) {
-
-    String token = getAccessToken();
-    HttpHeaders headers = new HttpHeaders();
-    headers.set("Authorization", "Bearer " + token);
-
     String url = USER_API_URL;
-    ResponseEntity<User> userResponse = restTemplate.postForEntity(url, registerRequest, User.class, headers);
-    if (!userResponse.getStatusCode().is2xxSuccessful())
-      throw new RuntimeException("Failed to register user");
+    ResponseEntity<User> userResponse = restTemplate.postForEntity(url, registerRequest, User.class);
+    if (!userResponse.getStatusCode().is2xxSuccessful()) {
+      String errorMessage = "Failed to register user: " + userResponse.getStatusCode() + ". " + userResponse.getBody();
+      throw new HttpClientErrorException(userResponse.getStatusCode(), errorMessage);
+    }
 
     return userResponse.getBody();
   }

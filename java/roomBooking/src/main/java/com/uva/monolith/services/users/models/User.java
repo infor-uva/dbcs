@@ -1,4 +1,4 @@
-package com.uva.monolith.services.users.models;
+package com.uva.api.services.users.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -33,7 +33,6 @@ public class User {
   @Column(nullable = false, unique = true)
   private String email;
 
-  @JsonIgnore
   @Basic(optional = false)
   @Column(nullable = false)
   private String password;
