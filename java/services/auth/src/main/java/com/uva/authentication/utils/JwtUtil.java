@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.uva.authentication.models.remote.Response;
+import com.uva.authentication.models.remote.User;
 
 @Component
 public class JwtUtil {
@@ -25,7 +25,7 @@ public class JwtUtil {
     return jwtExpiration;
   }
 
-  public String generateToken(Response user) {
+  public String generateToken(User user) {
     Algorithm algorithm = Algorithm.HMAC256(secretKey);
     return JWT
         .create()

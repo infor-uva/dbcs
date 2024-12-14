@@ -1,4 +1,4 @@
-package com.uva.api.exceptions;
+package com.uva.monolith.exceptions;
 
 public class InvalidDateRangeException extends RuntimeException {
     public InvalidDateRangeException(String message) {

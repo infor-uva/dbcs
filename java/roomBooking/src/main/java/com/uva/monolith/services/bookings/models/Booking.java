@@ -1,4 +1,4 @@
-package com.uva.api.services.bookings.models;
+package com.uva.monolith.services.bookings.models;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
@@ -13,8 +13,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 
-import com.uva.api.services.hotels.models.Room;
-import com.uva.api.services.users.models.Client;
+import com.uva.monolith.services.hotels.models.Room;
+import com.uva.monolith.services.users.models.Client;
 
 @Entity
 @Table(name = "bookings")

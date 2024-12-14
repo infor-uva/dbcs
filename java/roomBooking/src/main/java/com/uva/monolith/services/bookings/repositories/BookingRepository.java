@@ -1,5 +1,5 @@
 // BookingRepository.java
-package com.uva.api.services.bookings.repositories;
+package com.uva.monolith.services.bookings.repositories;
 
 import jakarta.transaction.Transactional;
 
@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.uva.api.services.bookings.models.Booking;
+import com.uva.monolith.services.bookings.models.Booking;
 
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
         @Query("SELECT b FROM Booking b WHERE b.userId.id = ?1")

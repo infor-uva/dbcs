@@ -1,4 +1,4 @@
-package com.uva.api.services.users.controllers;
+package com.uva.monolith.services.users.controllers;
 
 import java.util.List;
 import java.util.Map;
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.uva.api.services.users.models.User;
-import com.uva.api.services.users.models.UserStatus;
-import com.uva.api.services.users.services.UserService;
+import com.uva.monolith.services.users.models.User;
+import com.uva.monolith.services.users.models.UserStatus;
+import com.uva.monolith.services.users.services.UserService;
 
 @RestController
 @RequestMapping("users")

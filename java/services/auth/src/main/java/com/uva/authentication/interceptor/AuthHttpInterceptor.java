@@ -7,7 +7,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
 
-import com.uva.authentication.models.remote.Response;
+import com.uva.authentication.models.remote.User;
 import com.uva.authentication.models.remote.UserRol;
 import com.uva.authentication.utils.JwtUtil;
 
@@ -20,7 +20,7 @@ public class AuthHttpInterceptor implements ClientHttpRequestInterceptor {
   private JwtUtil jwtUtil;
 
   private String token;
-  private final Response USER = new Response(-1, "auth", "auth@dev.com", null, UserRol.ADMIN);
+  private final User USER = new User(-1, "auth", "auth@dev.com", null, UserRol.ADMIN);
 
   private String getAccessToken() {
     if (token == null || token.isEmpty()) {

@@ -1,4 +1,4 @@
-package com.uva.api.config;
+package com.uva.monolith.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.uva.api.filter.JwtAuthenticationFilter;
-import com.uva.api.services.users.models.UserRol;
+import com.uva.monolith.filter.JwtAuthenticationFilter;
+import com.uva.monolith.services.users.models.UserRol;
 
 @Configuration
 @EnableWebSecurity

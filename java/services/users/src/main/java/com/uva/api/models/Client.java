@@ -1,39 +1,39 @@
 package com.uva.api.models;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.uva.api.models.remote.Booking;
 
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "user_client")
+@NoArgsConstructor
+@Getter
+@Setter
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class Client extends User {
 
   @Basic(optional = false)
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private UserStatus status;
+  private UserStatus status = UserStatus.NO_BOOKINGS;
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private List<Booking> bookings;
-
-  public Client() {
-    super();
-    bookings = new ArrayList<>();
-    status = UserStatus.NO_BOOKINGS;
-  }
 
   public Client(int id, String name, String email, String password, UserStatus status,
       List<Booking> bookings) {
@@ -52,13 +52,5 @@ public class Client extends User {
 
   public void setStatus(UserStatus status) {
     this.status = status;
-  }
-
-  public List<Booking> getBookings() {
-    return this.bookings;
-  }
-
-  public void setBookings(List<Booking> bookings) {
-    this.bookings = bookings;
   }
 }

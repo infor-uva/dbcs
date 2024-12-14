@@ -9,7 +9,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.uva.authentication.models.RegisterRequest;
-import com.uva.authentication.models.remote.Response;
 import com.uva.authentication.models.remote.User;
 
 @Component
@@ -39,11 +38,11 @@ public class UserAPI {
    * @return User or null if not exists
    * @throws HttpClientErrorException
    */
-  public Response getUserByEmail(String email) {
+  public User getUserByEmail(String email) {
     String url = USER_API_URL + "?email={email}";
     System.err.println(url);
     try {
-      ResponseEntity<Response> userResponse = restTemplate.getForEntity(url, Response.class, email);
+      ResponseEntity<User> userResponse = restTemplate.getForEntity(url, User.class, email);
       return userResponse.getBody();
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() != HttpStatus.NOT_FOUND)

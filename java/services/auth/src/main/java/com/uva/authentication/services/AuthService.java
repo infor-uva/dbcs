@@ -9,7 +9,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import com.uva.authentication.api.UserAPI;
 import com.uva.authentication.models.LoginRequest;
 import com.uva.authentication.models.RegisterRequest;
-import com.uva.authentication.models.remote.Response;
 import com.uva.authentication.models.remote.User;
 import com.uva.authentication.utils.JwtUtil;
 import com.uva.authentication.utils.SecurityUtils;
@@ -23,8 +22,7 @@ public class AuthService {
   @Autowired
   private UserAPI userAPI;
 
-  private boolean authenticateUser(LoginRequest request, Response user) {
-    System.err.println(user.getPassword() + " " + request.getPassword());
+  private boolean authenticateUser(LoginRequest request, User user) {
     return (user != null)
         ? SecurityUtils.checkPassword(request.getPassword(), user.getPassword())
         : false;
@@ -38,9 +36,7 @@ public class AuthService {
    * @throws HttpClientErrorException(FORBIDDEN) if the credentials are invalid
    */
   public String login(LoginRequest loginRequest) {
-    Response user = userAPI.getUserByEmail(loginRequest.getEmail());
-    System.err.println(user.getName() + ", " + user.getEmail() + ", " +
-        user.getRol() + ", " + user.getPassword());
+    User user = userAPI.getUserByEmail(loginRequest.getEmail());
 
     if (!authenticateUser(loginRequest, user)) {
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials");

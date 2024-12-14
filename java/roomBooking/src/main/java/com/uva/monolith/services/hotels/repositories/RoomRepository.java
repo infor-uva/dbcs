@@ -1,9 +1,9 @@
-package com.uva.api.services.hotels.repositories;
+package com.uva.monolith.services.hotels.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.uva.api.services.hotels.models.Room;
+import com.uva.monolith.services.hotels.models.Room;
 
 import java.time.LocalDate;
 import java.util.List;

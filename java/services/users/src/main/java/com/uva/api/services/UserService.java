@@ -10,12 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.uva.api.apis.BookingAPI;
 import com.uva.api.models.AuthResponse;
 import com.uva.api.models.Client;
 import com.uva.api.models.HotelManager;
 import com.uva.api.models.User;
 import com.uva.api.models.UserRol;
 import com.uva.api.models.UserStatus;
+import com.uva.api.models.remote.Booking;
 import com.uva.api.repositories.ClientRepository;
 import com.uva.api.repositories.HotelManagerRepository;
 import com.uva.api.repositories.UserRepository;
@@ -32,6 +34,9 @@ public class UserService {
   @Autowired
   private HotelManagerRepository hotelManagerRepository;
 
+  @Autowired
+  private BookingAPI bookingAPI;
+
   public List<User> getAllUsers() {
     return userRepository.findAll();
   }
@@ -42,6 +47,15 @@ public class UserService {
 
   public User getUserById(int id) {
     return assertUser(userRepository.findById(id));
+  }
+
+  public Client getClientById(int id) {
+    User user = assertUser(clientRepository.findById(id));
+    Client client = new Client();
+    BeanUtils.copyProperties(user, client);
+    List<Booking> bookings = bookingAPI.getAllBookingsByUserId(user.getId());
+    client.setBookings(bookings);
+    return client;
   }
 
   public AuthResponse getUserByEmail(String email) {
@@ -68,7 +82,7 @@ public class UserService {
       case ADMIN:
         User admin = new User();
         BeanUtils.copyProperties(registerRequest, admin);
-        newUser = admin; // userAPI.save(admin);
+        newUser = userRepository.save(admin);
         break;
 
       case CLIENT: // Por defecto cliente normal

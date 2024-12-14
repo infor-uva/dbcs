@@ -1,11 +1,11 @@
-package com.uva.api.services.bookings.services;
+package com.uva.monolith.services.bookings.services;
 
-import com.uva.api.services.bookings.models.Booking;
-import com.uva.api.services.bookings.repositories.BookingRepository;
-import com.uva.api.services.hotels.models.Room;
-import com.uva.api.services.hotels.repositories.RoomRepository;
-import com.uva.api.services.users.models.Client;
-import com.uva.api.services.users.repositories.ClientRepository;
+import com.uva.monolith.services.bookings.models.Booking;
+import com.uva.monolith.services.bookings.repositories.BookingRepository;
+import com.uva.monolith.services.hotels.models.Room;
+import com.uva.monolith.services.hotels.repositories.RoomRepository;
+import com.uva.monolith.services.users.models.Client;
+import com.uva.monolith.services.users.repositories.ClientRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

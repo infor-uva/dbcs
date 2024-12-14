@@ -1,4 +1,4 @@
-package com.uva.api.services.users.services;
+package com.uva.monolith.services.users.services;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,15 +10,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.uva.api.services.users.models.AuthResponse;
-import com.uva.api.services.users.models.Client;
-import com.uva.api.services.users.models.HotelManager;
-import com.uva.api.services.users.models.User;
-import com.uva.api.services.users.models.UserRol;
-import com.uva.api.services.users.models.UserStatus;
-import com.uva.api.services.users.repositories.ClientRepository;
-import com.uva.api.services.users.repositories.HotelManagerRepository;
-import com.uva.api.services.users.repositories.UserRepository;
+import com.uva.monolith.services.users.models.AuthResponse;
+import com.uva.monolith.services.users.models.Client;
+import com.uva.monolith.services.users.models.HotelManager;
+import com.uva.monolith.services.users.models.User;
+import com.uva.monolith.services.users.models.UserRol;
+import com.uva.monolith.services.users.models.UserStatus;
+import com.uva.monolith.services.users.repositories.ClientRepository;
+import com.uva.monolith.services.users.repositories.HotelManagerRepository;
+import com.uva.monolith.services.users.repositories.UserRepository;
 
 @Service
 public class UserService {

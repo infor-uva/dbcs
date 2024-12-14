@@ -1,9 +1,9 @@
-package com.uva.api.services.hotels.models;
+package com.uva.monolith.services.hotels.models;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.uva.api.services.bookings.models.Booking;
+import com.uva.monolith.services.bookings.models.Booking;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;

@@ -1,4 +1,4 @@
-package com.uva.api.services.users.models;
+package com.uva.monolith.services.users.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

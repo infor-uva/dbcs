@@ -1,37 +1,30 @@
 package com.uva.api.models;
 
-import java.util.ArrayList;
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "hotel_manager_user")
+@NoArgsConstructor
+@Getter
+@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class HotelManager extends User {
 
-  @JsonIgnore
-  @OneToMany(mappedBy = "hotelManager", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  private List<Hotel> hotels;
+  private JsonNode hotels;
 
-  public HotelManager() {
-    super();
-    hotels = new ArrayList<>();
-  }
-
-  public HotelManager(int id, String name, String email, String password, List<Hotel> hotels) {
+  public HotelManager(int id, String name, String email, String password, JsonNode hotels) {
     super(id, name, email, password, UserRol.HOTEL_ADMIN);
     setHotels(hotels);
-  }
-
-  public List<Hotel> getHotels() {
-    return this.hotels;
-  }
-
-  public void setHotels(List<Hotel> hotels) {
-    this.hotels = hotels;
   }
 }

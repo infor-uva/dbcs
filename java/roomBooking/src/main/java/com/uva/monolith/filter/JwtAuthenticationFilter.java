@@ -1,4 +1,4 @@
-package com.uva.api.filter;
+package com.uva.monolith.filter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
-import com.uva.api.services.users.models.UserRol;
+import com.uva.monolith.services.users.models.UserRol;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
