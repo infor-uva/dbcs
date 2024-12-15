@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.uva.api.models.UserRol;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -12,8 +13,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-
-import com.uva.api.models.UserRol;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -80,8 +79,6 @@ public class JwtAuthenticationFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String token = getTokenFromRequest(httpRequest);
 
-        boolean aproved = false;
-
         System.out.print("[" + LocalDateTime.now().toString() + "] TOKEN: " + token);
 
         if (token != null) {
@@ -103,12 +100,9 @@ public class JwtAuthenticationFilter implements Filter {
 
                     // Establecer autenticación en el contexto de seguridad
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    aproved = true;
                 }
             }
         }
-
-        System.out.println(" APROVED: " + aproved);
 
         // Continuar con el resto de filtros
         chain.doFilter(request, response);

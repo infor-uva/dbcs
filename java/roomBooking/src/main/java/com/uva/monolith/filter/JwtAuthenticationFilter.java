@@ -80,8 +80,6 @@ public class JwtAuthenticationFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String token = getTokenFromRequest(httpRequest);
 
-        boolean aproved = false;
-
         System.out.print("[" + LocalDateTime.now().toString() + "] TOKEN: " + token);
 
         if (token != null) {
@@ -103,12 +101,9 @@ public class JwtAuthenticationFilter implements Filter {
 
                     // Establecer autenticación en el contexto de seguridad
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    aproved = true;
                 }
             }
         }
-
-        System.out.println(" APROVED: " + aproved);
 
         // Continuar con el resto de filtros
         chain.doFilter(request, response);

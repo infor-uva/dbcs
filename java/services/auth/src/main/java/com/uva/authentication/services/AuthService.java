@@ -56,4 +56,18 @@ public class AuthService {
 
     return login(logReq);
   }
+
+  public String changePassword(String email, String actualPass, String newPass) {
+    User user = userAPI.getUserByEmail(email);
+    // Validamos la anterior contraseña
+    if (SecurityUtils.checkPassword(actualPass, user.getPassword())) {
+      // Actualizamos la nueva
+      String hashPass = SecurityUtils.encrypt(newPass);
+      userAPI.changePassword(user, hashPass);
+      // Hacemos un login con los nuevos datos
+      return login(new LoginRequest(email, newPass));
+    } else {
+      throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials");
+    }
+  }
 }

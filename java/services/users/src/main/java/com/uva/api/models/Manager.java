@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,11 +20,12 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class HotelManager extends User {
+public class Manager extends User {
 
+  @Transient
   private JsonNode hotels;
 
-  public HotelManager(int id, String name, String email, String password, JsonNode hotels) {
+  public Manager(int id, String name, String email, String password, JsonNode hotels) {
     super(id, name, email, password, UserRol.HOTEL_ADMIN);
     setHotels(hotels);
   }

@@ -1,25 +1,15 @@
 package com.uva.api.services;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
-import com.uva.api.apis.BookingAPI;
+import com.uva.api.utils.Utils;
 import com.uva.api.models.AuthResponse;
-import com.uva.api.models.Client;
-import com.uva.api.models.HotelManager;
 import com.uva.api.models.User;
 import com.uva.api.models.UserRol;
-import com.uva.api.models.UserStatus;
-import com.uva.api.models.remote.Booking;
-import com.uva.api.repositories.ClientRepository;
-import com.uva.api.repositories.HotelManagerRepository;
 import com.uva.api.repositories.UserRepository;
 
 @Service
@@ -29,37 +19,21 @@ public class UserService {
   private UserRepository userRepository;
 
   @Autowired
-  private ClientRepository clientRepository;
+  private ClientService clientService;
 
   @Autowired
-  private HotelManagerRepository hotelManagerRepository;
-
-  @Autowired
-  private BookingAPI bookingAPI;
+  private ManagerService managerService;
 
   public List<User> getAllUsers() {
     return userRepository.findAll();
   }
 
-  private User assertUser(Optional<? extends User> opUser) {
-    return opUser.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-  }
-
   public User getUserById(int id) {
-    return assertUser(userRepository.findById(id));
-  }
-
-  public Client getClientById(int id) {
-    User user = assertUser(clientRepository.findById(id));
-    Client client = new Client();
-    BeanUtils.copyProperties(user, client);
-    List<Booking> bookings = bookingAPI.getAllBookingsByUserId(user.getId());
-    client.setBookings(bookings);
-    return client;
+    return Utils.assertUser(userRepository.findById(id));
   }
 
   public AuthResponse getUserByEmail(String email) {
-    User u = assertUser(userRepository.findByEmail(email));
+    User u = Utils.assertUser(userRepository.findByEmail(email));
     AuthResponse auth = new AuthResponse();
     BeanUtils.copyProperties(u, auth);
     return auth;
@@ -73,24 +47,19 @@ public class UserService {
       registerRequest.setRol(UserRol.CLIENT);
 
     switch (registerRequest.getRol()) {
-      case HOTEL_ADMIN:
-        HotelManager hm = new HotelManager();
-        BeanUtils.copyProperties(registerRequest, hm);
-        newUser = hotelManagerRepository.save(hm);
-        break;
-
-      case ADMIN:
+      case ADMIN: // Not extracted due to its complexity, it's the same as for the user
         User admin = new User();
         BeanUtils.copyProperties(registerRequest, admin);
         newUser = userRepository.save(admin);
         break;
 
-      case CLIENT: // Por defecto cliente normal
+      case HOTEL_ADMIN:
+        newUser = managerService.save(registerRequest);
+        break;
+
+      case CLIENT: // By default
       default:
-        Client client = new Client();
-        BeanUtils.copyProperties(registerRequest, client);
-        client.setRol(UserRol.CLIENT);
-        newUser = clientRepository.save(client);
+        newUser = clientService.save(registerRequest);
         break;
     }
     return newUser;
@@ -103,43 +72,14 @@ public class UserService {
     return userRepository.save(user);
   }
 
-  public User updateUserStatus(int id, UserStatus status) {
-
-    Client user = (Client) assertUser(clientRepository.findById(id));
-
-    boolean activeBookings = user.getBookings().stream()
-        .anyMatch(booking -> !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
-    boolean inactiveBookings = user.getBookings().stream()
-        .anyMatch(booking -> booking.getEndDate().isBefore(LocalDate.now())); // reserva < ahora
-
-    switch (status) {
-      case NO_BOOKINGS:
-        if (!user.getBookings().isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user has at least one booking");
-        break;
-      case WITH_ACTIVE_BOOKINGS:
-        if (user.getBookings().isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user don't has bookings");
-        if (!activeBookings)
-          throw new IllegalArgumentException("Invalid State: The user don't has active bookings");
-        break;
-      case WITH_INACTIVE_BOOKINGS:
-        if (user.getBookings().isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user don't has bookings");
-        if (!inactiveBookings)
-          throw new IllegalArgumentException("Invalid State: The user don't has inactive bookings");
-        break;
-      default:
-        break;
-    }
-    user.setStatus(status);
+  public User changePassword(int id, String password) {
+    User user = getUserById(id);
+    user.setPassword(password);
     return userRepository.save(user);
   }
 
   public User deleteUserById(int id) {
     User user = getUserById(id);
-    // TODO eliminar reservas de usuario ahora mismo no por el modo cascada pero a
-    // futuro sí, después de la disgregación en microservicios
     userRepository.deleteById(id);
     return user;
   }

@@ -19,9 +19,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.uva.api.models.Client;
+import com.uva.api.models.Manager;
 import com.uva.api.models.User;
-import com.uva.api.models.UserStatus;
+import com.uva.api.models.ClientStatus;
+import com.uva.api.services.ClientService;
+import com.uva.api.services.ManagerService;
 import com.uva.api.services.UserService;
+import com.uva.api.utils.Utils;
 
 @RestController
 @RequestMapping("users")
@@ -31,10 +37,54 @@ public class UserController {
   @Autowired
   private UserService userService;
 
-  @GetMapping
-  public ResponseEntity<List<User>> getAllUsers() {
-    List<User> users = userService.getAllUsers();
-    return ResponseEntity.ok(users);
+  @Autowired
+  private ClientService clientService;
+
+  @Autowired
+  private ManagerService managerService;
+
+  // Common
+  @PostMapping
+  public ResponseEntity<?> addUser(@RequestBody User user) {
+    userService.registerNewUser(user);
+    return new ResponseEntity<>(HttpStatus.ACCEPTED);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<?> updateUserData(@PathVariable int id, @RequestBody Map<String, String> json) {
+
+    String name = json.get("name");
+    String email = json.get("email");
+
+    if (!Utils.notEmptyStrings(name, email)) {
+      return new ResponseEntity<String>("Missing required fields", HttpStatus.BAD_REQUEST);
+    }
+    try {
+      User user = userService.updateUserData(id, name, email);
+      return new ResponseEntity<User>(user, HttpStatus.OK);
+    } catch (HttpClientErrorException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+      throw e;
+    }
+  }
+
+  @PutMapping("/{id}/password")
+  public ResponseEntity<?> updatePassword(@PathVariable int id, @RequestBody JsonNode json) {
+    String password = json.get("password").asText();
+
+    if (!Utils.notEmptyStrings(password)) {
+      return new ResponseEntity<String>("Missing required fields", HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      User user = userService.changePassword(id, password);
+      return new ResponseEntity<User>(user, HttpStatus.OK);
+    } catch (HttpClientErrorException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+      throw e;
+    }
   }
 
   @GetMapping(params = { "email" })
@@ -48,10 +98,10 @@ public class UserController {
     }
   }
 
-  @PostMapping
-  public ResponseEntity<?> addUser(@RequestBody User user) {
-    userService.registerNewUser(user);
-    return new ResponseEntity<>(HttpStatus.ACCEPTED);
+  @GetMapping
+  public ResponseEntity<List<User>> getAllUsers() {
+    List<User> users = userService.getAllUsers();
+    return ResponseEntity.ok(users);
   }
 
   @GetMapping("/{id}")
@@ -59,18 +109,10 @@ public class UserController {
     return ResponseEntity.ok(userService.getUserById(id));
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<?> updateUserData(@PathVariable int id, @RequestBody Map<String, String> json) {
-    System.err.println(json.entrySet().size());
-    json.keySet().forEach(k -> System.err.println(k));
-    String name = json.get("name");
-    String email = json.get("email");
-    if (name == null || email == null) {
-      return new ResponseEntity<String>("Missing required fields", HttpStatus.BAD_REQUEST);
-    }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
     try {
-      User user = userService.updateUserData(id, name, email);
-      return new ResponseEntity<User>(user, HttpStatus.OK);
+      return ResponseEntity.ok(userService.deleteUserById(id));
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() == HttpStatus.NOT_FOUND)
         return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
@@ -78,30 +120,64 @@ public class UserController {
     }
   }
 
-  @PatchMapping("/{id}")
-  public ResponseEntity<?> updateUserState(@PathVariable int id, @RequestBody Map<String, String> json) {
+  // Clients
+  @GetMapping("/clients")
+  public ResponseEntity<List<Client>> getAllClients() {
+    List<Client> users = clientService.findAll();
+    return ResponseEntity.ok(users);
+  }
+
+  @GetMapping("/clients/{id}")
+  public ResponseEntity<Client> getClientById(@PathVariable int id) {
+    return ResponseEntity.ok(clientService.findById(id));
+  }
+
+  @PatchMapping("/clients/{id}")
+  public ResponseEntity<?> updateClientState(@PathVariable int id, @RequestBody Map<String, String> json) {
 
     String strStatus = json.get("status");
     if (strStatus == null) {
       return new ResponseEntity<String>("Missing required fields", HttpStatus.BAD_REQUEST);
     }
     try {
-      UserStatus userStatus = UserStatus.valueOf(strStatus);
-      return ResponseEntity.ok(userService.updateUserStatus(id, userStatus));
+      ClientStatus clientStatus = ClientStatus.valueOf(strStatus);
+      return ResponseEntity.ok(clientService.updateClientStatus(id, clientStatus));
     } catch (IllegalArgumentException e) {
-      return new ResponseEntity<String>("Unknown user state", HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<String>("Unknown Client state", HttpStatus.BAD_REQUEST);
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() == HttpStatus.NOT_FOUND)
         return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
       throw e;
     }
-
   }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
+  @DeleteMapping("/clients/{id}")
+  public ResponseEntity<?> deleteClient(@PathVariable Integer id) {
     try {
-      return ResponseEntity.ok(userService.deleteUserById(id));
+      return ResponseEntity.ok(clientService.deleteById(id));
+    } catch (HttpClientErrorException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+      throw e;
+    }
+  }
+
+  // HotelManagers
+  @GetMapping("/managers")
+  public ResponseEntity<List<Manager>> getAllHotelManagers() {
+    List<Manager> users = managerService.findAll();
+    return ResponseEntity.ok(users);
+  }
+
+  @GetMapping("/managers/{id}")
+  public ResponseEntity<Manager> getHotelManagerById(@PathVariable int id) {
+    return ResponseEntity.ok(managerService.findById(id));
+  }
+
+  @DeleteMapping("/managers/{id}")
+  public ResponseEntity<?> deleteHotelManager(@PathVariable Integer id) {
+    try {
+      return ResponseEntity.ok(managerService.deleteById(id));
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() == HttpStatus.NOT_FOUND)
         return new ResponseEntity<String>(HttpStatus.NOT_FOUND);

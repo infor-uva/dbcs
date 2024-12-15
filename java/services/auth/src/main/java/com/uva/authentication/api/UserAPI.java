@@ -1,5 +1,8 @@
 package com.uva.authentication.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,17 +22,6 @@ public class UserAPI {
 
   @Value("${external.services.users.url}")
   private String USER_API_URL;
-
-  /**
-   * Check if the email it's already register
-   *
-   * @param email
-   * @return email is register
-   * @throws HttpClientErrorException
-   */
-  public boolean isEmailInUse(String email) {
-    return getUserByEmail(email) != null;
-  }
 
   /**
    * Get the user by email
@@ -68,6 +60,23 @@ public class UserAPI {
     }
 
     return userResponse.getBody();
+  }
+
+  /**
+   * Update the user's password
+   * 
+   * @param user
+   * @param hashPass
+   */
+  public void changePassword(User user, String hashPass) {
+    String url = USER_API_URL + "/{id}/password";
+
+    int id = user.getId();
+
+    Map<String, Object> body = new HashMap<>();
+    body.put("password", hashPass);
+
+    restTemplate.put(url, body, id);
   }
 
 }

@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,26 +32,26 @@ public class Client extends User {
   @Basic(optional = false)
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private UserStatus status = UserStatus.NO_BOOKINGS;
-
+  private ClientStatus status = ClientStatus.NO_BOOKINGS;
+  @Transient
   private List<Booking> bookings;
 
-  public Client(int id, String name, String email, String password, UserStatus status,
+  public Client(int id, String name, String email, String password, ClientStatus status,
       List<Booking> bookings) {
     super(id, name, email, password, UserRol.CLIENT);
     setStatus(status);
     setBookings(bookings);
   }
 
-  public UserStatus getStatus() {
+  public ClientStatus getStatus() {
     if (getBookings() == null || getBookings().isEmpty())
-      return UserStatus.NO_BOOKINGS;
+      return ClientStatus.NO_BOOKINGS;
     boolean activeBookings = getBookings().stream()
         .anyMatch(booking -> !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
-    return activeBookings ? UserStatus.WITH_ACTIVE_BOOKINGS : UserStatus.WITH_INACTIVE_BOOKINGS;
+    return activeBookings ? ClientStatus.WITH_ACTIVE_BOOKINGS : ClientStatus.WITH_INACTIVE_BOOKINGS;
   }
 
-  public void setStatus(UserStatus status) {
+  public void setStatus(ClientStatus status) {
     this.status = status;
   }
 }
