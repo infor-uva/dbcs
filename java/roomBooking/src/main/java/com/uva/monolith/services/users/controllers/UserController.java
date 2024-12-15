@@ -50,7 +50,7 @@ public class UserController {
 
   @PostMapping
   public ResponseEntity<?> addUser(@RequestBody User user) {
-    userService.addUser(user);
+    userService.registerNewUser(user);
     return new ResponseEntity<>(HttpStatus.ACCEPTED);
   }
 

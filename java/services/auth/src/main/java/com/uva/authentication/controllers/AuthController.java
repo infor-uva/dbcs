@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+
 import com.uva.authentication.models.*;
 import com.uva.authentication.services.AuthService;
 
@@ -31,12 +32,8 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
         try {
-            LoginRequest loginRequest = new LoginRequest();
-            loginRequest.setEmail(registerRequest.getEmail());
-            loginRequest.setPassword(registerRequest.getPassword());
-
-            authService.register(registerRequest);
-            return login(loginRequest);
+            String token = authService.register(registerRequest);
+            return ResponseEntity.ok(new JwtAuthResponse(token));
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);

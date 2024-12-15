@@ -1,8 +1,6 @@
 package com.uva.authentication.utils;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -40,4 +38,7 @@ public class JwtUtil {
         .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpiration * 1000))
         .sign(algorithm);
   }
+
+  // TODO estaría guapo recuperar métodos de validación para el token de petición
+  // para este servicio
 }

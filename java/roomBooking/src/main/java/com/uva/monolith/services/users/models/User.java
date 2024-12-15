@@ -33,7 +33,6 @@ public class User {
   @Column(nullable = false, unique = true)
   private String email;
 
-  @JsonIgnore
   @Basic(optional = false)
   @Column(nullable = false)
   private String password;
