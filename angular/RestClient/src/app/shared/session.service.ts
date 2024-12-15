@@ -41,10 +41,10 @@ export class SessionService {
 
   private setSession(resp: any) {
     const decoded = jwtDecode<JWTDecoded>(resp.token);
-    const user: User = { ...decoded, id: decoded.userId };
+    const user: Session = { ...decoded, id: decoded.userId };
     this.session$.next(user);
     this.storage.save(this.tokenKey, { ...resp, session: user });
-    const mainPage = this.getMainPage(decoded.user.rol as UserRol);
+    const mainPage = this.getMainPage(user.rol as UserRol);
     return { ...resp, mainPage };
   }
 
