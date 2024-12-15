@@ -2,6 +2,7 @@ package com.uva.monolith.services.hotels.controllers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class HotelController {
     private BookingAPI bookingAPI;
     @Autowired
     private HotelManagerAPI hotelManagerAPI;
+
     // Obtener todos los hoteles
     @GetMapping
     public List<Hotel> getAllHotels(
@@ -39,17 +41,18 @@ public class HotelController {
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end) {
         List<Hotel> hotels = (managerId != null)
-                ? hotelRepository.findAllByHotelManager(managerId)
+                ? hotelRepository.findAllByManagerId(managerId)
                 : hotelRepository.findAll();
         if (start != null && end != null) {
             // Filtramos para los hoteles que
             // tengan habitaciones disponibles para ese rango de fechas
-            System.out.println(start);
-            System.out.println(end);
+            Set<Integer> notAvailableRoomsId = bookingAPI.getNotAvailableRooms(start, end);
             hotels = hotels.stream().map(h -> {
                 if (h.getRooms().size() == 0)
                     return h;
-                h.setRooms(roomRepository.findAvailableRoomsByHotelAndDates(h.getId(), start, end));
+                List<Room> rooms = h.getRooms().stream()
+                        .filter(r -> notAvailableRoomsId.contains(r.getId())).toList();
+                h.setRooms(rooms);
                 return h;
             }).filter(h -> h.getRooms().size() >= 0).toList();
         }
@@ -59,7 +62,7 @@ public class HotelController {
     // Añadir un hotel con sus habitaciones
     @PostMapping
     public ResponseEntity<Hotel> addHotel(@RequestBody Hotel hotel) {
-        boolean exist = hotelManagerAPI.existsHotelManagerById(hotel.getHotelManagerID());
+        boolean exist = hotelManagerAPI.existsHotelManagerById(hotel.getManagerId());
         if (exist) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -93,14 +96,21 @@ public class HotelController {
             @RequestParam(required = false) LocalDate end) {
 
         List<Room> rooms;
-        if (start != null && end != null) {
+        boolean dateMode = start != null && end != null;
+        if (dateMode) {
             if (!start.isBefore(end)) {
                 throw new InvalidDateRangeException("La fecha de inicio debe ser anterior a la fecha de fin");
             }
-            rooms = roomRepository.findAvailableRoomsByHotelAndDates(hotelId, start, end);
-        } else {
-            rooms = roomRepository.findAllByHotelId(hotelId);
         }
+        rooms = roomRepository.findAllByHotelId(hotelId);
+
+        if (dateMode) {
+            // Consultar el set de ids ocupados del id
+            Set<Integer> notAvailableRoomsId = bookingAPI.getNotAvailableRooms(hotelId, start, end);
+            rooms = rooms.stream()
+                    .filter(r -> notAvailableRoomsId.contains(r.getId())).toList();
+        }
+
         return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 

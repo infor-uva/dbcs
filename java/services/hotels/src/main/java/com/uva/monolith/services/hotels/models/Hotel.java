@@ -34,7 +34,6 @@ public class Hotel {
   @Basic(optional = false)
   private int id;
 
-
   @Basic(optional = false)
   private String name;
 
@@ -45,6 +44,6 @@ public class Hotel {
   @OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private List<Room> rooms;
 
-  @Column(name="hotel_manager_id")
-  private int hotelManagerID;
+  @Column(name = "manager_id")
+  private int managerId;
 }

@@ -1,5 +1,6 @@
 package com.uva.apis.bookings.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,19 +16,17 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class BookingController {
 
-    private final BookingService bookingService;
-
-    public BookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+    @Autowired
+    private BookingService bookingService;
 
     @GetMapping
     public List<Booking> getAllBookings(
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end,
+            @RequestParam(required = false) Integer hotelId,
             @RequestParam(required = false) Integer roomId,
             @RequestParam(required = false) Integer userId) {
-        return bookingService.getBookings(start, end, roomId, userId);
+        return bookingService.getBookings(start, end, hotelId, roomId, userId);
     }
 
     @PostMapping

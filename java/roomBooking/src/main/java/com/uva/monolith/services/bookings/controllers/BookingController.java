@@ -48,4 +48,15 @@ public class BookingController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @DeleteMapping("/hotel/{hotelId}")
+    public ResponseEntity<Void> deleteBookingsByHotelId(@PathVariable Integer hotelId) {
+        try {
+            bookingService.deleteBookingsByHotelId(hotelId);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 }

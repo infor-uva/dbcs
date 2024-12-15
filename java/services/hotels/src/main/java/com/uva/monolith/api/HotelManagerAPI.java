@@ -15,19 +15,18 @@ public class HotelManagerAPI {
   @Autowired
   private RestTemplate restTemplate;
 
-  @Value("${external.services.users.url}")
-  private String HOTELMANAGER_API_URL;
+  @Value("${external.services.managers.url}")
+  private String MANAGERS_API_URL;
 
   public Boolean existsHotelManagerById(int id) {
     try {
-      String url = HOTELMANAGER_API_URL + "/{id}";
-      return restTemplate.getForEntity(url,Map.class, id).getBody().containsKey("id");
+      String url = MANAGERS_API_URL + "/{id}";
+      return restTemplate.getForEntity(url, Map.class, id).getBody().containsKey("id");
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() != HttpStatus.NOT_FOUND)
         throw e;
       return false;
     }
   }
-
 
 }

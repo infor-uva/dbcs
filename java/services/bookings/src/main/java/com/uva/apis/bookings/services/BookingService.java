@@ -25,12 +25,28 @@ public class BookingService {
     @Autowired
     private ClientApi managerApi;
 
-    public List<Booking> getBookings(LocalDate start, LocalDate end, Integer roomId, Integer userId) {
+    /**
+     * Consulta por bloques filtrados
+     * - fechas
+     * - roomId/hotelId
+     * - userId
+     * 
+     * @param start
+     * @param end
+     * @param hotelId
+     * @param roomId
+     * @param userId
+     * @return
+     */
+    public List<Booking> getBookings(
+            LocalDate start, LocalDate end, Integer hotelId,
+            Integer roomId, Integer userId) {
         List<Booking> bookings = null;
 
         if (start != null && end != null) {
             bookings = bookingRepository.findByDateRange(start, end);
         }
+
         if (roomId != null) {
             if (bookings == null) {
                 bookings = bookingRepository.findByRoomId(roomId);
@@ -39,7 +55,16 @@ public class BookingService {
                         .filter(booking -> booking.getRoomId() == roomId)
                         .toList();
             }
+        } else if (hotelId != null) {
+            if (bookings == null) {
+                bookings = bookingRepository.findByHotelId(roomId);
+            } else {
+                bookings = bookings.stream()
+                        .filter(booking -> booking.getHotelId() == hotelId)
+                        .toList();
+            }
         }
+
         if (userId != null) {
             if (bookings == null) {
                 bookings = bookingRepository.findByUserId(userId);
@@ -49,6 +74,7 @@ public class BookingService {
                         .toList();
             }
         }
+
         if (start == null && end == null && roomId == null && userId == null) {
             bookings = bookingRepository.findAll();
         }

@@ -86,4 +86,8 @@ public class BookingService {
         }
         bookingRepository.deleteBookingById(id);
     }
+
+    public void deleteBookingsByHotelId(int hotelId) {
+        bookingRepository.deleteAllByHotelId(hotelId);
+    }
 }

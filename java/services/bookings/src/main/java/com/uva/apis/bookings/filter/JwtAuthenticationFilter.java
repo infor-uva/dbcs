@@ -32,12 +32,6 @@ public class JwtAuthenticationFilter implements Filter {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
-    @Value("${security.jwt.kid}")
-    private String kid;
-
-    @Value("${security.jwt.expiration-time}")
-    private long jwtExpiration;
-
     private Algorithm getSigningAlgorithm() {
         return Algorithm.HMAC256(secretKey); // Usar HMAC256 con la clave secreta
     }

@@ -31,6 +31,6 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
                     )
                 )
             """)
-    List<Room> findAvailableRoomsByHotelAndDates(
+    List<Room> findAvailableRoomsByHotelAndDates_(
             int hotelId, LocalDate startDate, LocalDate endDate);
 }
