@@ -21,7 +21,7 @@ public class BookingAPI {
 
   public List<Booking> getAllBookingsByUserId(int id) {
     String url = BOOKING_API_URL + "?userId={id}";
-
+    System.out.println("\n" + url);
     Booking[] bookingsArray = restTemplate
         .getForObject(url, Booking[].class, id);
 

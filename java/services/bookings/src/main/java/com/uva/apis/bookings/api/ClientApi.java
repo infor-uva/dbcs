@@ -17,7 +17,8 @@ public class ClientApi {
   private String CLIENTS_API_URL;
 
   public boolean existsById(int id) {
-    String url = CLIENTS_API_URL + "/{id}";
+    String url = CLIENTS_API_URL + "/" + id;
+    System.out.println(url);
     ResponseEntity<Void> response = restTemplate.getForEntity(url, Void.class, id);
     return response.getStatusCode() == HttpStatus.OK;
   }

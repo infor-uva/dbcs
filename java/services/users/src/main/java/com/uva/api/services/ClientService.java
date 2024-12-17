@@ -1,6 +1,7 @@
 package com.uva.api.services;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -31,10 +32,17 @@ public class ClientService {
 
   public Client findById(int id) {
     Client client = Utils.assertUser(clientRepository.findById(id));
-    List<Booking> bookings = bookingAPI.getAllBookingsByUserId(client.getId());
+    List<Booking> bookings;
+    try {
+        bookings = bookingAPI.getAllBookingsByUserId(client.getId());
+    } catch (Exception e) {
+        bookings = new ArrayList<>(); 
+    }
     client.setBookings(bookings);
     return client;
-  }
+}
+
+
 
   public Client deleteById(int id) {
     Client client = Utils.assertUser(clientRepository.findById(id));

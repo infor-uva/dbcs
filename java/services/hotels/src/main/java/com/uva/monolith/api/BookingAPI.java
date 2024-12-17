@@ -15,7 +15,7 @@ public class BookingAPI {
 
   @Autowired
   private RestTemplate restTemplate;
-
+  
   @Value("${external.services.bookings.url}")
   private String BOOKING_API_URL;
 
