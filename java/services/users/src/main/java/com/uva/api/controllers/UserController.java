@@ -3,6 +3,7 @@ package com.uva.api.controllers;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.uva.api.models.AuthResponse;
 import com.uva.api.models.Client;
 import com.uva.api.models.Manager;
 import com.uva.api.models.User;
@@ -45,9 +47,11 @@ public class UserController {
 
   // Common
   @PostMapping
-  public ResponseEntity<?> addUser(@RequestBody User user) {
+  public ResponseEntity<?> addUser(@RequestBody AuthResponse body) {
+    User user = new User();
+    BeanUtils.copyProperties(body, user);
     userService.registerNewUser(user);
-    return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    return new ResponseEntity<User>(user, HttpStatus.ACCEPTED);
   }
 
   @PutMapping("/{id}")

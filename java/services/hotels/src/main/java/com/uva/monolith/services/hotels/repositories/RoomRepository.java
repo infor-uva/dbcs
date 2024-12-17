@@ -15,22 +15,4 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
 
     // Encontrar todas las habitaciones de un hotel
     List<Room> findAllByHotelId(int hotelId);
-
-    // Encontrar habitaciones disponibles de un hotel en un rango de fechas
-    @Query("""
-                SELECT r FROM Room r
-                WHERE r.hotel.id = ?1
-                AND r.available = true
-                AND NOT EXISTS (
-                    SELECT b FROM Booking b
-                    WHERE b.roomId.id = r.id
-                    AND (
-                        b.endDate >= ?2
-                        OR
-                        ?3 >= b.startDate
-                    )
-                )
-            """)
-    List<Room> findAvailableRoomsByHotelAndDates_(
-            int hotelId, LocalDate startDate, LocalDate endDate);
 }

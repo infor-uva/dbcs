@@ -21,7 +21,7 @@ public class HotelManagerAPI {
   public Boolean existsHotelManagerById(int id) {
     try {
       String url = MANAGERS_API_URL + "/{id}";
-      return restTemplate.getForEntity(url, Map.class, id).getBody().containsKey("id");
+      return restTemplate.getForObject(url, Map.class, id).containsKey("id");
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() != HttpStatus.NOT_FOUND)
         throw e;

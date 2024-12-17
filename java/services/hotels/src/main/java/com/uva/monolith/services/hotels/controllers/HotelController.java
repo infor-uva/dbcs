@@ -61,10 +61,11 @@ public class HotelController {
 
     // Añadir un hotel con sus habitaciones
     @PostMapping
-    public ResponseEntity<Hotel> addHotel(@RequestBody Hotel hotel) {
+    public ResponseEntity<?> addHotel(@RequestBody Hotel hotel) {
         boolean exist = hotelManagerAPI.existsHotelManagerById(hotel.getManagerId());
-        if (exist) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!exist) {
+            return new ResponseEntity<>(
+                    "No existe el manager con id " + String.valueOf(hotel.getManagerId()), HttpStatus.BAD_REQUEST);
         }
         Hotel savedHotel = hotelRepository.save(hotel);
         return new ResponseEntity<>(savedHotel, HttpStatus.CREATED);

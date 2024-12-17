@@ -46,4 +46,9 @@ public class Hotel {
 
   @Column(name = "manager_id")
   private int managerId;
+
+  public void setRooms(List<Room> rooms) {
+    this.rooms = rooms;
+    rooms.forEach(r -> r.setHotel(this));
+  }
 }

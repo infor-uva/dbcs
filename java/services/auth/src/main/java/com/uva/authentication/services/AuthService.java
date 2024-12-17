@@ -46,14 +46,17 @@ public class AuthService {
   }
 
   public String register(RegisterRequest registerRequest) {
+    String plainTextPassword = registerRequest.getPassword();
     // Ciframos la contraseña
-    String hashPass = SecurityUtils.encrypt(registerRequest.getPassword());
+    String hashPass = SecurityUtils.encrypt(plainTextPassword);
     registerRequest.setPassword(hashPass);
     // Registramos el usuario
     User user = userAPI.registerUser(registerRequest);
     LoginRequest logReq = new LoginRequest();
     BeanUtils.copyProperties(user, logReq);
-
+    // Recuperamos la contraseña y lo loggeamos
+    logReq.setPassword(plainTextPassword);
+    System.err.println(logReq);
     return login(logReq);
   }
 

@@ -32,10 +32,13 @@ public class Room {
     @JoinColumn(name = "hotel_id", referencedColumnName = "id")
     @JsonIgnore
     private Hotel hotel;
+
     @Column(name = "room_number", nullable = false)
     private String roomNumber;
+
     @Column(name = "type", nullable = false)
     private RoomType type;
+
     @Column(name = "available", nullable = false)
     private boolean available;
 }

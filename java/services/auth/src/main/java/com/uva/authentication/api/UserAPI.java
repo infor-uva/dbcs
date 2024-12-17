@@ -53,6 +53,7 @@ public class UserAPI {
    */
   public User registerUser(RegisterRequest registerRequest) {
     String url = USER_API_URL;
+    System.out.println(registerRequest + " " + registerRequest.getPassword());
     ResponseEntity<User> userResponse = restTemplate.postForEntity(url, registerRequest, User.class);
     if (!userResponse.getStatusCode().is2xxSuccessful()) {
       String errorMessage = "Failed to register user: " + userResponse.getStatusCode() + ". " + userResponse.getBody();

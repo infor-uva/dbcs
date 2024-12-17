@@ -22,32 +22,33 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(authorize -> authorize
-            // Permitir OPTIONS sin autenticación
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            // Acceso restringido a usuarios y administradores
-            .requestMatchers("users", "users/**").hasAnyRole(
-                UserRol.CLIENT.toString(),
-                UserRol.HOTEL_ADMIN.toString(),
-                UserRol.ADMIN.toString())
-            // Acceso restringido a gestores de hoteles y administradores
-            .requestMatchers(HttpMethod.GET, "hotels", "hotels/*").hasAnyRole(
-                UserRol.CLIENT.toString(),
-                UserRol.HOTEL_ADMIN.toString(),
-                UserRol.ADMIN.toString())
+  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.csrf(csrf -> csrf.disable());
+    // .authorizeHttpRequests(authorize -> authorize
+    // // Permitir OPTIONS sin autenticación
+    // .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+    // // Acceso restringido a usuarios y administradores
+    // .requestMatchers("users", "users/**").hasAnyRole(
+    // UserRol.CLIENT.toString(),
+    // UserRol.HOTEL_ADMIN.toString(),
+    // UserRol.ADMIN.toString())
+    // // Acceso restringido a gestores de hoteles y administradores
+    // .requestMatchers(HttpMethod.GET, "hotels", "hotels/*").hasAnyRole(
+    // UserRol.CLIENT.toString(),
+    // UserRol.HOTEL_ADMIN.toString(),
+    // UserRol.ADMIN.toString())
 
-            .requestMatchers("hotels", "hotels/**")
-            .hasAnyRole(UserRol.ADMIN.toString(), UserRol.HOTEL_ADMIN.toString())
-            // Acceso restringido a cualquier usuario del sistema
-            .requestMatchers("bookings", "bookings/**")
-            .hasAnyRole(UserRol.ADMIN.toString(), UserRol.HOTEL_ADMIN.toString(),
-                UserRol.CLIENT.toString())
-            // Rechazar el resto
-            .anyRequest().denyAll())
-        // Registra el filtro antes del filtro estándar de autenticación
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    // .requestMatchers("hotels", "hotels/**")
+    // .hasAnyRole(UserRol.ADMIN.toString(), UserRol.HOTEL_ADMIN.toString())
+    // // Acceso restringido a cualquier usuario del sistema
+    // .requestMatchers("bookings", "bookings/**")
+    // .hasAnyRole(UserRol.ADMIN.toString(), UserRol.HOTEL_ADMIN.toString(),
+    // UserRol.CLIENT.toString())
+    // // Rechazar el resto
+    // .anyRequest().denyAll())
+    // // Registra el filtro antes del filtro estándar de autenticación
+    // .addFilterBefore(jwtAuthenticationFilter,
+    // UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }

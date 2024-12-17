@@ -42,7 +42,7 @@ public class AuthController {
             if (e.getStatusCode() == HttpStatus.CONFLICT) {
                 return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
             }
-            e.fillInStackTrace();
+            e.printStackTrace(System.err);
         }
 
         return new ResponseEntity<String>("Algo no fue bien", HttpStatus.UNAUTHORIZED);
@@ -63,7 +63,7 @@ public class AuthController {
         String actualPassword = json.get("actual");
         String newPassword = json.get("new");
 
-        if (validStrings(email, actualPassword, newPassword))
+        if (!validStrings(email, actualPassword, newPassword))
             return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
 
         try {
