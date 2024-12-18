@@ -34,18 +34,17 @@ public class ClientService {
     Client client = Utils.assertUser(clientRepository.findById(id));
     List<Booking> bookings;
     try {
-        bookings = bookingAPI.getAllBookingsByUserId(client.getId());
+      bookings = bookingAPI.getAllBookingsByUserId(client.getId());
     } catch (Exception e) {
-        bookings = new ArrayList<>(); 
+      bookings = new ArrayList<>();
     }
     client.setBookings(bookings);
     return client;
-}
-
-
+  }
 
   public Client deleteById(int id) {
     Client client = Utils.assertUser(clientRepository.findById(id));
+    bookingAPI.deleteAllByUserId(id);
     clientRepository.delete(client);
     return client;
   }

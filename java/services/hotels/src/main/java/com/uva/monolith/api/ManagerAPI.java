@@ -10,7 +10,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class HotelManagerAPI {
+public class ManagerAPI {
 
   @Autowired
   private RestTemplate restTemplate;
@@ -18,7 +18,7 @@ public class HotelManagerAPI {
   @Value("${external.services.managers.url}")
   private String MANAGERS_API_URL;
 
-  public Boolean existsHotelManagerById(int id) {
+  public Boolean existsManagerById(int id) {
     try {
       String url = MANAGERS_API_URL + "/{id}";
       return restTemplate.getForObject(url, Map.class, id).containsKey("id");

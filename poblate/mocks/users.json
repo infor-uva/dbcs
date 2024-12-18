@@ -1,0 +1,20 @@
+[
+	{
+		"name": "John Doe",
+		"email": "john.doe@example.com",
+		"password": "securePassword123",
+		"rol": "CLIENT"
+	},
+	{
+		"name": "Jane Smith",
+		"email": "jane.smith@example.com",
+		"password": "securePassword456",
+		"rol": "HOTEL_ADMIN"
+	},
+	{
+		"name": "Alice Johnson",
+		"email": "alice.johnson@example.com",
+		"password": "securePassword789",
+		"rol": "CLIENT"
+	}
+]

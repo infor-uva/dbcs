@@ -116,7 +116,17 @@ public class UserController {
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
     try {
-      return ResponseEntity.ok(userService.deleteUserById(id));
+      User user = userService.getUserById(id);
+      switch (user.getRol()) {
+        case CLIENT:
+          clientService.deleteById(id);
+          break;
+        case HOTEL_ADMIN:
+          managerService.deleteById(id);
+        default:
+          break;
+      }
+      return ResponseEntity.ok(user);
     } catch (HttpClientErrorException e) {
       if (e.getStatusCode() == HttpStatus.NOT_FOUND)
         return new ResponseEntity<String>(HttpStatus.NOT_FOUND);

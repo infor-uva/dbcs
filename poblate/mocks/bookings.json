@@ -1,0 +1,16 @@
+[
+	{
+		"clientId": 1,
+		"hotelId": 1,
+		"roomId": 2,
+		"startDate": "2024-10-20",
+		"endDate": "2024-10-25"
+	},
+	{
+		"clientId": 3,
+		"hotelId": 2,
+		"roomId": 3,
+		"startDate": "2025-02-22",
+		"endDate": "2025-02-27"
+	}
+]

@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.uva.monolith.api.BookingAPI;
-import com.uva.monolith.api.HotelManagerAPI;
+import com.uva.monolith.api.ManagerAPI;
 import com.uva.monolith.exceptions.HotelNotFoundException;
 import com.uva.monolith.exceptions.InvalidDateRangeException;
 import com.uva.monolith.exceptions.InvalidRequestException;
@@ -32,7 +32,7 @@ public class HotelController {
     @Autowired
     private BookingAPI bookingAPI;
     @Autowired
-    private HotelManagerAPI hotelManagerAPI;
+    private ManagerAPI managerAPI;
 
     // Obtener todos los hoteles
     @GetMapping
@@ -62,7 +62,7 @@ public class HotelController {
     // Añadir un hotel con sus habitaciones
     @PostMapping
     public ResponseEntity<?> addHotel(@RequestBody Hotel hotel) {
-        boolean exist = hotelManagerAPI.existsHotelManagerById(hotel.getManagerId());
+        boolean exist = managerAPI.existsManagerById(hotel.getManagerId());
         if (!exist) {
             return new ResponseEntity<>(
                     "No existe el manager con id " + String.valueOf(hotel.getManagerId()), HttpStatus.BAD_REQUEST);
@@ -76,6 +76,19 @@ public class HotelController {
     public Hotel getHotelById(@PathVariable int id) {
         return hotelRepository.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
+    }
+
+    // Borrar hoteles administrados por un manager concreto
+    @DeleteMapping
+    public ResponseEntity<?> deleteHotelsByManagerId(
+            @RequestParam(required = true) Integer managerId) {
+        List<Hotel> hotels = hotelRepository.findAllByManagerId(managerId);
+        if (hotels.isEmpty()) {
+            return new ResponseEntity<>("No hay hoteles para el manager con id " + managerId, HttpStatus.BAD_REQUEST);
+        }
+        bookingAPI.deleteAllByManagerId(managerId);
+        hotelRepository.deleteAll(hotels);
+        return new ResponseEntity<>(hotels, HttpStatus.OK);
     }
 
     // Borrar un hotel junto con sus habitaciones (borrado en cascada)

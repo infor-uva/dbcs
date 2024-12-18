@@ -2,6 +2,7 @@ package com.uva.apis.bookings.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,12 +40,27 @@ public class BookingController {
         return bookingService.getBookingById(id);
     }
 
-    @DeleteMapping /// ?hotelId={hotelId}
-    public ResponseEntity<Void> deleteBooking(@RequestParam int hotelId) {
+    @DeleteMapping /// ?hotelId={hotelId}|managerId={managerId}
+    public ResponseEntity<?> deleteBooking(
+            @RequestParam(required = false) Integer hotelId,
+            @RequestParam(required = false) Integer managerId) {
         try {
-            bookingService.deleteBookingsByHotelId(hotelId);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+            List<Booking> bookings;
+            String message;
+            if (managerId != null) {
+                bookings = bookingService.deleteAllByManagerId(managerId);
+                message = "No bookings for this manager";
+            } else if (hotelId != null) {
+                bookings = bookingService.deleteBookingsByHotelId(hotelId);
+                message = "No bookings for this hotel";
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            return !bookings.isEmpty()
+                    ? new ResponseEntity<>(bookings, HttpStatus.OK)
+                    : new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
+            e.printStackTrace(System.err);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

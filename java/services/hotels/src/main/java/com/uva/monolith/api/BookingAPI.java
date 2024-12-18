@@ -15,7 +15,7 @@ public class BookingAPI {
 
   @Autowired
   private RestTemplate restTemplate;
-  
+
   @Value("${external.services.bookings.url}")
   private String BOOKING_API_URL;
 
@@ -44,5 +44,10 @@ public class BookingAPI {
       notAvailableRooms.add((Integer) booking.get("roomId"));
 
     return notAvailableRooms;
+  }
+
+  public void deleteAllByManagerId(Integer managerId) {
+    String url = BOOKING_API_URL + "?managerId={managerId}";
+    restTemplate.delete(url, managerId);
   }
 }
