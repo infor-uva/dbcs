@@ -16,6 +16,7 @@ public class User extends RegisterRequest {
 
   public User(int id, String email, String password, String name, UserRol rol) {
     super();
+    this.id = id;
     setEmail(email);
     setName(name);
     setPassword(password);

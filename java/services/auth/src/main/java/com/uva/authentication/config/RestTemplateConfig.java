@@ -7,19 +7,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
-import com.uva.authentication.interceptor.AuthHttpInterceptor;
-
 @Configuration
 public class RestTemplateConfig {
 
     @Autowired
-    private AuthHttpInterceptor jwtInterceptor;
+    private RestTemplateInterceptor interceptor;
 
     @Bean
     RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setInterceptors(List.of(jwtInterceptor));
-
+        restTemplate.setInterceptors(List.of(interceptor));
         return restTemplate;
 
     }
