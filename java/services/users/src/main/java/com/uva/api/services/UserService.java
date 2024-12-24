@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import com.uva.api.utils.Utils;
-import com.uva.api.models.AuthResponse;
+import com.uva.api.models.AuthDTO;
 import com.uva.api.models.User;
 import com.uva.api.models.UserRol;
 import com.uva.api.repositories.UserRepository;
@@ -24,63 +24,83 @@ public class UserService {
   @Autowired
   private ManagerService managerService;
 
-  public List<User> getAllUsers() {
-    return userRepository.findAll();
+  public ResponseEntity<List<User>> getAllUsers() {
+    List<User> users = userRepository.findAll();
+    return ResponseEntity.ok(users);
   }
 
-  public User getUserById(int id) {
+  private User assertUserById(int id) {
     return Utils.assertUser(userRepository.findById(id));
   }
 
-  public AuthResponse getUserByEmail(String email) {
-    User u = Utils.assertUser(userRepository.findByEmail(email));
-    AuthResponse auth = new AuthResponse();
-    BeanUtils.copyProperties(u, auth);
-    return auth;
+  public ResponseEntity<User> getUserById(int id) {
+    User user = assertUserById(id);
+    return ResponseEntity.ok(user);
   }
 
-  public User registerNewUser(User registerRequest) {
-    User newUser;
+  public ResponseEntity<AuthDTO> getUserByEmail(String email) {
+    User u = Utils.assertUser(userRepository.findByEmail(email));
+    AuthDTO auth = new AuthDTO();
+    BeanUtils.copyProperties(u, auth);
+    return ResponseEntity.ok(auth);
+  }
+
+  public ResponseEntity<User> registerNewUser(AuthDTO request) {
+    User user = new User();
+    BeanUtils.copyProperties(request, user);
 
     // Aseguramos que tenga un rol, por defecto es cliente
-    if (registerRequest.getRol() == null)
-      registerRequest.setRol(UserRol.CLIENT);
+    if (user.getRol() == null)
+      user.setRol(UserRol.CLIENT);
 
-    switch (registerRequest.getRol()) {
+    switch (user.getRol()) {
       case ADMIN: // Not extracted due to its complexity, it's the same as for the user
         User admin = new User();
-        BeanUtils.copyProperties(registerRequest, admin);
-        newUser = userRepository.save(admin);
+        BeanUtils.copyProperties(user, admin);
+        user = userRepository.save(admin);
         break;
 
       case HOTEL_ADMIN:
-        newUser = managerService.save(registerRequest);
+        user = managerService.save(user);
         break;
 
       case CLIENT: // By default
       default:
-        newUser = clientService.save(registerRequest);
+        user = clientService.save(user);
         break;
     }
-    return newUser;
+    return ResponseEntity.ok(user);
   }
 
-  public User updateUserData(int id, String name, String email) {
-    User user = getUserById(id);
+  public ResponseEntity<User> updateUserData(int id, String name, String email) {
+    User user = assertUserById(id);
     user.setName(name);
     user.setEmail(email);
-    return userRepository.save(user);
+    user = userRepository.save(user);
+    return ResponseEntity.ok(user);
   }
 
-  public User changePassword(int id, String password) {
-    User user = getUserById(id);
+  public ResponseEntity<User> changePassword(int id, String password) {
+    User user = assertUserById(id);
     user.setPassword(password);
-    return userRepository.save(user);
+    user = userRepository.save(user);
+    return ResponseEntity.ok(user);
   }
 
-  public User deleteUserById(int id) {
-    User user = getUserById(id);
-    userRepository.deleteById(id);
-    return user;
+  public ResponseEntity<User> deleteUserById(int id) {
+    User user = assertUserById(id);
+    switch (user.getRol()) {
+      case CLIENT:
+        clientService.deleteById(id);
+        break;
+      case HOTEL_ADMIN:
+        managerService.deleteById(id);
+        break;
+      case ADMIN:
+      default:
+        userRepository.deleteById(id);
+        break;
+    }
+    return ResponseEntity.ok(user);
   }
 }

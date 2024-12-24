@@ -9,11 +9,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AuthResponse {
+public class AuthDTO {
 
   private int id;
   private String name;
   private String email;
   private String password;
-  private UserRol rol;
+  private UserRol rol = UserRol.CLIENT;
 }
