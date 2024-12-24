@@ -42,6 +42,16 @@
 				"roomNumber": "202",
 				"type": "SUITE",
 				"available": true
+			},
+			{
+				"roomNumber": "203",
+				"type": "SUITE",
+				"available": true
+			},
+			{
+				"roomNumber": "204",
+				"type": "SUITE",
+				"available": false
 			}
 		]
 	}

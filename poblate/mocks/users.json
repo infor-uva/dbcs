@@ -1,20 +1,20 @@
 [
 	{
-		"name": "John Doe",
-		"email": "john.doe@example.com",
-		"password": "securePassword123",
-		"rol": "CLIENT"
+		"name": "ADMIN",
+		"email": "admin@dev.com",
+		"password": "123",
+		"rol": "ADMIN"
 	},
 	{
-		"name": "Jane Smith",
-		"email": "jane.smith@example.com",
-		"password": "securePassword456",
+		"name": "Hotel",
+		"email": "hotel@dev.com",
+		"password": "123",
 		"rol": "HOTEL_ADMIN"
 	},
 	{
-		"name": "Alice Johnson",
-		"email": "alice.johnson@example.com",
-		"password": "securePassword789",
+		"name": "Client",
+		"email": "client@dev.com",
+		"password": "123",
 		"rol": "CLIENT"
 	}
 ]
