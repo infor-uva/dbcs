@@ -1,4 +1,4 @@
-package com.uva.authentication.models;
+package com.uva.authentication.models.auth;
 
 import com.uva.authentication.models.remote.UserRol;
 

@@ -8,7 +8,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.uva.authentication.models.TokenData;
+import com.uva.authentication.models.jwt.JwtData;
 import com.uva.authentication.models.remote.User;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -32,14 +32,15 @@ public class JwtUtil {
 
   private String token;
 
-  private static final String SERVICE = "AUTH_SERVICES";
+  @Value("${spring.application.name}")
+  private String service;
 
   public String getOwnInternalToken() {
 
     // Si no hay token, no es valido o quedan 10 seg para caducar se genera otro
     if (token == null || validate(token) == null ||
         decodeToken(token).getTtl() <= 10) {
-      token = generateInternalToken(SERVICE);
+      token = generateInternalToken(service);
     }
 
     return token;
@@ -70,6 +71,8 @@ public class JwtUtil {
   public String generateToken(User user) {
     Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
+    System.out.println("\n\n<-- " + user + " " + user.getId() + " -->");
+
     return JWT
         .create()
 
@@ -77,7 +80,7 @@ public class JwtUtil {
         .withIssuedAt(new Date())
         .withExpiresAt(new Date(System.currentTimeMillis() + extJwtExpiration * 1000))
 
-        .withSubject(SERVICE)
+        .withSubject(service)
         .withAudience("EXTERNAL")
 
         // DATA
@@ -97,11 +100,11 @@ public class JwtUtil {
     }
   }
 
-  public TokenData decodeToken(String token) {
+  public JwtData decodeToken(String token) {
     DecodedJWT decoded = validate(token);
     if (decoded == null)
       return null;
-    return new TokenData(decoded, calculateTTL(decoded));
+    return new JwtData(decoded, calculateTTL(decoded));
   }
 
   private long calculateTTL(DecodedJWT decodedJWT) {

@@ -6,13 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.servlet.function.EntityResponse;
 
 import com.uva.authentication.api.UserAPI;
-import com.uva.authentication.models.JwtAuth;
-import com.uva.authentication.models.LoginRequest;
-import com.uva.authentication.models.RegisterRequest;
-import com.uva.authentication.models.TokenData;
+import com.uva.authentication.models.auth.LoginRequest;
+import com.uva.authentication.models.auth.RegisterRequest;
+import com.uva.authentication.models.jwt.JwtAuth;
+import com.uva.authentication.models.jwt.JwtData;
 import com.uva.authentication.models.remote.User;
 import com.uva.authentication.utils.JwtUtil;
 import com.uva.authentication.utils.SecurityUtils;
@@ -78,7 +77,7 @@ public class AuthService {
   }
 
   public ResponseEntity<?> changePassword(String token, String actualPass, String newPass) {
-    TokenData decoded = jwtUtil.decodeToken(token);
+    JwtData decoded = jwtUtil.decodeToken(token);
     if (decoded == null)
       return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
@@ -102,7 +101,7 @@ public class AuthService {
   }
 
   public ResponseEntity<?> deleteUser(String token, int id, String password) {
-    TokenData decoded = jwtUtil.decodeToken(token);
+    JwtData decoded = jwtUtil.decodeToken(token);
     if (decoded == null)
       return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 

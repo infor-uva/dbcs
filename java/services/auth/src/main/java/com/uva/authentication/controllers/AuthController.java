@@ -8,7 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.uva.authentication.models.*;
+import com.uva.authentication.models.auth.LoginRequest;
+import com.uva.authentication.models.auth.RegisterRequest;
 import com.uva.authentication.services.AuthService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,7 +48,7 @@ public class AuthController {
 
     @PostMapping("/password")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> json,
-            @RequestHeader(value = "Authorization", required = false) String authorization) {
+            @RequestHeader(value = "Authorization", required = true) String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer "))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
@@ -61,7 +62,7 @@ public class AuthController {
 
     @PostMapping("/delete/{id}")
     public Object postMethodName(@PathVariable int id, @RequestBody Map<String, String> json,
-            @RequestHeader(value = "Authorization", required = false) String authorization) {
+            @RequestHeader(value = "Authorization", required = true) String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer "))
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 

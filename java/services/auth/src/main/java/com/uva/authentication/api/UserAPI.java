@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.uva.authentication.models.RegisterRequest;
+import com.uva.authentication.models.auth.RegisterRequest;
 import com.uva.authentication.models.remote.User;
 
 @Component
@@ -20,7 +20,7 @@ public class UserAPI {
   @Autowired
   private RestTemplate restTemplate;
 
-  @Value("${external.services.users.url}")
+  @Value("${services.external.users.url}")
   private String USER_API_URL;
 
   /**

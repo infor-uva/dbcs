@@ -1,4 +1,4 @@
-package com.uva.authentication.models;
+package com.uva.authentication.models.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

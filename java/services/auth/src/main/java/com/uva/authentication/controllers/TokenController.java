@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.uva.authentication.models.JwtAuth;
+import com.uva.authentication.models.jwt.JwtAuth;
 import com.uva.authentication.services.TokenService;
 
 @RestController
-@RequestMapping("/token")
+@RequestMapping("token")
 public class TokenController {
 
   @Autowired

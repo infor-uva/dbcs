@@ -1,6 +1,6 @@
 package com.uva.authentication.models.remote;
 
-import com.uva.authentication.models.RegisterRequest;
+import com.uva.authentication.models.auth.RegisterRequest;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
