@@ -9,7 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.uva.monolith.filter.JwtAuthenticationFilter;
-import com.uva.monolith.services.hotels.models.external.users.UserRol;
+import com.uva.monolith.models.external.users.UserRol;
 
 @Configuration
 @EnableWebSecurity

@@ -7,7 +7,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
 
-import com.uva.monolith.services.hotels.models.external.users.UserRol;
+import com.uva.monolith.models.external.users.UserRol;
 import com.uva.monolith.utils.JwtUtil;
 
 import java.io.IOException;

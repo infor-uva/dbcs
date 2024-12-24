@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.uva.monolith.services.hotels.models.external.users.UserRol;
+import com.uva.monolith.models.external.users.UserRol;
 
 @Component
 public class JwtUtil {

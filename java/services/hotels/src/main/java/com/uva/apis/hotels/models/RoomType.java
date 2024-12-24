@@ -1,4 +1,4 @@
-package com.uva.monolith.services.hotels.models;
+package com.uva.monolith.models;
 
 public enum RoomType {
     SINGLE,
