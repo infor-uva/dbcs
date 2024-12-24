@@ -20,7 +20,7 @@ lint:
   disabled:
     - git-diff-check
   enabled:
-    - checkov@3.2.336
+    - checkov@3.2.341
     - dotenv-linter@3.3.0
     - hadolint@2.12.1-beta
     - markdownlint@0.43.0

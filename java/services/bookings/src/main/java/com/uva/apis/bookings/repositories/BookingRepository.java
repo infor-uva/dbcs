@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 import com.uva.apis.bookings.models.Booking;
 
+import jakarta.transaction.Transactional;
+
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
         List<Booking> findByUserId(int userId);
@@ -26,8 +28,14 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
         void deleteById(int id);
 
+        @Transactional
         void deleteAllByHotelId(int hotelId);
 
         List<Booking> findByHotelId(Integer roomId);
+
+        @Transactional
+        void deleteAllByManagerId(int managerId);
+
+        List<Booking> findByManagerId(int managerId);
 
 }

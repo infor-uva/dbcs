@@ -1,5 +1,6 @@
 package com.uva.api.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.persistence.Entity;
@@ -23,6 +24,7 @@ import lombok.ToString;
 public class Manager extends User {
 
   @Transient
+  @JsonIgnore
   private JsonNode hotels;
 
   public Manager(int id, String name, String email, String password, JsonNode hotels) {

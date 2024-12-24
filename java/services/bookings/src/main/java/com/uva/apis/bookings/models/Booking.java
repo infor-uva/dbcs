@@ -31,6 +31,9 @@ public class Booking {
     @Column(name = "user_id", nullable = false)
     private int userId;
 
+    @Column(name = "manager_id", nullable = false)
+    private int managerId;
+
     @Column(name = "hotel_id", nullable = false)
     private int hotelId;
 

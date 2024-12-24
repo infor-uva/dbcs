@@ -5,14 +5,15 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.uva.api.apis.BookingAPI;
 import com.uva.api.models.Client;
 import com.uva.api.models.User;
 import com.uva.api.models.UserRol;
-import com.uva.api.models.ClientStatus;
 import com.uva.api.models.remote.Booking;
+import com.uva.api.models.ClientStatus;
 import com.uva.api.repositories.ClientRepository;
 import com.uva.api.utils.Utils;
 
@@ -25,19 +26,18 @@ public class ClientService {
   @Autowired
   private BookingAPI bookingAPI;
 
-  public List<Client> findAll() {
-    return clientRepository.findAll();
+  public ResponseEntity<?> findAll() {
+    return ResponseEntity.ok(clientRepository.findAll());
   }
 
-  public Client findById(int id) {
+  public ResponseEntity<?> findById(int id) {
     Client client = Utils.assertUser(clientRepository.findById(id));
-    List<Booking> bookings = bookingAPI.getAllBookingsByUserId(client.getId());
-    client.setBookings(bookings);
-    return client;
+    return ResponseEntity.ok(client);
   }
 
   public Client deleteById(int id) {
     Client client = Utils.assertUser(clientRepository.findById(id));
+    bookingAPI.deleteAllByUserId(id);
     clientRepository.delete(client);
     return client;
   }
@@ -50,27 +50,30 @@ public class ClientService {
     return clientRepository.save(client);
   }
 
+  // TODO No entiendo donde debería ir esto
   public User updateClientStatus(int id, ClientStatus status) {
     Client user = Utils.assertUser(clientRepository.findById(id));
 
-    boolean activeBookings = user.getBookings().stream()
+    List<Booking> bookings = bookingAPI.getAllByUserId(id);
+
+    boolean activeBookings = bookings.stream()
         .anyMatch(booking -> !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
-    boolean inactiveBookings = user.getBookings().stream()
+    boolean inactiveBookings = bookings.stream()
         .anyMatch(booking -> booking.getEndDate().isBefore(LocalDate.now())); // reserva < ahora
 
     switch (status) {
       case NO_BOOKINGS:
-        if (!user.getBookings().isEmpty())
+        if (!bookings.isEmpty())
           throw new IllegalArgumentException("Invalid State: The user has at least one booking");
         break;
       case WITH_ACTIVE_BOOKINGS:
-        if (user.getBookings().isEmpty())
+        if (bookings.isEmpty())
           throw new IllegalArgumentException("Invalid State: The user don't has bookings");
         if (!activeBookings)
           throw new IllegalArgumentException("Invalid State: The user don't has active bookings");
         break;
       case WITH_INACTIVE_BOOKINGS:
-        if (user.getBookings().isEmpty())
+        if (bookings.isEmpty())
           throw new IllegalArgumentException("Invalid State: The user don't has bookings");
         if (!inactiveBookings)
           throw new IllegalArgumentException("Invalid State: The user don't has inactive bookings");

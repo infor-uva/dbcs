@@ -53,7 +53,7 @@ public class UserAPI {
    */
   public User registerUser(RegisterRequest registerRequest) {
     String url = USER_API_URL;
-    System.out.println(registerRequest + " " + registerRequest.getPassword());
+    System.out.println(url + " " + registerRequest);
     ResponseEntity<User> userResponse = restTemplate.postForEntity(url, registerRequest, User.class);
     if (!userResponse.getStatusCode().is2xxSuccessful()) {
       String errorMessage = "Failed to register user: " + userResponse.getStatusCode() + ". " + userResponse.getBody();
@@ -78,6 +78,12 @@ public class UserAPI {
     body.put("password", hashPass);
 
     restTemplate.put(url, body, id);
+  }
+
+  public void deleteUser(User user) {
+    String url = USER_API_URL + "/{id}";
+
+    restTemplate.delete(url, user.getId());
   }
 
 }

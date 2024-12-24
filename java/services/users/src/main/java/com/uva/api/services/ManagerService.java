@@ -6,6 +6,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.uva.api.apis.HotelApi;
 import com.uva.api.models.Manager;
 import com.uva.api.models.User;
 import com.uva.api.repositories.ManagerRepository;
@@ -13,6 +14,9 @@ import com.uva.api.utils.Utils;
 
 @Service
 public class ManagerService {
+
+  @Autowired
+  private HotelApi hotelApi;
 
   @Autowired
   private ManagerRepository managerRepository;
@@ -34,6 +38,7 @@ public class ManagerService {
 
   public Object deleteById(Integer id) {
     Manager manager = Utils.assertUser(managerRepository.findById(id));
+    hotelApi.deleteAllByManagerId(id);
     managerRepository.delete(manager);
     return manager;
   }
