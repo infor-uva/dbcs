@@ -116,7 +116,7 @@ public class AuthService {
 
     if (changePasswordAllowed) {
       userAPI.deleteUser(user);
-      return new ResponseEntity<>(HttpStatus.ACCEPTED);
+      return new ResponseEntity<>(HttpStatus.OK);
     } else {
       return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
     }

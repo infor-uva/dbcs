@@ -192,7 +192,7 @@ public class BookingService {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
         if (bookings.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, message);
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, message);
         }
         return ResponseEntity.ok(bookings);
     }

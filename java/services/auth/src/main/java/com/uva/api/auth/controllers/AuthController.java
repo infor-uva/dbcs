@@ -61,7 +61,7 @@ public class AuthController {
         return authService.changePassword(token, actualPassword, newPassword);
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public Object postMethodName(@PathVariable int id, @RequestBody Map<String, String> json,
             @RequestHeader(value = "Authorization", required = true) String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer "))
