@@ -62,13 +62,19 @@ public class HotelController {
     // Añadir un hotel con sus habitaciones
     @PostMapping
     public ResponseEntity<?> addHotel(@RequestBody Hotel hotel) {
-        boolean exist = managerAPI.existsManagerById(hotel.getManagerId());
-        if (!exist) {
-            return new ResponseEntity<>(
-                    "No existe el manager con id " + String.valueOf(hotel.getManagerId()), HttpStatus.BAD_REQUEST);
+        try {
+
+            boolean exist = managerAPI.existsManagerById(hotel.getManagerId());
+            String message = "No existe el manager con id " + String.valueOf(hotel.getManagerId());
+            if (!exist) {
+                return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+            }
+            Hotel savedHotel = hotelRepository.save(hotel);
+            return new ResponseEntity<>(savedHotel, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            throw e;
         }
-        Hotel savedHotel = hotelRepository.save(hotel);
-        return new ResponseEntity<>(savedHotel, HttpStatus.CREATED);
     }
 
     // Obtener un hotel por su ID
