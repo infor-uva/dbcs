@@ -1,0 +1,48 @@
+[
+	{
+		"name": "Ocean View Hotel",
+		"address": {
+			"streetKind": "Avenida",
+			"streetName": "Marítima",
+			"number": 123,
+			"postCode": "45678",
+			"otherInfo": "Frente al mar"
+		},
+		"managerId": 2,
+		"rooms": [
+			{
+				"roomNumber": "101",
+				"type": "SINGLE",
+				"available": true
+			},
+			{
+				"roomNumber": "102",
+				"type": "DOUBLE",
+				"available": false
+			}
+		]
+	},
+	{
+		"name": "Mountain Retreat",
+		"address": {
+			"streetKind": "Calle",
+			"streetName": "Bosque",
+			"number": 42,
+			"postCode": "98765",
+			"otherInfo": "Cerca del parque nacional"
+		},
+		"managerId": 2,
+		"rooms": [
+			{
+				"roomNumber": "201",
+				"type": "DOUBLE",
+				"available": true
+			},
+			{
+				"roomNumber": "202",
+				"type": "SUITE",
+				"available": true
+			}
+		]
+	}
+]

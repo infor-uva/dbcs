@@ -11,6 +11,7 @@ import com.uva.apis.bookings.models.Booking;
 import com.uva.apis.bookings.repositories.BookingRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -117,8 +118,22 @@ public class BookingService {
         bookingRepository.deleteById(id);
     }
 
-    public void deleteBookingsByHotelId(int hotelId) {
+    public List<Booking> deleteBookingsByHotelId(int hotelId) {
         // Extraer reservas realizadas al hotel
+        List<Booking> bookings = bookingRepository.findByHotelId(hotelId);
+        if (bookings.isEmpty()) {
+            return new ArrayList<>();
+        }
         bookingRepository.deleteAllByHotelId(hotelId);
+        return bookings;
+    }
+
+    public List<Booking> deleteAllByManagerId(int managerId) {
+        List<Booking> bookings = bookingRepository.findByManagerId(managerId);
+        if (bookings.isEmpty()) {
+            return new ArrayList<>();
+        }
+        bookingRepository.deleteAllByManagerId(managerId);
+        return bookings;
     }
 }

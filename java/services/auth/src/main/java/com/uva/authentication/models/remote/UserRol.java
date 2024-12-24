@@ -1,5 +1,5 @@
 package com.uva.authentication.models.remote;
 
 public enum UserRol {
-  ADMIN, AUTH, HOTEL_ADMIN, CLIENT
+  ADMIN, HOTEL_ADMIN, CLIENT
 }

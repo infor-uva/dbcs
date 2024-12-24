@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
+@RequestMapping("auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
 
@@ -23,55 +24,52 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            String token = authService.login(loginRequest);
-            return ResponseEntity.ok(new JwtAuthResponse(token));
+            return authService.login(loginRequest);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
-                return new ResponseEntity<String>(e.getMessage(), HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
             }
         }
-        return new ResponseEntity<String>("Algo no fue bien", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("Algo no fue bien", HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
         try {
-            String token = authService.register(registerRequest);
-            return ResponseEntity.ok(new JwtAuthResponse(token));
+            return authService.register(registerRequest);
         } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.CONFLICT) {
-                return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
-            }
-            e.printStackTrace(System.err);
+            if (e.getStatusCode() == HttpStatus.CONFLICT)
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
 
-        return new ResponseEntity<String>("Algo no fue bien", HttpStatus.UNAUTHORIZED);
-    }
-
-    private boolean validStrings(String... args) {
-        for (String arg : args) {
-            if (arg == null || arg.isBlank())
-                return false;
-        }
-        return true;
+        return new ResponseEntity<>("Algo no fue bien", HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/password")
-    public ResponseEntity<?> postMethodName(@RequestBody Map<String, String> json) {
-        // TODO adaptar a comportamiento de admin
-        String email = json.get("email");
-        String actualPassword = json.get("actual");
-        String newPassword = json.get("new");
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> json,
+            @RequestHeader(value = "Authorization", required = false) String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer "))
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
-        if (!validStrings(email, actualPassword, newPassword))
-            return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+        String token = authorization.substring(7);
 
-        try {
-            // TODO extraer información del token?
-            String token = authService.changePassword(email, actualPassword, newPassword);
-            return ResponseEntity.ok(new JwtAuthResponse(token));
-        } catch (Exception e) {
-            return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
-        }
+        String actualPassword = json.get("password");
+        String newPassword = json.get("newPassword");
+
+        return authService.changePassword(token, actualPassword, newPassword);
     }
+
+    @PostMapping("/delete/{id}")
+    public Object postMethodName(@PathVariable int id, @RequestBody Map<String, String> json,
+            @RequestHeader(value = "Authorization", required = false) String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer "))
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        String token = authorization.substring(7);
+
+        String actualPassword = json.get("password");
+
+        return authService.deleteUser(token, id, actualPassword);
+    }
+
 }

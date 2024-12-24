@@ -45,4 +45,9 @@ public class BookingAPI {
 
     return notAvailableRooms;
   }
+
+  public void deleteAllByManagerId(Integer managerId) {
+    String url = BOOKING_API_URL + "?managerId={managerId}";
+    restTemplate.delete(url, managerId);
+  }
 }
