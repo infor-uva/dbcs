@@ -2,11 +2,14 @@ package com.uva.apis.bookings.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.uva.apis.bookings.api.HotelApi;
-import com.uva.apis.bookings.api.ClientApi;
+import com.uva.apis.bookings.exceptions.BookingNotFoundException;
+import com.uva.apis.bookings.exceptions.InvalidDateRangeException;
+import com.uva.apis.bookings.api.UserApi;
 import com.uva.apis.bookings.models.Booking;
 import com.uva.apis.bookings.repositories.BookingRepository;
 
@@ -24,7 +27,7 @@ public class BookingService {
     private HotelApi hotelApi;
 
     @Autowired
-    private ClientApi managerApi;
+    private UserApi userApi;
 
     /**
      * Consulta por bloques filtrados
@@ -39,18 +42,22 @@ public class BookingService {
      * @param userId
      * @return
      */
-    public List<Booking> getBookings(
-            LocalDate start, LocalDate end, Integer hotelId,
-            Integer roomId, Integer userId) {
+    public ResponseEntity<?> getBookings(
+            LocalDate start, LocalDate end,
+            Integer hotelId, Integer roomId,
+            Integer userId, Integer managerId) {
         List<Booking> bookings = null;
 
         if (start != null && end != null) {
-            bookings = bookingRepository.findByDateRange(start, end);
+            if (!start.isBefore(end))
+                throw new InvalidDateRangeException("Start can't be before than end");
+
+            bookings = bookingRepository.findAllInDateRange(start, end);
         }
 
         if (roomId != null) {
             if (bookings == null) {
-                bookings = bookingRepository.findByRoomId(roomId);
+                bookings = bookingRepository.findAllByRoomId(roomId);
             } else {
                 bookings = bookings.stream()
                         .filter(booking -> booking.getRoomId() == roomId)
@@ -58,7 +65,7 @@ public class BookingService {
             }
         } else if (hotelId != null) {
             if (bookings == null) {
-                bookings = bookingRepository.findByHotelId(roomId);
+                bookings = bookingRepository.findAllByHotelId(hotelId);
             } else {
                 bookings = bookings.stream()
                         .filter(booking -> booking.getHotelId() == hotelId)
@@ -68,59 +75,81 @@ public class BookingService {
 
         if (userId != null) {
             if (bookings == null) {
-                bookings = bookingRepository.findByUserId(userId);
+                bookings = bookingRepository.findAllByUserId(userId);
             } else {
                 bookings = bookings.stream()
                         .filter(booking -> booking.getUserId() == userId)
                         .toList();
             }
+        } else if (managerId != null) {
+            if (bookings == null) {
+                bookings = bookingRepository.findAllByManagerId(managerId);
+            } else {
+                bookings = bookings.stream()
+                        .filter(booking -> booking.getManagerId() == managerId)
+                        .toList();
+            }
         }
 
-        if (start == null && end == null && roomId == null && userId == null) {
+        if (bookings == null) {
             bookings = bookingRepository.findAll();
         }
 
-        return bookings;
+        return ResponseEntity.ok(bookings);
     }
 
-    public Booking createBooking(Booking booking) {
+    public ResponseEntity<Booking> createBooking(Booking booking) {
+        if (booking.getId() != null)
+            booking.setId(null);
         int userId = booking.getUserId();
         int roomId = booking.getRoomId();
         int hotelId = booking.getHotelId();
+        int managerId = booking.getManagerId();
 
         // Check if the customer and rooms exists
-        if (!managerApi.existsById(userId))
+        if (!userApi.existsManagerById(managerId))
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Manager not found");
+
+        if (!userApi.existsClientById(userId))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "User not found");
 
         if (!hotelApi.existsById(hotelId, roomId))
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "room not found");
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Hotel or room not found");
 
         // Check availability
-        List<Booking> existingBookings = bookingRepository.findByRoomIdAndDateRange(roomId, booking.getStartDate(),
-                booking.getEndDate());
+        List<Booking> existingBookings = bookingRepository.findAllByRoomIdInDateRange(roomId, booking.getStart(),
+                booking.getEnd());
 
         if (!existingBookings.isEmpty()) {
-            throw new RuntimeException("Room is not available for the selected dates");
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "Room is not available for the selected dates");
         }
 
-        return bookingRepository.save(booking);
+        booking = bookingRepository.save(booking);
+
+        return ResponseEntity.ok(booking);
     }
 
-    public Booking getBookingById(Integer id) {
+    public Booking findById(Integer id) {
         return bookingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new BookingNotFoundException(id));
     }
 
-    public void deleteBooking(Integer id) {
-        if (!bookingRepository.existsById(id)) {
-            throw new RuntimeException("Booking not found");
-        }
+    public ResponseEntity<?> getBookingById(Integer id) {
+        Booking booking = findById(id);
         bookingRepository.deleteById(id);
+        return ResponseEntity.ok(booking);
     }
 
-    public List<Booking> deleteBookingsByHotelId(int hotelId) {
+    public ResponseEntity<?> deleteBooking(Integer id) {
+        Booking booking = findById(id);
+        bookingRepository.deleteById(id);
+        return ResponseEntity.ok(booking);
+    }
+
+    public List<Booking> deleteAllByHotelId(int hotelId) {
         // Extraer reservas realizadas al hotel
-        List<Booking> bookings = bookingRepository.findByHotelId(hotelId);
+        List<Booking> bookings = bookingRepository.findAllByHotelId(hotelId);
         if (bookings.isEmpty()) {
             return new ArrayList<>();
         }
@@ -129,11 +158,42 @@ public class BookingService {
     }
 
     public List<Booking> deleteAllByManagerId(int managerId) {
-        List<Booking> bookings = bookingRepository.findByManagerId(managerId);
+        List<Booking> bookings = bookingRepository.findAllByManagerId(managerId);
         if (bookings.isEmpty()) {
             return new ArrayList<>();
         }
         bookingRepository.deleteAllByManagerId(managerId);
         return bookings;
+    }
+
+    public List<Booking> deleteAllByUserId(Integer userId) {
+        List<Booking> bookings = bookingRepository.findAllByUserId(userId);
+        if (bookings.isEmpty()) {
+            return new ArrayList<>();
+        }
+        bookingRepository.deleteAllByUserId(userId);
+        return bookings;
+    }
+
+    public ResponseEntity<?> deleteBookings(
+            Integer hotelId, Integer managerId, Integer userId) {
+        List<Booking> bookings;
+        String message;
+        if (managerId != null) {
+            bookings = deleteAllByManagerId(managerId);
+            message = "No bookings for this manager";
+        } else if (hotelId != null) {
+            bookings = deleteAllByHotelId(hotelId);
+            message = "No bookings for this hotel";
+        } else if (userId != null) {
+            bookings = deleteAllByUserId(userId);
+            message = "No bookings for this hotel";
+        } else {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+        if (bookings.isEmpty()) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, message);
+        }
+        return ResponseEntity.ok(bookings);
     }
 }

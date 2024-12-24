@@ -26,7 +26,7 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    private int id;
+    private Integer id;
 
     @Column(name = "user_id", nullable = false)
     private int userId;
@@ -40,10 +40,10 @@ public class Booking {
     @Column(name = "room_id", nullable = false)
     private int roomId;
 
-    @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
+    @Column(name = "start", nullable = false)
+    private LocalDate start;
 
-    @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
+    @Column(name = "end", nullable = false)
+    private LocalDate end;
 
 }

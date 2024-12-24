@@ -14,28 +14,36 @@ import jakarta.transaction.Transactional;
 
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
-        List<Booking> findByUserId(int userId);
-
-        List<Booking> findByRoomId(int roomId);
-
-        @Query("SELECT b FROM Booking b WHERE b.startDate >= ?1 AND b.endDate <= ?2")
-        List<Booking> findByDateRange(@Param("startDate") LocalDate startDate,
-                        @Param("endDate") LocalDate endDate);
-
-        @Query("SELECT b FROM Booking b WHERE b.roomId = ?1 AND b.startDate < ?2 AND b.endDate > ?3")
-        List<Booking> findByRoomIdAndDateRange(@Param("roomId") int roomId, @Param("startDate") LocalDate startDate,
-                        @Param("endDate") LocalDate endDate);
+        // Bookings
+        @Query("SELECT b FROM Booking b WHERE ?1 <= b.end AND ?2 >= b.start")
+        List<Booking> findAllInDateRange(
+                        @Param("start") LocalDate start,
+                        @Param("end") LocalDate end);
 
         void deleteById(int id);
+
+        // Hotels
+        List<Booking> findAllByRoomId(int roomId);
+
+        @Query("SELECT b FROM Booking b WHERE b.roomId = ?1 AND ?2 <= b.end AND ?3 >= b.start")
+        List<Booking> findAllByRoomIdInDateRange(
+                        @Param("roomId") int roomId,
+                        @Param("start") LocalDate start,
+                        @Param("end") LocalDate end);
+
+        List<Booking> findAllByHotelId(Integer roomId);
 
         @Transactional
         void deleteAllByHotelId(int hotelId);
 
-        List<Booking> findByHotelId(Integer roomId);
+        // Users (Clients or Managers)
+        List<Booking> findAllByUserId(int userId);
+
+        List<Booking> findAllByManagerId(int managerId);
+
+        @Transactional
+        void deleteAllByUserId(int userId);
 
         @Transactional
         void deleteAllByManagerId(int managerId);
-
-        List<Booking> findByManagerId(int managerId);
-
 }
