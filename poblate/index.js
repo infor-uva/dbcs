@@ -5,10 +5,11 @@ const { jwtDecode } = require("jwt-decode");
 const dev = require("./environments/env");
 const prod = require("./environments/env.production");
 
-// Modo
+// Environments consts
 const args = process.argv;
 const isProduction = args.includes("--prod");
-const DEBUG = args.includes("--debug");
+const DEBUG = args.includes("--debug") || args.includes("-d");
+const FORCE = args.includes("--force") || args.includes("-f");
 
 const env = (isProduction ? prod : dev).env;
 const { authApi, hotelsApi, bookingsApi } = env;
@@ -59,6 +60,10 @@ const savePost = async (data, first, second = "") => {
 			return await axios.post(first, data);
 		} catch (error) {
 			console.error("ERROR Al REGISTRO, SE PROCEDE A INTENTAR ACCEDER");
+			if (!FORCE) {
+				console.log("Parece que ya hay datos en el sistema");
+				process.exit(0);
+			}
 			return await axios.post(second, data);
 		}
 	} catch (error) {
