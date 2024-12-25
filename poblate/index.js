@@ -10,6 +10,7 @@ const args = process.argv;
 const isProduction = args.includes("--prod");
 const DEBUG = args.includes("--debug") || args.includes("-d");
 const FORCE = args.includes("--force") || args.includes("-f");
+const ERROR = args.includes("--error") || args.includes("-e");
 
 const env = (isProduction ? prod : dev).env;
 const { authApi, hotelsApi, bookingsApi } = env;
@@ -33,7 +34,7 @@ function genDates(ref = new Date()) {
 
 	// After
 	const afterStart = new Date(ref);
-	afterStart.setDate(ref.getDate() + 14); // Restar 2 semanas
+	afterStart.setDate(ref.getDate() + 14); // Sumar 2 semanas
 
 	const afterEnd = new Date(afterStart);
 	afterEnd.setDate(afterStart.getDate() + 2);
@@ -57,18 +58,23 @@ function getRandomItem(a = []) {
 const savePost = async (data, first, second = "") => {
 	try {
 		try {
+			debug("Trying to register user", data);
 			return await axios.post(first, data);
 		} catch (error) {
-			console.error("ERROR Al REGISTRO, SE PROCEDE A INTENTAR ACCEDER");
+			debug("Trying to log user", data);
+			debug("ERROR:", ERROR ? error : error.data ?? error.cause);
+			debug("ERROR Al REGISTRO, SE PROCEDE A INTENTAR ACCEDER");
+			const response = await axios.post(second, data);
 			if (!FORCE) {
 				console.log("Parece que ya hay datos en el sistema");
 				process.exit(0);
 			}
-			return await axios.post(second, data);
+			return response;
 		}
 	} catch (error) {
 		console.error("ERROR Al LOGIN");
 		console.error("\nNo se ha podido comunicar con el servicio de auth");
+		debug("ERROR:", ERROR ? error : error.data ?? error.cause);
 		process.exit(-1);
 	}
 };
@@ -79,6 +85,7 @@ async function register(user) {
 		`${authApi}/register`,
 		`${authApi}/login`
 	);
+	debug("User identified successful");
 	const decoded = jwtDecode(data.token);
 	user.id = decoded.id;
 	user.token = data.token;
@@ -100,22 +107,21 @@ const addUsers = async () => {
 
 const insertHotel = async ({ manager, hotel }) => {
 	try {
-		const { data } = await axios.post(
-			hotelsApi,
-			{
-				...hotel,
-				managerId: manager.id,
+		const body = {
+			...hotel,
+			managerId: manager.id,
+		};
+		debug("Trying to add booking", body);
+		const { data } = await axios.post(hotelsApi, body, {
+			headers: {
+				Authorization: `Bearer ${manager.token}`,
 			},
-			{
-				headers: {
-					Authorization: `Bearer ${manager.token}`,
-				},
-			}
-		);
+		});
+		debug("Hotel added successful");
 		return data;
-	} catch (e) {
-		// console.error(e);
+	} catch (error) {
 		console.error("ERROR Al INSERTAR HOTEL");
+		debug("ERROR:", ERROR ? error : error.data ?? error.cause);
 		process.exit(-1);
 	}
 };
@@ -131,15 +137,17 @@ async function addHotels(managers) {
 
 const insertBookings = async (booking, token) => {
 	try {
+		debug("Trying to add booking", booking);
 		const { data } = await axios.post(bookingsApi, booking, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
 		});
+		debug("Booking added successful");
 		return data;
-	} catch (e) {
-		// console.error(e);
-		console.error("ERROR Al INSERTAR HOTEL");
+	} catch (error) {
+		console.error("ERROR Al INSERTAR RESERVA");
+		debug("ERROR:", ERROR ? error : error.data ?? error.cause);
 		process.exit(-1);
 	}
 };
