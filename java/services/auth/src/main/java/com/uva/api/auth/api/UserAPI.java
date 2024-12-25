@@ -55,14 +55,14 @@ public class UserAPI {
    */
   public User registerUser(RegisterRequest registerRequest) {
     String url = USER_API_URL;
-    System.out.println(url + " " + registerRequest);
-    ResponseEntity<User> userResponse = restTemplate.postForEntity(url, registerRequest, User.class);
-    if (!userResponse.getStatusCode().is2xxSuccessful()) {
-      String errorMessage = "Failed to register user: " + userResponse.getStatusCode() + ". " + userResponse.getBody();
-      throw new HttpClientErrorException(userResponse.getStatusCode(), errorMessage);
+    try {
+      ResponseEntity<User> userResponse = restTemplate.postForEntity(url, registerRequest, User.class);
+      return userResponse.getBody();
+    } catch (HttpClientErrorException ex) {
+      if (ex.getStatusCode() == HttpStatus.BAD_REQUEST)
+        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Register failed");
+      throw ex;
     }
-
-    return userResponse.getBody();
   }
 
   /**

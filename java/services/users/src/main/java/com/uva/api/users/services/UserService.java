@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.uva.api.users.models.AuthDTO;
 import com.uva.api.users.models.User;
@@ -47,6 +49,9 @@ public class UserService {
   }
 
   public ResponseEntity<User> registerNewUser(AuthDTO request) {
+    if (userRepository.existsByEmail(request.getEmail()))
+      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+
     User user = new User();
     BeanUtils.copyProperties(request, user);
 

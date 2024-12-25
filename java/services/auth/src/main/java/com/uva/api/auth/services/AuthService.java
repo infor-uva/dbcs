@@ -79,7 +79,7 @@ public class AuthService {
   public ResponseEntity<?> changePassword(String token, String actualPass, String newPass) {
     JwtData decoded = jwtUtil.decodeToken(token);
     if (decoded == null)
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+      throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
     String email = decoded.getEmail();
     User user = getUser(email, actualPass);
@@ -87,23 +87,22 @@ public class AuthService {
     boolean changePasswordAllowed = decoded.isAdmin() || user != null;
 
     if (user != null && !validStrings(actualPass, newPass))
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
-    if (changePasswordAllowed) {
-      // Actualizamos la nueva
-      String hashPass = SecurityUtils.encrypt(newPass);
-      userAPI.changePassword(user, hashPass);
-      // Hacemos un login con los nuevos datos
-      return login(new LoginRequest(email, newPass));
-    } else {
-      return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
-    }
+    if (!changePasswordAllowed)
+      throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials");
+
+    // Actualizamos la nueva
+    String hashPass = SecurityUtils.encrypt(newPass);
+    userAPI.changePassword(user, hashPass);
+    // Hacemos un login con los nuevos datos
+    return login(new LoginRequest(email, newPass));
   }
 
   public ResponseEntity<?> deleteUser(String token, int id, String password) {
     JwtData decoded = jwtUtil.decodeToken(token);
     if (decoded == null)
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+      throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
     String email = decoded.getEmail();
     User user = getUser(email, password);
@@ -112,13 +111,12 @@ public class AuthService {
         || (user != null && user.getId() == id);
 
     if (user != null && !validStrings(password))
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
-    if (changePasswordAllowed) {
-      userAPI.deleteUser(user);
-      return new ResponseEntity<>(HttpStatus.OK);
-    } else {
-      return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
-    }
+    if (!changePasswordAllowed)
+      throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials");
+
+    userAPI.deleteUser(user);
+    return ResponseEntity.ok(user);
   }
 }
