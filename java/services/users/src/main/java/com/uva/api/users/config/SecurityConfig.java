@@ -8,8 +8,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.uva.api.users.api.TokenAPI;
 import com.uva.api.users.filter.JwtAuthenticationFilter;
 import com.uva.api.users.models.UserRol;
+import com.uva.api.users.services.TokenService;
 
 @Configuration
 @EnableWebSecurity

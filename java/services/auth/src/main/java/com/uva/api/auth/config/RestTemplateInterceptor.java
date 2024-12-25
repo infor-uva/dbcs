@@ -2,7 +2,6 @@ package com.uva.api.auth.config;
 
 import org.springframework.http.HttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
@@ -22,10 +21,9 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
   public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
       throws IOException {
 
-    // Añadir el encabezado "Authorization" con el valor "Bearer <token>"
-    HttpHeaders headers = request.getHeaders();
-    headers.add("Authorization",
-        "Bearer " + jwtUtil.getOwnInternalToken());
+    String token = jwtUtil.getOwnInternalToken();
+
+    request.getHeaders().add("Authorization", "Bearer " + token);
 
     // Continuar con la solicitud
     return execution.execute(request, body);

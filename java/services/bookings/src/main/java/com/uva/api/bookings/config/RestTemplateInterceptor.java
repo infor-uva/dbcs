@@ -22,7 +22,6 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
       throws IOException {
 
     String jwtToken = service.getServiceToken();
-    System.out.println("Using token " + jwtToken);
 
     request.getHeaders().add("Authorization", "Bearer " + jwtToken);
 

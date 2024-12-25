@@ -3,7 +3,7 @@ package com.uva.api.users.api;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -14,8 +14,11 @@ import com.uva.api.users.models.remote.JwtData;
 @Component
 public class TokenAPI {
 
-  @Autowired
-  private RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
+
+  public TokenAPI(@Qualifier("simpleRestTemplate") RestTemplate restTemplate) {
+    this.restTemplate = restTemplate;
+  }
 
   @Value("${spring.application.name}")
   private String service;

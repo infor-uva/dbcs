@@ -3,7 +3,6 @@ package com.uva.api.users.services;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uva.api.users.api.TokenAPI;
@@ -12,8 +11,11 @@ import com.uva.api.users.models.remote.JwtData;
 @Service
 public class TokenService {
 
-  @Autowired
-  private TokenAPI api;
+  private final TokenAPI api;
+
+  public TokenService(TokenAPI api) {
+    this.api = api;
+  }
 
   private JwtData ownToken;
   private Map<String, JwtData> cache = new HashMap<>();

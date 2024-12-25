@@ -28,8 +28,11 @@ import java.util.Map;
 @Component
 public class JwtAuthenticationFilter implements Filter {
 
-    @Autowired
-    private TokenService service;
+    private final TokenService service;
+
+    public JwtAuthenticationFilter(TokenService service) {
+        this.service = service;
+    }
 
     private String getTokenFromRequest(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");

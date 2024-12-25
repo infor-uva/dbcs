@@ -3,7 +3,6 @@ package com.uva.api.auth.api;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,11 @@ import com.uva.api.auth.models.remote.User;
 @Component
 public class UserAPI {
 
-  @Autowired
-  private RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
+
+  public UserAPI(RestTemplate restTemplate) {
+    this.restTemplate = restTemplate;
+  }
 
   @Value("${services.external.users.url}")
   private String USER_API_URL;
