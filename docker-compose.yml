@@ -15,7 +15,7 @@ services:
   # Postgres: The database used by Kong
   kong-database:
     image: postgres:9.6
-    container_DATABASE: kong-postgres
+    container_name: kong-postgres
     restart: on-failure
     networks:
       - kong-net
@@ -108,7 +108,7 @@ services:
       kong-database:
         condition: service_healthy
     ports:
-      - 1337:133
+      - 1337:1337
 
   #######################################
   # APIs
@@ -124,10 +124,10 @@ services:
     networks:
       - kong-net
     environment:
-      # TODO Meter kid y secret key
-      KID: ${JWT_KID}
-      SECRET_KEY: ${JWT_KID}
-      EXTERNAL_SERVICE_USERS_URL: ${API_USERS_URL}${API_USERS_ENDPOINT}
+      SECURITY_JWT_EXPIRATION: 3600000
+      SECURITY_JWT_KID: ${JWT_KID:-9L8RmLEKMFd54WrR06CE9zoRSAGpCWeu}
+      SECURITY_JWT_SECRET_KEY: ${JWT_KEY:-MiClaveDeSeguridadMuyLargaParaQueNoFalleSpringBoot}
+      EXTERNAL_SERVICES_USERS_URL: ${API_USERS_URL}
     depends_on:
       - Users-API
 
@@ -135,7 +135,7 @@ services:
     image: users-api-image
     hostname: ${API_USERS_HOSTNAME}
     build:
-      context: ./java/services/user
+      context: ./java/services/users
       dockerfile: Dockerfile
     restart: unless-stopped
     networks:
