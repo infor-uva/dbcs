@@ -1,16 +1,21 @@
 const mockedUsers = require("./mocks/users.json");
 const mockedHotels = require("./mocks/hotels.json");
-const mockedBookings = require("./mocks/bookings.json");
 const axios = require("axios");
 const { jwtDecode } = require("jwt-decode");
+const dev = require("./environments/env");
+const prod = require("./environments/env.production");
 
 // Modo
 const args = process.argv;
 const isProduction = args.includes("--prod");
+const DEBUG = args.includes("--debug");
 
-const authUrl = "http://localhost:8101/auth";
-const hotelsUrl = "http://localhost:8301/hotels";
-const bookingUrl = "http://localhost:8401/bookings";
+const env = isProduction ? prod : dev;
+const { authApi, hotelsApi, bookingsApi } = env;
+
+const debug = (...values) => {
+	if (DEBUG) console.log(...values);
+};
 
 const loj = (data) => {
 	console.log(JSON.stringify(data, null, 2));
@@ -53,11 +58,12 @@ const savePost = async (data, first, second = "") => {
 		try {
 			return await axios.post(first, data);
 		} catch (error) {
-			console.error("ERROR 1");
+			console.error("ERROR Al REGISTRO");
 			return await axios.post(second, data);
 		}
 	} catch (error) {
-		console.error("ERROR 2");
+		console.error("ERROR Al LOGIN");
+		console.error("\nNo se ha podido comunicar con el servicio de auth");
 		process.exit(-1);
 	}
 };
@@ -65,8 +71,8 @@ const savePost = async (data, first, second = "") => {
 async function register(user) {
 	const { data } = await savePost(
 		user,
-		`${authUrl}/register`,
-		`${authUrl}/login`
+		`${authApi}/register`,
+		`${authApi}/login`
 	);
 	const decoded = jwtDecode(data.token);
 	user.id = decoded.id;
@@ -87,7 +93,7 @@ const addUsers = async () => {
 };
 
 const insertHotel = async ({ manager, hotel }) => {
-	const { data } = await axios.post(hotelsUrl, {
+	const { data } = await axios.post(hotelsApi, {
 		...hotel,
 		managerId: manager.id,
 	});
@@ -104,8 +110,7 @@ async function addHotels(managers) {
 }
 
 const insertBookings = async (booking) => {
-	console.log({ booking });
-	const { data } = await axios.post(bookingUrl, booking);
+	const { data } = await axios.post(bookingsApi, booking);
 	return data;
 };
 
@@ -131,10 +136,12 @@ async function addBookings(clients, hotels) {
 }
 
 async function init() {
+	debug("MODE:", isProduction ? "PRODUCTION" : "DEVELOPMENT");
+	debug("ENV:", env.env, "\n");
 	const { managers, clients } = await addUsers();
 	const hotels = await addHotels(managers, 3);
 	await addBookings(clients, hotels);
+	console.log("POBLACIÓN COMPLETADA EXITOSAMENTE");
 }
 
-console.log("MODE:", isProduction ? "PRODUCTION" : "DEVELOPMENT");
 init();

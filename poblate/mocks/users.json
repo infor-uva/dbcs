@@ -6,14 +6,32 @@
 		"rol": "ADMIN"
 	},
 	{
-		"name": "Hotel",
-		"email": "hotel@dev.com",
+		"name": "Hotel 1",
+		"email": "hotel1@dev.com",
 		"password": "123",
 		"rol": "HOTEL_ADMIN"
 	},
 	{
-		"name": "Client",
-		"email": "client@dev.com",
+		"name": "Hotel 2",
+		"email": "hotel2@dev.com",
+		"password": "123",
+		"rol": "HOTEL_ADMIN"
+	},
+	{
+		"name": "Client 1",
+		"email": "client1@dev.com",
+		"password": "123",
+		"rol": "CLIENT"
+	},
+	{
+		"name": "Client 2",
+		"email": "client2@dev.com",
+		"password": "123",
+		"rol": "CLIENT"
+	},
+	{
+		"name": "Client 3",
+		"email": "client3@dev.com",
 		"password": "123",
 		"rol": "CLIENT"
 	}
