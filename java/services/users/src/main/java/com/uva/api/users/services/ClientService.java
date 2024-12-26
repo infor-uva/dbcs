@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.uva.api.users.api.BookingAPI;
 import com.uva.api.users.models.Client;
 import com.uva.api.users.models.ClientStatus;
-import com.uva.api.users.models.User;
 import com.uva.api.users.models.UserRol;
 import com.uva.api.users.models.remote.Booking;
 import com.uva.api.users.repositories.ClientRepository;
@@ -25,31 +24,32 @@ public class ClientService {
   @Autowired
   private BookingAPI bookingAPI;
 
-  public ResponseEntity<?> findAll() {
+  public ResponseEntity<List<Client>> findAll() {
     return ResponseEntity.ok(clientRepository.findAll());
   }
 
-  public ResponseEntity<?> findById(int id) {
+  public ResponseEntity<Client> findById(int id) {
     Client client = Utils.assertUser(clientRepository.findById(id));
     return ResponseEntity.ok(client);
   }
 
-  public Client deleteById(int id) {
+  public ResponseEntity<Client> deleteById(int id) {
     Client client = Utils.assertUser(clientRepository.findById(id));
     bookingAPI.deleteAllByUserId(id);
     clientRepository.delete(client);
-    return client;
+    return ResponseEntity.ok(client);
   }
 
-  public Client save(Client client) {
+  public ResponseEntity<Client> save(Client client) {
     // Default rol
     client.setRol(UserRol.CLIENT);
-    return clientRepository.save(client);
+    client = clientRepository.save(client);
+    return ResponseEntity.ok(client);
   }
 
   // TODO No entiendo donde debería ir esto
-  public User updateClientStatus(int id, ClientStatus status) {
-    Client user = Utils.assertUser(clientRepository.findById(id));
+  public ResponseEntity<?> updateClientStatus(int id, ClientStatus status) {
+    Client client = Utils.assertUser(clientRepository.findById(id));
 
     List<Booking> bookings = bookingAPI.getAllByUserId(id);
 
@@ -79,8 +79,10 @@ public class ClientService {
         break;
     }
 
-    user.setStatus(status);
+    client.setStatus(status);
 
-    return clientRepository.save(user);
+    client = clientRepository.save(client);
+
+    return ResponseEntity.ok(client);
   }
 }

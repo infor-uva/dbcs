@@ -71,14 +71,14 @@ public class UserService {
       case HOTEL_ADMIN:
         Manager manager = new Manager();
         BeanUtils.copyProperties(request, manager);
-        user = managerService.save(manager);
+        user = managerService.save(manager).getBody();
         break;
 
       case CLIENT: // By default
       default:
         Client client = new Client();
         BeanUtils.copyProperties(request, client);
-        user = clientService.save(client);
+        user = clientService.save(client).getBody();
         break;
     }
     return ResponseEntity.ok(user);

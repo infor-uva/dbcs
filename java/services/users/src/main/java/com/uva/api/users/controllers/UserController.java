@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.uva.api.users.models.AuthDTO;
 import com.uva.api.users.services.UserService;
@@ -39,9 +41,8 @@ public class UserController {
     String name = json.get("name");
     String email = json.get("email");
 
-    if (!Utils.notEmptyStrings(name, email)) {
-      return new ResponseEntity<String>("Missing required fields", HttpStatus.BAD_REQUEST);
-    }
+    if (!Utils.notEmptyStrings(name, email))
+      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing required fields");
 
     return userService.updateUserData(id, name, email);
   }
@@ -50,9 +51,8 @@ public class UserController {
   public ResponseEntity<?> updatePassword(@PathVariable int id, @RequestBody JsonNode json) {
     String password = json.get("password").asText();
 
-    if (!Utils.notEmptyStrings(password)) {
-      return new ResponseEntity<String>("Missing required fields", HttpStatus.BAD_REQUEST);
-    }
+    if (!Utils.notEmptyStrings(password))
+      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing required fields");
 
     return userService.changePassword(id, password);
   }

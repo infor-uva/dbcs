@@ -33,7 +33,7 @@ public class HotelService {
                 ? hotelRepository.findAllByManagerId(managerId)
                 : hotelRepository.findAll();
         if (start != null && end != null) {
-            if (!start.isBefore(end))
+            if (start.isAfter(end))
                 throw new InvalidDateRangeException("La fecha de inicio debe ser anterior a la fecha de fin");
 
             Set<Integer> notAvailableRoomsId = bookingAPI.getNotAvailableRooms(start, end);

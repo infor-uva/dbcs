@@ -26,7 +26,6 @@ public class ClientController {
   @Autowired
   private ClientService clientService;
 
-  // Clients
   @GetMapping
   public ResponseEntity<?> getAllClients() {
     return clientService.findAll();
@@ -41,29 +40,19 @@ public class ClientController {
   public ResponseEntity<?> updateClientState(@PathVariable int id, @RequestBody Map<String, String> json) {
 
     String strStatus = json.get("status");
-    if (strStatus == null) {
-      return new ResponseEntity<String>("Missing required fields", HttpStatus.BAD_REQUEST);
-    }
+    if (strStatus == null)
+      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing required fields");
+
     try {
       ClientStatus clientStatus = ClientStatus.valueOf(strStatus);
-      return ResponseEntity.ok(clientService.updateClientStatus(id, clientStatus));
+      return clientService.updateClientStatus(id, clientStatus);
     } catch (IllegalArgumentException e) {
-      return new ResponseEntity<String>("Unknown Client state", HttpStatus.BAD_REQUEST);
-    } catch (HttpClientErrorException e) {
-      if (e.getStatusCode() == HttpStatus.NOT_FOUND)
-        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-      throw e;
+      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Unknown Client state");
     }
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteClient(@PathVariable Integer id) {
-    try {
-      return ResponseEntity.ok(clientService.deleteById(id));
-    } catch (HttpClientErrorException e) {
-      if (e.getStatusCode() == HttpStatus.NOT_FOUND)
-        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-      throw e;
-    }
+    return clientService.deleteById(id);
   }
 }

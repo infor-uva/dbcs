@@ -49,7 +49,7 @@ public class BookingService {
         List<Booking> bookings = null;
 
         if (start != null && end != null) {
-            if (!start.isBefore(end))
+            if (start.isAfter(end))
                 throw new InvalidDateRangeException("Start can't be before than end");
 
             bookings = bookingRepository.findAllInDateRange(start, end);

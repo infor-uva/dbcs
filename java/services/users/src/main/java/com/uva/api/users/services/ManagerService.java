@@ -3,6 +3,7 @@ package com.uva.api.users.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.uva.api.users.api.HotelApi;
 import com.uva.api.users.models.Manager;
@@ -18,23 +19,25 @@ public class ManagerService {
   @Autowired
   private ManagerRepository managerRepository;
 
-  public Manager save(Manager manager) {
-    return managerRepository.save(manager);
+  public ResponseEntity<Manager> save(Manager manager) {
+    manager = managerRepository.save(manager);
+    return ResponseEntity.ok(manager);
   }
 
-  public List<Manager> findAll() {
-    return managerRepository.findAll();
+  public ResponseEntity<List<Manager>> findAll() {
+    List<Manager> managers = managerRepository.findAll();
+    return ResponseEntity.ok(managers);
   }
 
-  public Manager findById(int id) {
+  public ResponseEntity<Manager> findById(int id) {
     Manager manager = Utils.assertUser(managerRepository.findById(id));
-    return manager;
+    return ResponseEntity.ok(manager);
   }
 
-  public Object deleteById(Integer id) {
+  public ResponseEntity<Manager> deleteById(Integer id) {
     Manager manager = Utils.assertUser(managerRepository.findById(id));
     hotelApi.deleteAllByManagerId(id);
     managerRepository.delete(manager);
-    return manager;
+    return ResponseEntity.ok(manager);
   }
 }

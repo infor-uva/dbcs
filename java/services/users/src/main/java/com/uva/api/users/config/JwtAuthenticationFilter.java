@@ -1,4 +1,4 @@
-package com.uva.api.users.filter;
+package com.uva.api.users.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
