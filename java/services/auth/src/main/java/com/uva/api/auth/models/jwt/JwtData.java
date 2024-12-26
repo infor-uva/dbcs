@@ -44,8 +44,6 @@ public class JwtData {
 
       // Verificamos si el campo está en el mapa y asignamos el valor
       Claim claim = decoded.getClaim(field.getName());
-      System.out.println(field.getName() + " => " + claim.isMissing() + " " + claim.isNull() + " " + claim.asString()
-          + " " + decoded.getClaim("rol").asString());
       if (!claim.isNull()) {
         String value = claim.asString();
         try {
@@ -63,7 +61,6 @@ public class JwtData {
         }
       }
     }
-    System.out.println("\n\n\n<-- " + this + " -->");
   }
 
   public boolean isAdmin() {

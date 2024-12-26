@@ -5,12 +5,13 @@ const { jwtDecode } = require("jwt-decode");
 const dev = require("./environments/env");
 const prod = require("./environments/env.production");
 
-// Modo
+// Environments consts
 const args = process.argv;
 const isProduction = args.includes("--prod");
-const DEBUG = args.includes("--debug");
+const DEBUG = args.includes("--debug") || args.includes("-d");
+const FORCE = args.includes("--force") || args.includes("-f");
 
-const env = isProduction ? prod : dev;
+const env = (isProduction ? prod : dev).env;
 const { authApi, hotelsApi, bookingsApi } = env;
 
 const debug = (...values) => {
@@ -58,7 +59,11 @@ const savePost = async (data, first, second = "") => {
 		try {
 			return await axios.post(first, data);
 		} catch (error) {
-			console.error("ERROR Al REGISTRO");
+			console.error("ERROR Al REGISTRO, SE PROCEDE A INTENTAR ACCEDER");
+			if (!FORCE) {
+				console.log("Parece que ya hay datos en el sistema");
+				process.exit(0);
+			}
 			return await axios.post(second, data);
 		}
 	} catch (error) {
@@ -76,6 +81,7 @@ async function register(user) {
 	);
 	const decoded = jwtDecode(data.token);
 	user.id = decoded.id;
+	user.token = data.token;
 	return user;
 }
 
@@ -93,11 +99,25 @@ const addUsers = async () => {
 };
 
 const insertHotel = async ({ manager, hotel }) => {
-	const { data } = await axios.post(hotelsApi, {
-		...hotel,
-		managerId: manager.id,
-	});
-	return data;
+	try {
+		const { data } = await axios.post(
+			hotelsApi,
+			{
+				...hotel,
+				managerId: manager.id,
+			},
+			{
+				headers: {
+					Authorization: `Bearer ${manager.token}`,
+				},
+			}
+		);
+		return data;
+	} catch (e) {
+		// console.error(e);
+		console.error("ERROR Al INSERTAR HOTEL");
+		process.exit(-1);
+	}
 };
 
 async function addHotels(managers) {
@@ -109,9 +129,19 @@ async function addHotels(managers) {
 	return hotels;
 }
 
-const insertBookings = async (booking) => {
-	const { data } = await axios.post(bookingsApi, booking);
-	return data;
+const insertBookings = async (booking, token) => {
+	try {
+		const { data } = await axios.post(bookingsApi, booking, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		return data;
+	} catch (e) {
+		// console.error(e);
+		console.error("ERROR Al INSERTAR HOTEL");
+		process.exit(-1);
+	}
 };
 
 async function addBookings(clients, hotels) {
@@ -119,27 +149,43 @@ async function addBookings(clients, hotels) {
 	const t = hotels.length;
 	for await (const hotel of hotels) {
 		const roomId = getRandomItem(hotel.rooms.filter((r) => r.available)).id;
-		const userId = getRandomItem(clients).id;
+		const client = getRandomItem(clients);
 		const des = (i - t / 2) * 15;
 		const date = new Date();
 		date.setDate(date.getDate() + des);
 		for await (const dates of genDates(date)) {
-			await insertBookings({
-				managerId: hotel.managerId,
-				userId,
-				hotelId: hotel.id,
-				roomId,
-				...dates,
-			});
+			await insertBookings(
+				{
+					managerId: hotel.managerId,
+					userId: client.id,
+					hotelId: hotel.id,
+					roomId,
+					...dates,
+				},
+				client.token
+			);
 		}
 	}
 }
 
+function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function init() {
 	debug("MODE:", isProduction ? "PRODUCTION" : "DEVELOPMENT");
-	debug("ENV:", env.env, "\n");
+	debug("ENV:", env, "\n");
 	const { managers, clients } = await addUsers();
+	const time = 2;
+	debug("USUARIOS REGISTRADOS O IDENTIFICADOS");
+	if (DEBUG) {
+		await sleep(time * 1000);
+	}
 	const hotels = await addHotels(managers, 3);
+	debug("HOTELES REGISTRADOS");
+	if (DEBUG) {
+		await sleep(time * 1000);
+	}
 	await addBookings(clients, hotels);
 	console.log("POBLACIÓN COMPLETADA EXITOSAMENTE");
 }

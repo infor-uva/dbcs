@@ -63,14 +63,13 @@ public class JwtUtil {
         // DATA
         .withClaim("service", service)
         .withClaim("email", email)
+        // .withClaim("rol", "SERVICE")
 
         .sign(algorithm);
   }
 
   public String generateToken(User user) {
     Algorithm algorithm = Algorithm.HMAC256(secretKey);
-
-    System.out.println("\n\n<-- " + user + " " + user.getId() + " -->");
 
     return JWT
         .create()
