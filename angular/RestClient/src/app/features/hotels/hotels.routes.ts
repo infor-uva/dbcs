@@ -22,24 +22,19 @@ export const HOTELS_ROUTES: AppRoute[] = [
 
 export const MANAGERS_ROUTES: AppRoute[] = [
   {
-    path: 'hotels',
-    children: [
-      {
-        path: '',
-        component: HotelListComponent,
-      },
-      {
-        path: ':id',
-        component: HotelRegisterComponent,
-      },
-      // {
-      //   path: ':id/bookings',
-      //   component: BookingListComponent,
-      // },
-      // {
-      //   path: ':id/rooms/:id/bookings',
-      //   component: BookingListComponent,
-      // },
-    ],
+    path: '',
+    component: HotelListComponent,
   },
+  {
+    path: ':id',
+    component: HotelRegisterComponent,
+  },
+  // {
+  //   path: ':id/bookings',
+  //   component: BookingListComponent,
+  // },
+  // {
+  //   path: ':id/rooms/:id/bookings',
+  //   component: BookingListComponent,
+  // },
 ];

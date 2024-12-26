@@ -1,4 +1,4 @@
-const gateWayUrl = 'localhost:8000'; // kong
+const gateWayUrl = 'localhost:8000/api'; // kong
 
 export const environment = {
   production: true,

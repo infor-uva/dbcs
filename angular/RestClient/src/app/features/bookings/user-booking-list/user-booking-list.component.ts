@@ -76,8 +76,7 @@ export class UserBookingListComponent {
   }
 
   genBookingState(booking: Booking) {
-    return new Date().setHours(0, 0, 0, 0) <=
-      new Date(booking.endDate).getTime()
+    return new Date().setHours(0, 0, 0, 0) <= new Date(booking.end).getTime()
       ? 'Reserva activa'
       : 'Reserva inactiva';
   }

@@ -16,16 +16,12 @@ import { SessionService } from '../../../core/services/session/session.service';
 import { Session, UserRol, UserRolesArray } from '../../../core/models';
 import { MatSelectModule } from '@angular/material/select';
 import { Observable } from 'rxjs';
-import { getBasePath } from '../../../utils/utils';
-import { environment } from '../../../../environments/environment';
+import {
+  UserFormMode,
+  UserFormRoute,
+} from 'app/features/users/types/UserFormData';
+import { getBasePath } from '@utils/utils';
 
-type EditMode =
-  | 'Login'
-  | 'Register'
-  | 'ViewUser'
-  | 'EditUser'
-  | 'ChangePassword'
-  | 'Other';
 const defaultUser: Session = {
   id: 0,
   name: 'test',
@@ -52,7 +48,7 @@ const defaultUser: Session = {
 export class UserFormComponent implements OnInit {
   userForm!: FormGroup;
   rolOptions: UserRol[] = UserRolesArray;
-  mode: EditMode = 'Other';
+  mode: UserFormMode = 'OTHER';
   isMeRoute = false;
 
   /** is editing the user data */
@@ -83,29 +79,6 @@ export class UserFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router
   ) {}
-
-  isEditRoute(urlSegments: any[], isMeRoute: boolean): boolean {
-    return isMeRoute
-      ? urlSegments.length >= 2 && urlSegments[1].path === 'edit'
-      : urlSegments.length >= 4 && urlSegments[3].path === 'edit';
-  }
-
-  isChangePasswordRoute(urlSegments: any[], isMeRoute: boolean): boolean {
-    return isMeRoute
-      ? urlSegments.length >= 2 && urlSegments[1].path === 'change-passwd'
-      : urlSegments.length >= 4 && urlSegments[3].path === 'change-passwd';
-  }
-
-  isViewUserRoute(urlSegments: any[], isMeRoute: boolean): boolean {
-    return isMeRoute
-      ? urlSegments.length === 1
-      : (urlSegments.length === 1 && urlSegments[0].path === 'admin') ||
-          urlSegments.length === 3;
-  }
-
-  isAuthRoute(urlSegments: any[], route: string): boolean {
-    return urlSegments.length === 1 && urlSegments[0].path === route;
-  }
 
   ngOnInit(): void {
     this.setUp();
@@ -167,47 +140,50 @@ export class UserFormComponent implements OnInit {
   }
 
   setUp() {
-    const urlSeg = this.route.snapshot.url;
-    if (this.isAuthRoute(urlSeg, 'login')) {
-      // Login
-      this.isAuth = true;
-      this.isLogin = true;
-      this.mode = 'Login';
-      this.currentPasswordText = 'Contraseña';
-      this.submitButtonText = 'Login';
-      this.titleText = 'Login';
-    } else if (this.isAuthRoute(urlSeg, 'register')) {
-      // Register
-      this.isAuth = true;
-      this.isRegister = true;
-      this.mode = 'Register';
-      this.currentPasswordText = 'Contraseña';
-      this.submitButtonText = 'Create';
-      this.titleText = 'Register';
-    } else {
-      // Identificar si estamos usando /me o /users/:id
-      getBasePath(this.route);
-      const isMeRoute = urlSeg[0].path === 'me';
-      this.isMeRoute = isMeRoute;
+    const snapshot = this.route.snapshot;
+    const urlSeg = snapshot.url;
+    const { data } = snapshot as UserFormRoute;
+    const mode = data!.mode!;
 
-      if (this.isEditRoute(urlSeg, isMeRoute)) {
-        this.isEditing = true;
-        this.mode = 'EditUser';
-        this.titleText = 'Editar mis datos';
-      } else if (this.isChangePasswordRoute(urlSeg, isMeRoute)) {
-        this.mode = 'ChangePassword';
+    console.log(mode);
+
+    switch (mode.formMode) {
+      case 'REGISTER':
+        this.isAuth = true;
+        this.isRegister = true;
+        this.currentPasswordText = 'Contraseña';
+        this.submitButtonText = 'Create';
+        this.titleText = 'Register';
+        break;
+      case 'LOGIN':
+        this.isAuth = true;
+        this.isLogin = true;
+        this.currentPasswordText = 'Contraseña';
+        this.submitButtonText = 'Login';
+        this.titleText = 'Login';
+        break;
+      case 'PASSWORD':
         this.isEditing = true;
         this.isChangePassword = true;
         this.currentPasswordText = 'Contraseña actual';
         this.titleText = 'Cambiar mi contraseña';
-      } else if (this.isViewUserRoute(urlSeg, isMeRoute)) {
-        this.mode = 'ViewUser';
+        this.submitButtonText = 'Update password';
+        break;
+      case 'VIEW':
         this.isViewUser = true;
         this.titleText = 'Mis datos';
-      }
-
-      this.submitButtonText = 'Update';
+        break;
+      case 'EDIT':
+        this.isEditing = true;
+        this.titleText = 'Editar mis datos';
+        this.submitButtonText = 'Update';
+        break;
+      case 'OTHER':
+      default:
+        break;
     }
+    this.isAdmin = !!mode.admin;
+    this.mode = mode.formMode;
 
     this.initializeForm();
     if (!this.isAuth) {
@@ -226,31 +202,31 @@ export class UserFormComponent implements OnInit {
   }
 
   getHotelsUri() {
-    const basePath = getBasePath(this.route); // Obtener la base: '/me' o '/users/:id'
+    const basePath = getBasePath(this.router.url); // Obtener la base: '/me' o '/users/:id'
     return `${basePath}/hotels`;
   }
 
   getBookingsUri() {
-    const basePath = getBasePath(this.route); // Obtener la base: '/me' o '/users/:id'
+    const basePath = getBasePath(this.router.url); // Obtener la base: '/me' o '/users/:id'
     return `${basePath}/bookings`;
   }
 
   togglePassword() {
-    const basePath = getBasePath(this.route); // Obtener la base: '/me' o '/users/:id'
-
-    if (this.mode === 'EditUser') {
+    const basePath = getBasePath(this.router.url); // Obtener la base: '/me' o '/users/:id'
+    console.log('->', basePath);
+    if (this.mode === 'EDIT') {
       this.router.navigateByUrl(`${basePath}/change-passwd`);
-    } else if (this.mode === 'ChangePassword') {
+    } else if (this.mode === 'PASSWORD') {
       this.router.navigateByUrl(`${basePath}/edit`);
     }
   }
 
   switchMode() {
-    const basePath = getBasePath(this.route); // Obtener la base: '/me' o '/users/:id'
-    console.log({ ...this });
-    if (this.mode === 'EditUser') {
+    const basePath = getBasePath(this.router.url); // Obtener la base: '/me' o '/users/:id'
+    console.log('->', { basePath });
+    if (this.mode === 'EDIT' || this.mode === 'PASSWORD') {
       this.router.navigateByUrl(basePath);
-    } else if (this.mode === 'ViewUser') {
+    } else if (this.mode === 'VIEW') {
       this.router.navigateByUrl(`${basePath}/edit`);
     }
   }
@@ -320,17 +296,17 @@ export class UserFormComponent implements OnInit {
     console.log({ data });
 
     switch (this.mode) {
-      case 'Login':
+      case 'LOGIN':
         this.login(data.email, data.currentPassword);
         break;
-      case 'Register':
+      case 'REGISTER':
         this.register(data.name, data.email, data.currentPassword, data.rol);
         break;
-      case 'EditUser':
+      case 'EDIT':
         this.updateUser(data.name, data.email);
         break;
-      case 'ChangePassword':
-        this.changePassword(data.currentPassword, data.newPassword);
+      case 'PASSWORD':
+        this.updatePassword(data.currentPassword, data.newPassword);
         break;
       default:
         break;
@@ -370,7 +346,7 @@ export class UserFormComponent implements OnInit {
   private updateUser(name: string, email: string) {
     this.userService.updateUser(this.user.id, { name, email }).subscribe({
       next: () => {
-        this.router.navigateByUrl(getBasePath(this.route));
+        this.router.navigateByUrl(getBasePath(this.router.url));
       },
       error: (error) => {
         console.error(error);
@@ -379,7 +355,7 @@ export class UserFormComponent implements OnInit {
     });
   }
 
-  private changePassword(password: string | undefined, newPassword: string) {
+  private updatePassword(password: string | undefined, newPassword: string) {
     alert('Unimplemented yet');
   }
 }

@@ -76,8 +76,11 @@ export class HotelListComponent {
     private storage: LocalStorageService,
     private sessionService: SessionService
   ) {
-    const isHotelManger = this.route.snapshot.url[0].path === 'me';
-    const isAdmin = this.route.snapshot.url[0].path === 'admin';
+    const url = this.router.url;
+    const baseUrl = getBasePath(url).split('/')[1];
+    const isHotelManger = url.split('/')[1] === 'me';
+    const isAdmin = baseUrl === 'admin';
+    console.log({ isHotelManger, isAdmin, baseUrl });
     this.isManaging = isHotelManger || isAdmin;
     const today = new Date();
 
@@ -91,6 +94,7 @@ export class HotelListComponent {
 
     this.sessionService.getSession().subscribe({
       next: (session) => {
+        console.log({ session });
         if (session && session.rol !== 'CLIENT') {
           this.isEditing = true;
           this.userId = isHotelManger
@@ -116,12 +120,14 @@ export class HotelListComponent {
     )
       .map((h) => {
         h = { ...h, rooms: [...h.rooms] };
-        h.rooms = h.rooms.filter(
-          (r) =>
-            r.available &&
-            (this.roomTypeSelected === 'All' ||
-              (r.type as SelectableRoomType) === this.roomTypeSelected)
-        );
+        if (!this.isManaging) {
+          h.rooms = h.rooms.filter(
+            (r) =>
+              r.available &&
+              (this.roomTypeSelected === 'All' ||
+                (r.type as SelectableRoomType) === this.roomTypeSelected)
+          );
+        }
         return h;
       })
       .filter((h) => h.rooms.length > 0);
@@ -148,9 +154,10 @@ export class HotelListComponent {
     const { start, end } = this.dateRangeForm.value.dateRange;
 
     const observable = this.isManaging
-      ? this.hotelClient.getAllHotelsByUser(this.userId, start, end)
+      ? this.hotelClient.getAllHotelsByUser(this.userId)
       : this.hotelClient.getAllHotels(start, end);
-    console.log({ ...this });
+    console.log('a', this.isManaging);
+
     observable.subscribe({
       next: (resp) => {
         if (!!resp && (resp as never[]).length >= 0) {
@@ -201,7 +208,8 @@ export class HotelListComponent {
   getHotelUri(hotelId: number) {
     var base;
     try {
-      base = getBasePath(this.route) + '/';
+      // TODO revisar
+      base = getBasePath(this.router.url) + '/';
     } catch (error) {
       base = '';
     }
@@ -215,8 +223,8 @@ export class HotelListComponent {
     };
     this.storage.save('booking-data', {
       roomId,
-      startDate: start.toString(),
-      endDate: end.toString(),
+      start: start.toString(),
+      end: end.toString(),
     });
     this.router.navigate(['/me', 'bookings', 'new'], {
       queryParams: { roomId, startDate: start.toLocaleDateString() },

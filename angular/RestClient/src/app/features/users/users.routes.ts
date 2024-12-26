@@ -1,22 +1,34 @@
-import { AppRoute, UserRolesArray } from '@core/models';
 import { UserFormComponent } from './user-form/user-form.component';
+import { UserFormRoute } from './types/UserFormData';
 
-export const USERS_ROUTES: AppRoute[] = [
+export const USERS_ROUTES: UserFormRoute[] = [
   // Common
   {
     path: '',
-    data: { expectedRole: UserRolesArray },
+    data: {
+      mode: {
+        formMode: 'VIEW',
+      },
+    },
     component: UserFormComponent,
   },
   {
     path: 'edit',
+    data: {
+      mode: {
+        formMode: 'EDIT',
+      },
+    },
     component: UserFormComponent,
-    data: { expectedRole: UserRolesArray },
   },
   {
     path: 'change-passwd',
+    data: {
+      mode: {
+        formMode: 'PASSWORD',
+      },
+    },
     component: UserFormComponent,
-    data: { expectedRole: UserRolesArray },
   },
   {
     // Usuario administrador de hoteles

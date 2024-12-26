@@ -25,8 +25,8 @@
       <li class="booking-item">
         <span class="booking-id">Reserva #{{ booking.id }}</span>
 
-        <span class="booking-start">{{ booking.startDate }}</span>
-        <span class="booking-end">{{ booking.endDate }}</span>
+        <span class="booking-start">{{ booking.start }}</span>
+        <span class="booking-end">{{ booking.end }}</span>
         <span class="booking-status">{{ genBookingState(booking) }}</span>
         <span class="booking-delete">
           <button (click)="deleteBooking(booking.id)">Eliminar</button>

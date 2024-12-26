@@ -3,8 +3,8 @@ import { User } from './User.interface';
 
 export interface Booking {
   id: number;
-  startDate: Date;
-  endDate: Date;
+  start: Date;
+  end: Date;
   userId: User;
   roomId: Room;
 }

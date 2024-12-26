@@ -8,7 +8,7 @@ import { AuthClientService } from '../api/auth/auth-client.service';
 import { Router } from '@angular/router';
 
 interface JWTDecoded {
-  userId: number;
+  id: number;
   rol: UserRol;
   name: string;
   email: string;
@@ -41,7 +41,8 @@ export class SessionService {
 
   private setSession(resp: any) {
     const decoded = jwtDecode<JWTDecoded>(resp.token);
-    const user: Session = { ...decoded, id: decoded.userId };
+    const user: Session = { ...decoded };
+    console.log({ user, decoded, resp });
     this.session$.next(user);
     this.storage.save(this.tokenKey, { ...resp, session: user });
     const mainPage = this.getMainPage(user.rol as UserRol);

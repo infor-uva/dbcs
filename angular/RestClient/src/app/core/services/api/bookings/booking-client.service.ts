@@ -14,9 +14,9 @@ export class BookingClientService {
 
   // Método para crear una nueva reserva
   createBooking(bookingRequest: Booking): Observable<Booking> {
-    const { startDate, endDate } = bookingRequest;
-    const end = endDate.toISOString();
-    console.log({ bookingRequest, end });
+    const { start, end } = bookingRequest;
+    const endDate = end.toISOString();
+    console.log({ bookingRequest, end: endDate });
 
     return this.http.post<Booking>(this.URI, bookingRequest);
   }

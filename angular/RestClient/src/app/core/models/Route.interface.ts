@@ -1,10 +1,10 @@
 import { Route } from '@angular/router';
 import { UserRol } from './User.interface';
 
-interface RouteData {
-  expectedRole: UserRol | UserRol[];
-}
+type RolledRoute = {
+  expectedRole?: UserRol | UserRol[];
+};
 
-export type AppRoute = Omit<Route, 'data'> & {
-  data?: RouteData;
+export type AppRoute<T = {}> = Omit<Route, 'data'> & {
+  data?: RolledRoute & T;
 };

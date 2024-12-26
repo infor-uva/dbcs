@@ -1,23 +1,36 @@
 import { AppRoute } from '@core/models';
 import { MainPageComponent } from 'app/features/users/main-page/main-page.component';
+import { UserFormRoute } from 'app/features/users/types/UserFormData';
 import { UserFormComponent } from 'app/features/users/user-form/user-form.component';
 import { USERS_ROUTES } from 'app/features/users/users.routes';
 
-function getRoutesWithoutRol(routes: AppRoute[]) {
+function changeToAdminScope(routes: UserFormRoute[]) {
   return routes.map((r) => {
-    if (r.data?.expectedRole) {
+    if (r.data) {
       const { data, ...rest } = r;
-      return { ...rest };
+      data.expectedRole = undefined;
+      if (data.mode) {
+        data.mode.admin = true;
+      }
+      return { data, ...rest };
     }
     return r;
   });
 }
 
-export const ADMIN_ROUTES: AppRoute[] = [
-  {
-    path: '', // Main
-    component: UserFormComponent,
+const mainRoute: UserFormRoute = {
+  path: '', // Main
+  data: {
+    mode: {
+      formMode: 'VIEW',
+      admin: true,
+    },
   },
+  component: UserFormComponent,
+};
+
+export const ADMIN_ROUTES: AppRoute[] = [
+  mainRoute,
   {
     path: 'users',
     children: [
@@ -27,7 +40,7 @@ export const ADMIN_ROUTES: AppRoute[] = [
       },
       {
         path: ':id',
-        children: getRoutesWithoutRol(USERS_ROUTES),
+        children: changeToAdminScope(USERS_ROUTES),
       },
     ],
   },

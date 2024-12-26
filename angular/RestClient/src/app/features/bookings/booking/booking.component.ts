@@ -15,8 +15,8 @@ import { SessionService } from '../../../core/services/session/session.service';
 
 type communication = {
   roomId: number;
-  startDate: Date;
-  endDate: Date;
+  start: Date;
+  end: Date;
 };
 
 @Component({
@@ -29,10 +29,10 @@ type communication = {
 export class BookingComponent {
   user: User = { id: 0, email: '', name: '', rol: 'CLIENT' };
   bookingForm: FormGroup;
-  bookingLocal: { roomId: number; startDate: Date; endDate: Date } = {
+  bookingLocal: { roomId: number; start: Date; end: Date } = {
     roomId: 0,
-    endDate: new Date(),
-    startDate: new Date(),
+    end: new Date(),
+    start: new Date(),
   };
   roomId: number = 0;
 
@@ -48,8 +48,8 @@ export class BookingComponent {
     // Inicialización del formulario con validaciones
     this.bookingForm = this.fb.group({
       roomId: [{ value: '', disabled: true }, Validators.required],
-      startDate: [{ value: '', disabled: true }, Validators.required],
-      endDate: [{ value: '', disabled: true }, Validators.required],
+      start: [{ value: '', disabled: true }, Validators.required],
+      end: [{ value: '', disabled: true }, Validators.required],
     });
     const localBooking = storage.read<communication | null>('booking-data');
     if (localBooking === null) {
@@ -66,8 +66,8 @@ export class BookingComponent {
       }
       this.bookingLocal = {
         ...this.bookingLocal,
-        startDate: new Date(this.bookingLocal.startDate),
-        endDate: new Date(this.bookingLocal.endDate),
+        start: new Date(this.bookingLocal.start),
+        end: new Date(this.bookingLocal.end),
       };
       this.loadBooking();
     });
@@ -78,15 +78,22 @@ export class BookingComponent {
     });
   }
 
+  private formatDate(date: Date) {
+    console.log(date);
+    return date.toISOString().split('T')[0].split('-').reverse().join('-');
+  }
+
   loadBooking() {
     const booking = this.bookingLocal;
     if (!booking) return;
-    const start = new Date(booking.startDate).toISOString();
-    const end = new Date(booking.endDate).toISOString();
+    const start = this.formatDate(booking.start);
+    const end = this.formatDate(booking.end);
+    console.log({ start, end });
+
     this.bookingForm = this.fb.group({
       roomId: [{ value: booking.roomId, disabled: true }, Validators.required],
-      startDate: [{ value: start, disabled: true }, Validators.required],
-      endDate: [{ value: end, disabled: true }, Validators.required],
+      start: [{ value: start, disabled: true }, Validators.required],
+      end: [{ value: end, disabled: true }, Validators.required],
     });
   }
 
@@ -94,11 +101,13 @@ export class BookingComponent {
     const { id } = this.user;
     const bookingRequest: any = {
       ...this.bookingLocal,
-      userId: { id },
-      roomId: { id: this.roomId },
+      userId: id,
+      roomId: this.roomId,
     };
 
     // Llama al servicio para crear una nueva reserva
+    console.log(bookingRequest);
+
     this.bookingClient.createBooking(bookingRequest).subscribe({
       next: (response) => {
         console.log('Reserva creada con éxito', response);

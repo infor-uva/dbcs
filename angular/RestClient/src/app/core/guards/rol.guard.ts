@@ -36,21 +36,27 @@ function verifyRol(expectedRole: UserRol) {
     router.navigate(['/login']);
     return false;
   }
+
+  if (!expectedRole) {
+    console.log('any rol required');
+    return true;
+  }
+
   return sessionService.getSession().pipe(
     map((session: Session | null) => {
       if (!session) return false;
 
       if (
         Array.isArray(expectedRole) &&
-        (expectedRole as UserRol[]).includes(session.rol)
+        !(expectedRole as UserRol[]).includes(session.rol)
       ) {
-        console.log('Rol in Rol arry');
+        console.log('Rol in Rol array');
         return true;
       } else if (session.rol === expectedRole) {
         console.log('Rol valido');
         return true;
       }
-      console.log('Unautorizado');
+      console.log('Unauthorized');
 
       // Redirige si el usuario no tiene el rol necesario
       router.navigate(['/unauthorized']);

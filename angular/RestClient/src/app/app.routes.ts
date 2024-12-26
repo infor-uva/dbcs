@@ -1,13 +1,6 @@
-import { HotelListComponent } from './features/hotels/hotel-list/hotel-list.component';
-import { BookingComponent } from './features/bookings/booking/booking.component';
-import { HotelRegisterComponent } from './features/hotels/hotel-register/hotel-register.component';
-import { MainPageComponent } from './features/users/main-page/main-page.component';
-import { UserBookingListComponent } from './features/bookings/user-booking-list/user-booking-list.component';
-import { UserFormComponent } from './features/users/user-form/user-form.component';
 import { UnauthorizedComponent } from './page/unauthorized/unauthorized.component';
-import { AppRoute, UserRolesArray } from './core/models';
+import { AppRoute } from './core/models';
 import { rolGuard, rolGuardChild } from '@core/guards';
-
 export const routes: AppRoute[] = [
   // Auth
   {
@@ -40,9 +33,9 @@ export const routes: AppRoute[] = [
     path: 'unauthorized',
     component: UnauthorizedComponent,
   },
-  {
-    path: '**',
-    redirectTo: '/login',
-    pathMatch: 'full',
-  },
+  // {
+  //   path: '**',
+  //   redirectTo: '/login',
+  //   pathMatch: 'full',
+  // },
 ];

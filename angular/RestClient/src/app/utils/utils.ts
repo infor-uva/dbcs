@@ -1,18 +1,20 @@
-import { ActivatedRoute } from '@angular/router';
-
-export function getBasePath(route: ActivatedRoute): string {
-  const urlSegments = route.snapshot.url;
-  if (urlSegments[0].path === 'me') {
-    return '/me';
-  } else if (
-    urlSegments.length >= 3 &&
-    urlSegments[0].path === 'admin' &&
-    urlSegments[1].path === 'users' &&
-    urlSegments[2]
-  ) {
-    return `/admin/users/${urlSegments[2]}`; // Devuelve la ruta con el ID del usuario
-  } else if (urlSegments[0].path === 'admin') {
-    return '/me';
+export function getBasePath(route: string) {
+  const url = route.split('/').slice(1);
+  const me = '/me';
+  let base = me;
+  if (url.length > 0 && url[0] === me) {
+    base = url[0];
+  } else if (url.length > 0 && url[0] === 'admin') {
+    const i = url.indexOf('users');
+    const j = url.indexOf('hotels');
+    base =
+      i !== -1
+        ? url.slice(0, i + 2).join('/')
+        : j !== -1
+        ? url.slice(0, i + 2).join('/')
+        : me;
   }
-  throw new Error('Invalid route structure'); // Manejo de errores si la URL no es válida
+
+  console.log({ url, route, base });
+  return base;
 }
