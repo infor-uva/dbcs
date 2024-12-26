@@ -9,13 +9,33 @@ networks: #Red interna para comunicar los servicios
 
 services:
   #######################################
+  # Cliente Angular
+  #######################################
+  # RoomsBooking-Web:
+  #   image: roomsbooking-web-image
+  #   build:
+  #     context: ./angular/RestClient
+  #     dockerfile: ./Dockerfile
+  #   restart: unless-stopped
+  #   ports:
+  #     - 4200:80
+  #   networks:
+  #     - kong-net
+  #   depends_on:
+  #     - kong
+  #     - Auth-API
+  #     - Users-API
+  #     - Hotels-API
+  #     - Bookings-API
+
+  #######################################
   # Kong
   #######################################
 
   # Postgres: The database used by Kong
   kong-database:
     image: postgres:9.6
-    container_DATABASE: kong-postgres
+    container_name: kong-postgres
     restart: on-failure
     networks:
       - kong-net
@@ -108,7 +128,26 @@ services:
       kong-database:
         condition: service_healthy
     ports:
-      - 1337:133
+      - 1337:1337
+
+  #######################################
+  # Generate Data
+  #######################################
+
+  Generate-APIs-Data:
+    image: gen-apis-data
+    build:
+      context: ./poblate
+      dockerfile: Dockerfile
+    networks:
+      - kong-net
+    restart: on-failure
+    depends_on:
+      - kong
+      - Auth-API
+      - Users-API
+      - Hotels-API
+      - Bookings-API
 
   #######################################
   # APIs
@@ -124,10 +163,11 @@ services:
     networks:
       - kong-net
     environment:
-      # TODO Meter kid y secret key
-      KID: ${JWT_KID}
-      SECRET_KEY: ${JWT_KID}
-      EXTERNAL_SERVICE_USERS_URL: ${API_USERS_URL}${API_USERS_ENDPOINT}
+      SECURITY_JWT_SECRET-KEY: ${JWT_KEY}
+      SECURITY_JWT_KID: ${JWT_KID}
+      SECURITY_JWT_EXTERNAL_EXPIRATION: ${JWT_EXTERNAL_EXPIRATION:-3600}
+      SECURITY_JWT_INTERNAL_EXPIRATION: ${JWT_INTERNAL_EXPIRATION:-600}
+      SERVICES_EXTERNAL_USERS_URL: ${API_KONG_ROUTE_USERS_URL}
     depends_on:
       - Users-API
 
@@ -135,14 +175,16 @@ services:
     image: users-api-image
     hostname: ${API_USERS_HOSTNAME}
     build:
-      context: ./java/services/user
+      context: ./java/services/users
       dockerfile: Dockerfile
     restart: unless-stopped
     networks:
       - kong-net
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://${DB_USERS_HOSTNAME}:${DB_USERS_PORT:-3306}/${DB_USERS_DATABASE}?createDatabaseIfNotExist=true
-      EXTERNAL_SERVICE_USERS_URL: ${API_USERS_URL}${API_USERS_ENDPOINT}
+      SERVICES_INTERNAL_TOKEN_URL: ${API_AUTH_TOKEN_URL}
+      SERVICES_EXTERNAL_HOTELS_URL: ${API_KONG_ROUTE_HOTELS_URL}
+      SERVICES_EXTERNAL_BOOKINGS_URL: ${API_KONG_ROUTE_BOOKINGS_URL}
     depends_on:
       - Users-DB
 
@@ -157,6 +199,9 @@ services:
       - kong-net
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://${DB_HOTELS_HOSTNAME}:${DB_HOTELS_PORT:-3306}/${DB_HOTELS_DATABASE}?createDatabaseIfNotExist=true
+      SERVICES_INTERNAL_TOKEN_URL: ${API_AUTH_TOKEN_URL}
+      SERVICES_EXTERNAL_MANAGERS_URL: ${API_KONG_ROUTE_MANAGERS_URL}
+      SERVICES_EXTERNAL_BOOKINGS_URL: ${API_KONG_ROUTE_BOOKINGS_URL}
     depends_on:
       - Hotels-DB
 
@@ -171,6 +216,11 @@ services:
       - kong-net
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://${DB_BOOKINGS_HOSTNAME}:${DB_BOOKINGS_PORT:-3306}/${DB_BOOKINGS_DATABASE}?createDatabaseIfNotExist=true
+      SERVICES_INTERNAL_TOKEN_URL: ${API_AUTH_TOKEN_URL}
+      SERVICES_EXTERNAL_CLIENTS_URL: ${API_KONG_ROUTE_CLIENTS_URL}
+      SERVICES_EXTERNAL_MANAGERS_URL: ${API_KONG_ROUTE_MANAGERS_URL}
+      SERVICES_EXTERNAL_HOTELS_URL: ${API_KONG_ROUTE_HOTELS_URL}
+
     depends_on:
       - Users-API
       - Hotels-API
@@ -223,26 +273,10 @@ services:
     networks:
       - kong-net
     volumes:
-      - hotels_data:/var/lib/mysql
+      - bookings_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_CREDENTIALS_ROOT_PASSWORD:-ClaveRoot}
       MYSQL_USER: ${DB_CREDENTIALS_USER:-user}
       MYSQL_PASSWORD: ${DB_CREDENTIALS_PASSWORD:-password}
       MYSQL_DATABASE: ${DB_BOOKINGS_DATABASE}
       MYSQL_ROOT_HOST: "%"
-
-  #######################################
-  # Cliente Angular
-  #######################################
-  RoomsBooking-Web:
-    image: roomsbooking-web-image
-    build:
-      context: ./angular/RestClient
-      dockerfile: ./Dockerfile
-    restart: unless-stopped
-    ports:
-      - 4200:80
-    networks:
-      - kong-net
-    depends_on:
-      - RoomsBooking-database

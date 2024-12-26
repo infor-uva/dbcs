@@ -4,10 +4,14 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.uva.api.users.models.AuthDTO;
+import com.uva.api.users.models.Client;
+import com.uva.api.users.models.Manager;
 import com.uva.api.users.models.User;
 import com.uva.api.users.models.UserRol;
 import com.uva.api.users.repositories.UserRepository;
@@ -47,6 +51,9 @@ public class UserService {
   }
 
   public ResponseEntity<User> registerNewUser(AuthDTO request) {
+    if (userRepository.existsByEmail(request.getEmail()))
+      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+
     User user = new User();
     BeanUtils.copyProperties(request, user);
 
@@ -62,12 +69,16 @@ public class UserService {
         break;
 
       case HOTEL_ADMIN:
-        user = managerService.save(user);
+        Manager manager = new Manager();
+        BeanUtils.copyProperties(request, manager);
+        user = managerService.save(manager);
         break;
 
       case CLIENT: // By default
       default:
-        user = clientService.save(user);
+        Client client = new Client();
+        BeanUtils.copyProperties(request, client);
+        user = clientService.save(client);
         break;
     }
     return ResponseEntity.ok(user);

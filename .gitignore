@@ -1,5 +1,5 @@
 ### Own ###
-taller
+.trunk/
 *.pdf
 **/target/
 **/.vscode
@@ -7,4 +7,3 @@ taller
 **/*.tmp
 *.ln
 *.log
-
