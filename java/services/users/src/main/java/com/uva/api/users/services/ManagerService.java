@@ -2,12 +2,10 @@ package com.uva.api.users.services;
 
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.uva.api.users.api.HotelApi;
 import com.uva.api.users.models.Manager;
-import com.uva.api.users.models.User;
 import com.uva.api.users.repositories.ManagerRepository;
 import com.uva.api.users.utils.Utils;
 
@@ -20,10 +18,8 @@ public class ManagerService {
   @Autowired
   private ManagerRepository managerRepository;
 
-  public Manager save(User request) {
-    Manager hm = new Manager();
-    BeanUtils.copyProperties(request, hm);
-    return managerRepository.save(hm);
+  public Manager save(Manager manager) {
+    return managerRepository.save(manager);
   }
 
   public List<Manager> findAll() {
