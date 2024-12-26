@@ -1,4 +1,4 @@
-import { Address } from './Address.interface';
+import { Address } from './Address';
 import { Room } from './Room.interface';
 
 export interface Hotel {
@@ -6,4 +6,5 @@ export interface Hotel {
   name: string;
   address: Address;
   rooms: Room[];
+  managerId: number;
 }

@@ -25,7 +25,7 @@
       "@core/*": ["app/core/*"], // Alias para el core
       "@shared": ["app/shared"], // Alias para shared
       "@shared/*": ["app/shared/*"], // Alias para shared
-      "@features/*": ["app/core/features/*"], // Alias para features
+      "@features/*": ["app/features/*"], // Alias para features
       "@utils/*": ["app/utils/*"], // Alias para utilidades
       "@pages/*": ["app/pages/*"] // Alias para pages
     }

@@ -7,6 +7,7 @@ export type UserFormMode =
   | 'VIEW'
   | 'EDIT'
   | 'OTHER';
+
 export type ModeType = {
   formMode: UserFormMode;
   admin?: boolean;

@@ -1,4 +1,4 @@
-import { UserRol } from './User.interface';
+import { UserRol } from '../../features/users/types/User.interface';
 
 export interface Session {
   id: number;

@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { UserRol } from './User.interface';
+import { UserRol } from '../../features/users/types/User.interface';
 
 type RolledRoute = {
   expectedRole?: UserRol | UserRol[];
