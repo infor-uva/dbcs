@@ -3,7 +3,6 @@ package com.uva.api.users.services;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -42,9 +41,7 @@ public class ClientService {
     return client;
   }
 
-  public Client save(User request) {
-    Client client = new Client();
-    BeanUtils.copyProperties(request, client);
+  public Client save(Client client) {
     // Default rol
     client.setRol(UserRol.CLIENT);
     return clientRepository.save(client);

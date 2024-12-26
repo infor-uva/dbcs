@@ -14,12 +14,15 @@ public class UserApi {
   @Autowired
   private RestTemplate restTemplate;
 
-  @Value("${services.external.users.url}")
-  private String USERS_API_URL;
+  @Value("${services.external.clients.url}")
+  private String CLIENTS_API_URL;
+
+  @Value("${services.external.managers.url}")
+  private String MANAGERS_API_URL;
 
   public boolean existsClientById(int id) {
     try {
-      String url = USERS_API_URL + "/clients/{id}";
+      String url = CLIENTS_API_URL + "/{id}";
       ResponseEntity<Void> response = restTemplate.getForEntity(url, Void.class, id);
       return response.getStatusCode() == HttpStatus.OK;
     } catch (HttpClientErrorException ex) {
@@ -32,7 +35,7 @@ public class UserApi {
 
   public boolean existsManagerById(int id) {
     try {
-      String url = USERS_API_URL + "/managers/{id}";
+      String url = MANAGERS_API_URL + "/{id}";
       ResponseEntity<Void> response = restTemplate.getForEntity(url, Void.class, id);
       return response.getStatusCode() == HttpStatus.OK;
     } catch (HttpClientErrorException ex) {

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 
 import com.uva.api.auth.models.auth.LoginRequest;
 import com.uva.api.auth.models.auth.RegisterRequest;
@@ -25,26 +24,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            return authService.login(loginRequest);
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
-            }
-        }
-        return new ResponseEntity<>("Algo no fue bien", HttpStatus.UNAUTHORIZED);
+        return authService.login(loginRequest);
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
-        try {
-            return authService.register(registerRequest);
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.CONFLICT)
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        }
-
-        return new ResponseEntity<>("Algo no fue bien", HttpStatus.UNAUTHORIZED);
+        return authService.register(registerRequest);
     }
 
     @PostMapping("/password")
