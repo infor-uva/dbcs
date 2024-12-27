@@ -4,12 +4,8 @@ import { environment } from '../../../../../environments/environment';
 import { SessionService } from '../../session/session.service';
 import { tap } from 'rxjs';
 import { Client, ClientState, User } from '@features/users';
-import { Session } from 'inspector';
+import { Session } from '@core/models';
 
-let user:User;
-let session:Session;
-let client:Client;
-let userstate:ClientState;
 
 @Injectable({
   providedIn: 'root',

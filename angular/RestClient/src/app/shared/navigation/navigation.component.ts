@@ -3,7 +3,8 @@ import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-import { Session, UserRol } from '@core/models';
+import { Session } from '@core/models/Session.interface';
+import { UserRol } from '@features/users';
 import { SessionService } from '@core/services';
 
 var comp_id = 0;

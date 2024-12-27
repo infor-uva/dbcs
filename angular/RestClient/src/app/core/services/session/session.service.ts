@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { LocalStorageService } from '../storage/local-storage.service';
-import { PersistenToken, Session, UserRol } from '../../models';
+import { Session, PersistenToken } from '../../models/Session.interface';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { AuthClientService } from '../api/auth/auth-client.service';
 import { Router } from '@angular/router';
+import { UserRol } from '@features/users/types/User.interface';
 
 interface JWTDecoded {
   id: number;

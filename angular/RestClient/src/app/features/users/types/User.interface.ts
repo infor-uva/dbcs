@@ -8,8 +8,9 @@ export interface User {
   rol: UserRol;
 }
 
-export const UserRolesArray = ['CLIENT', 'HOTEL_ADMIN', 'ADMIN'] as const;
 export type UserRol = 'CLIENT' | 'HOTEL_ADMIN' | 'ADMIN';
+export const UserRolesArray: UserRol[] = ['CLIENT', 'HOTEL_ADMIN', 'ADMIN'];
+
 
 export interface Client extends User {
   status: ClientState;
@@ -27,4 +28,4 @@ export const ClientStateArray = [
   'WITH_ACTIVE_BOOKINGS',
   'WITH_INACTIVE_BOOKINGS',
 ] as const;
-export type ClientState = typeof ClientStateArray;
+export type ClientState = 'NO_BOOKINGS' | 'WITH_ACTIVE_BOOKINGS' |  'WITH_INACTIVE_BOOKINGS';

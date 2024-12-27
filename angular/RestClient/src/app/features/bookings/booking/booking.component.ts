@@ -7,7 +7,8 @@ import {
 } from '@angular/forms';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { Booking, User } from '../../../core/models';
+import { Booking} from '@features/bookings';
+import { User } from '@features/users';
 import { LocalStorageService } from '../../../core/services/storage/local-storage.service';
 import { BookingClientService } from '../../../core/services/api/bookings/booking-client.service';
 import { UserClientService } from '../../../core/services/api/users/user-client.service';

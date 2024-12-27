@@ -1,5 +1,5 @@
 export const roomTypeArray = ['SINGLE', 'DOUBLE', 'SUITE'] as const;
-export type RoomType = typeof roomTypeArray;
+export type RoomType = 'SINGLE' | 'DOUBLE' | 'SUITE';
 
 export interface Room {
   id: number;

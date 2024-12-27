@@ -13,7 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CommonModule } from '@angular/common';
-import { Address, Hotel, Room } from '../../../core/models';
+import { Address, Hotel, Room } from '@features/hotels';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotelClientService } from '../../../core/services/api/hotels/hotel-client.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,6 +35,7 @@ const emptyHotel: Hotel = {
     postCode: '',
     streetName: '',
   },
+  managerId: 0
 };
 
 @Component({

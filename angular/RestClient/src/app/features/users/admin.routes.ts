@@ -1,4 +1,4 @@
-import { AppRoute } from '@core/models';
+import { AppRoute } from '@core/models/Route.interface';
 import { MainPageComponent } from 'app/features/users/main-page/main-page.component';
 import { UserFormRoute } from 'app/features/users/types/UserFormData';
 import { UserFormComponent } from 'app/features/users/user-form/user-form.component';

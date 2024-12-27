@@ -13,7 +13,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SessionService } from '../../../core/services/session/session.service';
-import { Session, UserRol, UserRolesArray } from '../../../core/models';
+import { Session } from '@core/models';
+import { UserRol, UserRolesArray} from '@features/users';
 import { MatSelectModule } from '@angular/material/select';
 import { Observable } from 'rxjs';
 import {

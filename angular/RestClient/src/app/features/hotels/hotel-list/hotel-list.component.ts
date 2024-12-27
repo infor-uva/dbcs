@@ -1,6 +1,6 @@
 import { Component, NgModule } from '@angular/core';
 import { RouterModule, Router, ActivatedRoute, Data } from '@angular/router';
-import { Hotel, Room, RoomType, roomTypeArray } from '../../../core/models';
+import { Hotel, Room, RoomType, roomTypeArray } from '@features/hotels';
 import {
   MatAccordion,
   MatExpansionPanel,

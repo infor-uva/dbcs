@@ -1,10 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Client, User, UserStateFilter } from '../../../core/models';
+import { Client, User, UserStateFilter } from '@features/users';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { UserClientService } from '../../../core/services/api/users/user-client.service';
-import { users } from '../../../../mocks/users'; // Renombrado para claridad
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatCardModule } from '@angular/material/card';
