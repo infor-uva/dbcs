@@ -1,0 +1,12 @@
+[
+  {
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "status": "NO_BOOKINGS"
+  },
+  {
+    "name": "Pepe",
+    "email": "pepe@example.com",
+    "status": "WITH_ACTIVE_BOOKINGS"
+  }
+]
