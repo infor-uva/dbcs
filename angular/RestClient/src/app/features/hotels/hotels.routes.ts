@@ -1,4 +1,4 @@
-import { AppRoute } from '@core/models';
+import { AppRoute } from '@core/models/Route.interface';
 import { HotelRegisterComponent } from './hotel-register/hotel-register.component';
 import { HotelListComponent } from './hotel-list/hotel-list.component';
 import { rolGuard } from '@core/guards';

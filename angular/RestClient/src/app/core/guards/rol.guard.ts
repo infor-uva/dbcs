@@ -5,7 +5,8 @@ import {
   CanActivateFn,
   Router,
 } from '@angular/router';
-import { Session, UserRol } from '@core/models';
+import { Session } from '@core/models/Session.interface';
+import { UserRol } from '../../features/users/types/User.interface';
 import { SessionService } from '@core/services';
 
 import { map } from 'rxjs';

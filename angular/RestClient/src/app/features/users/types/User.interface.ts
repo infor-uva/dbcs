@@ -9,7 +9,7 @@ export interface User {
 }
 
 export const UserRolesArray = ['CLIENT', 'HOTEL_ADMIN', 'ADMIN'] as const;
-export type UserRol = typeof UserRolesArray;
+export type UserRol = 'CLIENT' | 'HOTEL_ADMIN' | 'ADMIN';
 
 export interface Client extends User {
   status: ClientState;

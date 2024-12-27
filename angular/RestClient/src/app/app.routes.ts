@@ -1,5 +1,5 @@
 import { UnauthorizedComponent } from './page/unauthorized/unauthorized.component';
-import { AppRoute } from './core/models';
+import { AppRoute } from './core/models/Route.interface';
 import { rolGuard, rolGuardChild } from '@core/guards';
 export const routes: AppRoute[] = [
   // Auth

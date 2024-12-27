@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Hotel, Room } from '../../../models';
 import { SessionService } from '../../session/session.service';
 import { catchError, map, switchMap, throwError } from 'rxjs';
+import { Hotel, Room } from '@features/hotels';
+
+let hotel:Hotel;
+let rooms:Room;
 
 @Injectable({
   providedIn: 'root',

@@ -1,9 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
-import { Client, Session, User, UserState } from '../../../models';
 import { SessionService } from '../../session/session.service';
 import { tap } from 'rxjs';
+import { Client, ClientState, User } from '@features/users';
+import { Session } from 'inspector';
+
+let user:User;
+let session:Session;
+let client:Client;
+let userstate:ClientState;
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +35,7 @@ export class UserClientService {
   }
 
   // Cambiar estado de un usuario
-  alterUserStatus(userId: number, status: UserState) {
+  alterUserStatus(userId: number, status: ClientState) {
     return this.http.patch(
       `${this.URI}/${userId}`,
       {
