@@ -53,7 +53,7 @@ export class HotelClientService {
           throw new Error('No session found');
         }
         const { id } = session;
-        const hotelWithHM = { ...hotel, hotelManager: { id } };
+        const hotelWithHM = { ...hotel, managerId: id };
         return hotelWithHM;
       }),
       switchMap((hotelWithHM) =>
