@@ -27,7 +27,7 @@ export class MainPageComponent implements OnInit {
   users: Client[] = [];
   filteredUsers: Client[] = [];
   selectedStatus: UserStateFilter = 'All';
-  displayedColumns: string[] = ['id', 'name', 'email', 'rol'];
+  displayedColumns: string[] = ['id', 'name', 'email', 'rol', 'status'];
   dataSource = new MatTableDataSource<User>();
 
   constructor(private userClient: UserClientService, private router: Router) {}
@@ -36,7 +36,6 @@ export class MainPageComponent implements OnInit {
     this.users = users;
     this.filteredUsers = [...this.users];
 
-    // Sobrescribir con datos reales si están disponibles
     this.userClient.getAllUsers().subscribe({
       next: (data: Client[]) => {
         this.users = data;
@@ -49,28 +48,29 @@ export class MainPageComponent implements OnInit {
   @ViewChild(MatPaginator) paginator?: MatPaginator;
 
   filterUsers(): void {
-    if (this.selectedStatus === 'All') {
-      this.filteredUsers = [...this.users];
-    } else {
-      this.filteredUsers = this.users.filter(
-        (user) => user.status === this.selectedStatus
-      );
-    }
+    this.filteredUsers = 
+      this.selectedStatus === 'All'
+        ? [...this.users]
+        : this.users.filter(user => user?.status === this.selectedStatus);
+    
     this.dataSource = new MatTableDataSource<User>(this.filteredUsers);
     this.dataSource.paginator = this.paginator!;
   }
 
   getState(user: Client): string {
-    switch (user.status) {
-      case 'NO_BOOKINGS':
-        return 'SIN RESERVAS';
-      case 'WITH_ACTIVE_BOOKINGS':
-        return 'CON RESERVAS ACTIVAS';
-      case 'WITH_INACTIVE_BOOKINGS':
-        return 'CON RESERVAS INACTIVAS';
-      default:
-        return 'ESTADO DESCONOCIDO';
+    if (user.rol === 'CLIENT') {
+      switch (user.status) {
+        case 'NO_BOOKINGS':
+          return 'SIN RESERVAS';
+        case 'WITH_ACTIVE_BOOKINGS':
+          return 'CON RESERVAS ACTIVAS';
+        case 'WITH_INACTIVE_BOOKINGS':
+          return 'CON RESERVAS INACTIVAS';
+        default:
+          return 'ESTADO DESCONOCIDO';
+      }
     }
+    return '-';
   }
 
   userDetails(id: number) {
