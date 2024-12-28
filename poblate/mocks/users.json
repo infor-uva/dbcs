@@ -9,13 +9,13 @@
 		"name": "Hotel 1",
 		"email": "hotel1@dev.com",
 		"password": "123",
-		"rol": "HOTEL_ADMIN"
+		"rol": "MANAGER"
 	},
 	{
 		"name": "Hotel 2",
 		"email": "hotel2@dev.com",
 		"password": "123",
-		"rol": "HOTEL_ADMIN"
+		"rol": "MANAGER"
 	},
 	{
 		"name": "Client 1",

@@ -1,9 +1,5 @@
 package com.uva.api.users.models;
 
-import java.util.List;
-
-import com.uva.api.users.models.remote.Booking;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,8 +26,7 @@ public class Client extends User {
   @Enumerated(EnumType.STRING)
   private ClientStatus status = ClientStatus.NO_BOOKINGS;
 
-  public Client(int id, String name, String email, String password, ClientStatus status,
-      List<Booking> bookings) {
+  public Client(int id, String name, String email, String password, ClientStatus status) {
     super(id, name, email, password, UserRol.CLIENT);
     setStatus(status);
   }

@@ -1,6 +1,5 @@
 package com.uva.api.users.services;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import com.uva.api.users.api.BookingAPI;
 import com.uva.api.users.models.Client;
 import com.uva.api.users.models.ClientStatus;
 import com.uva.api.users.models.UserRol;
-import com.uva.api.users.models.remote.Booking;
 import com.uva.api.users.repositories.ClientRepository;
 import com.uva.api.users.utils.Utils;
 
@@ -24,16 +22,21 @@ public class ClientService {
   @Autowired
   private BookingAPI bookingAPI;
 
+  @Autowired
+  private TokenService tokenService;
+
   public ResponseEntity<List<Client>> findAll() {
     return ResponseEntity.ok(clientRepository.findAll());
   }
 
-  public ResponseEntity<Client> findById(int id) {
+  public ResponseEntity<Client> findById(String token, int id) {
+    tokenService.assertPermission(token, id);
     Client client = Utils.assertUser(clientRepository.findById(id));
     return ResponseEntity.ok(client);
   }
 
-  public ResponseEntity<Client> deleteById(int id) {
+  public ResponseEntity<Client> deleteById(String token, int id) {
+    tokenService.assertPermission(token, id);
     Client client = Utils.assertUser(clientRepository.findById(id));
     bookingAPI.deleteAllByUserId(id);
     clientRepository.delete(client);
@@ -47,42 +50,10 @@ public class ClientService {
     return ResponseEntity.ok(client);
   }
 
-  // TODO No entiendo donde debería ir esto
   public ResponseEntity<?> updateClientStatus(int id, ClientStatus status) {
     Client client = Utils.assertUser(clientRepository.findById(id));
-
-    List<Booking> bookings = bookingAPI.getAllByUserId(id);
-
-    boolean activeBookings = bookings.stream()
-        .anyMatch(booking -> !booking.getEndDate().isBefore(LocalDate.now())); // reserva >= ahora
-    boolean inactiveBookings = bookings.stream()
-        .anyMatch(booking -> booking.getEndDate().isBefore(LocalDate.now())); // reserva < ahora
-
-    switch (status) {
-      case NO_BOOKINGS:
-        if (!bookings.isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user has at least one booking");
-        break;
-      case WITH_ACTIVE_BOOKINGS:
-        if (bookings.isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user don't has bookings");
-        if (!activeBookings)
-          throw new IllegalArgumentException("Invalid State: The user don't has active bookings");
-        break;
-      case WITH_INACTIVE_BOOKINGS:
-        if (bookings.isEmpty())
-          throw new IllegalArgumentException("Invalid State: The user don't has bookings");
-        if (!inactiveBookings)
-          throw new IllegalArgumentException("Invalid State: The user don't has inactive bookings");
-        break;
-      default:
-        break;
-    }
-
     client.setStatus(status);
-
     client = clientRepository.save(client);
-
     return ResponseEntity.ok(client);
   }
 }

@@ -28,7 +28,7 @@ public class Manager extends User {
   private JsonNode hotels;
 
   public Manager(int id, String name, String email, String password, JsonNode hotels) {
-    super(id, name, email, password, UserRol.HOTEL_ADMIN);
+    super(id, name, email, password, UserRol.MANAGER);
     setHotels(hotels);
   }
 }
