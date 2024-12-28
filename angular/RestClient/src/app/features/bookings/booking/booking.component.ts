@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { Booking } from '@features/bookings';
+import { Booking} from '@features/bookings';
 import { User } from '@features/users';
 import { LocalStorageService } from '../../../core/services/storage/local-storage.service';
 import { BookingClientService } from '../../../core/services/api/bookings/booking-client.service';
@@ -18,6 +18,8 @@ type communication = {
   roomId: number;
   start: Date;
   end: Date;
+  hotelId : number;
+  managerId : number;
 };
 
 @Component({
@@ -30,13 +32,13 @@ type communication = {
 export class BookingComponent {
   user: User = { id: 0, email: '', name: '', rol: 'CLIENT' };
   bookingForm: FormGroup;
-  bookingLocal: { roomId: number; start: Date; end: Date } = {
+  bookingLocal: { roomId: number; start: Date; end: Date, hotelId : number, managerId : number } = {
     roomId: 0,
     end: new Date(),
     start: new Date(),
+    hotelId : 0,
+    managerId : 0
   };
-  roomId: number = 0;
-  hotelId: number = 0;  // Agregamos hotelId
 
   constructor(
     private router: Router,
@@ -53,38 +55,25 @@ export class BookingComponent {
       start: [{ value: '', disabled: true }, Validators.required],
       end: [{ value: '', disabled: true }, Validators.required],
     });
-
     const localBooking = storage.read<communication | null>('booking-data');
     if (localBooking === null) {
       this.router.navigate(['/booking', 'search']);
       return;
     }
     this.bookingLocal = localBooking!;
-
     this.route.queryParams.subscribe((params) => {
       const roomId = Number(params['roomId']);
-      this.hotelId = Number(params['hotelId']);  // Extraemos hotelId de los parámetros de la URL
-      this.roomId = roomId;
-
       if (this.bookingLocal.roomId !== roomId) {
         this.router.navigate(['/bookings', 'search']);
         return;
       }
-
-      if (!this.hotelId) {
-        console.error('No se ha proporcionado hotelId');
-        return;
-      }
-
       this.bookingLocal = {
         ...this.bookingLocal,
         start: new Date(this.bookingLocal.start),
         end: new Date(this.bookingLocal.end),
       };
-
       this.loadBooking();
     });
-
     this.sessionService.getSession().subscribe({
       next: (session) => {
         if (session) this.user = session;
@@ -116,8 +105,6 @@ export class BookingComponent {
     const bookingRequest: any = {
       ...this.bookingLocal,
       userId: id,
-      roomId: this.roomId,
-      hotelId: this.hotelId,  // Aseguramos que hotelId esté incluido
     };
 
     // Llama al servicio para crear una nueva reserva
@@ -126,17 +113,8 @@ export class BookingComponent {
     this.bookingClient.createBooking(bookingRequest).subscribe({
       next: (response) => {
         console.log('Reserva creada con éxito', response);
-        // Llama al servicio para actualizar el estado del usuario
-        this.userClient.alterUserStatus(id, 'WITH_ACTIVE_BOOKINGS').subscribe({
-          next: (response) => {
-            console.log('Estado de usuario actualizado con éxito', response);
             this.storage.remove('booking-data');
             this.router.navigate(['/me', 'bookings']);
-          },
-          error: (error) => {
-            console.error('Error al cambiar el estado del usuario', error);
-          },
-        });
       },
       error: (error) => {
         console.error('Error al crear la reserva', error);

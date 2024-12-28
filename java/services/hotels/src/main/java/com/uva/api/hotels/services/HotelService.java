@@ -51,6 +51,7 @@ public class HotelService {
 
     public Hotel addHotel(Hotel hotel) {
         boolean exist = managerAPI.existsManagerById(hotel.getManagerId());
+        System.out.println("Id del manager" + hotel.getManagerId());
         if (!exist) {
             throw new InvalidRequestException("No existe el manager con id " + hotel.getManagerId());
         }

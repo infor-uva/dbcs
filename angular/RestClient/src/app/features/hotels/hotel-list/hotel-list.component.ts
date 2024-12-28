@@ -217,15 +217,19 @@ export class HotelListComponent {
     return (this.isManaging ? base : '/') + 'hotels/' + hotelId;
   }
 
-  bookingRoom(roomId: number) {
+  bookingRoom(roomId: number, hotel: Hotel) {
     const { start, end } = this.dateRangeForm.value.dateRange as {
       start: Date;
       end: Date;
     };
+    const {managerId} = hotel;
+    const hotelId = hotel.id;
     this.storage.save('booking-data', {
       roomId,
       start: start.toString(),
       end: end.toString(),
+      hotelId,
+      managerId
     });
     this.router.navigate(['/me', 'bookings', 'new'], {
       queryParams: { roomId, startDate: start.toLocaleDateString() },

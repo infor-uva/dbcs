@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { Booking } from '@features/bookings';
-import { HotelClientService } from '../hotels/hotel-client.service';
-import { switchMap, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -12,36 +10,16 @@ import { switchMap, map } from 'rxjs/operators';
 export class BookingClientService {
   private URI = environment.bookingAPI;
 
-  constructor(
-    private http: HttpClient,
-    private hotelClientService: HotelClientService // Inyectamos el servicio HotelClientService
-  ) {}
+  constructor(private http: HttpClient) {}
 
   // Método para crear una nueva reserva
   createBooking(bookingRequest: Booking): Observable<Booking> {
-    const { hotelId, start, end, userId, roomId } = bookingRequest;
-    
-    if (!hotelId) {
-      console.error("hotelId is undefined");
-      return throwError(() => new Error("hotelId is undefined"));
-    }
-  
-    // Llamamos al servicio HotelClientService para obtener el hotel y su managerId
-    return this.hotelClientService.getHotel(hotelId).pipe(
-      map((hotel) => {
-        const managerId = hotel.managerId;
-        console.log("Manager ID:", managerId);  // Verifica que el managerId es correcto
-        
-        // Retornamos el objeto bookingRequest con el managerId actualizado
-        return { ...bookingRequest, managerId };
-      }),
-      switchMap((updatedBookingRequest) => {
-        console.log("Final bookingRequest with managerId:", updatedBookingRequest);  // Verifica el objeto final
-        return this.http.post<Booking>(this.URI, updatedBookingRequest);
-      })
-    );
+    const { start, end } = bookingRequest;
+    const endDate = end.toISOString();
+    console.log({ bookingRequest, end: endDate });
+
+    return this.http.post<Booking>(this.URI, bookingRequest);
   }
-  
 
   // Método para obtener todas las reservas
   getAllBookings(): Observable<Booking[]> {

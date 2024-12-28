@@ -173,7 +173,7 @@
                   [disabled]="!isAvailable(room)"
                   mat-raised-button
                   class="w-full text-center py-3 rounded-lg shadow-md hover:shadow-lg bg-sky-600 text-slate-200 font-bold"
-                  (click)="bookingRoom(room.id)"
+                  (click)="bookingRoom(room.id, hotel)"
                 >
                   <span class="flex items-center justify-center text-2xl">
                     <mat-icon>booking</mat-icon>
