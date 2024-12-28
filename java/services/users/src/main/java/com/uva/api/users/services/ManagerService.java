@@ -19,6 +19,9 @@ public class ManagerService {
   @Autowired
   private ManagerRepository managerRepository;
 
+  @Autowired
+  private TokenService tokenService;
+
   public ResponseEntity<Manager> save(Manager manager) {
     manager = managerRepository.save(manager);
     return ResponseEntity.ok(manager);
@@ -29,12 +32,14 @@ public class ManagerService {
     return ResponseEntity.ok(managers);
   }
 
-  public ResponseEntity<Manager> findById(int id) {
+  public ResponseEntity<Manager> findById(String token, int id) {
+    tokenService.assertPermission(token, id);
     Manager manager = Utils.assertUser(managerRepository.findById(id));
     return ResponseEntity.ok(manager);
   }
 
-  public ResponseEntity<Manager> deleteById(Integer id) {
+  public ResponseEntity<Manager> deleteById(String token, Integer id) {
+    tokenService.assertPermission(token, id);
     Manager manager = Utils.assertUser(managerRepository.findById(id));
     hotelApi.deleteAllByManagerId(id);
     managerRepository.delete(manager);

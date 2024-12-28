@@ -17,7 +17,7 @@ public class JwtData {
 
   private String token;
 
-  private Integer id;
+  private int id = -1;
   private String name;
   private String email;
   private UserRol rol;

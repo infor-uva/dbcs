@@ -29,6 +29,9 @@ public class UserService {
   @Autowired
   private ManagerService managerService;
 
+  @Autowired
+  private TokenService tokenService;
+
   public ResponseEntity<List<User>> getAllUsers() {
     List<User> users = userRepository.findAll();
     return ResponseEntity.ok(users);
@@ -38,7 +41,8 @@ public class UserService {
     return Utils.assertUser(userRepository.findById(id));
   }
 
-  public ResponseEntity<User> getUserById(int id) {
+  public ResponseEntity<User> getUserById(String token, int id) {
+    tokenService.assertPermission(token, id);
     User user = assertUserById(id);
     return ResponseEntity.ok(user);
   }
@@ -68,7 +72,7 @@ public class UserService {
         user = userRepository.save(admin);
         break;
 
-      case HOTEL_ADMIN:
+      case MANAGER:
         Manager manager = new Manager();
         BeanUtils.copyProperties(request, manager);
         user = managerService.save(manager).getBody();
@@ -84,7 +88,8 @@ public class UserService {
     return ResponseEntity.ok(user);
   }
 
-  public ResponseEntity<User> updateUserData(int id, String name, String email) {
+  public ResponseEntity<User> updateUserData(String token, int id, String name, String email) {
+    tokenService.assertPermission(token, id);
     User user = assertUserById(id);
     user.setName(name);
     user.setEmail(email);
@@ -92,21 +97,23 @@ public class UserService {
     return ResponseEntity.ok(user);
   }
 
-  public ResponseEntity<User> changePassword(int id, String password) {
+  public ResponseEntity<User> changePassword(String token, int id, String password) {
+    tokenService.assertPermission(token, id);
     User user = assertUserById(id);
     user.setPassword(password);
     user = userRepository.save(user);
     return ResponseEntity.ok(user);
   }
 
-  public ResponseEntity<User> deleteUserById(int id) {
+  public ResponseEntity<User> deleteUserById(String token, int id) {
+    tokenService.assertPermission(token, id);
     User user = assertUserById(id);
     switch (user.getRol()) {
       case CLIENT:
-        clientService.deleteById(id);
+        clientService.deleteById(token, id);
         break;
-      case HOTEL_ADMIN:
-        managerService.deleteById(id);
+      case MANAGER:
+        managerService.deleteById(token, id);
         break;
       case ADMIN:
       default:
