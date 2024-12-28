@@ -48,6 +48,7 @@ public class JwtUtil {
 
   public String generateInternalToken(String service) {
     String email = service.toLowerCase() + "@internal.com";
+    service = service.toUpperCase();
     Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
     return JWT

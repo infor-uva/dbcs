@@ -34,7 +34,7 @@ public class UserAPI {
    */
   public User getUserByEmail(String email) {
     String url = USER_API_URL + "?email={email}";
-    System.err.println(url);
+
     try {
       ResponseEntity<User> userResponse = restTemplate.getForEntity(url, User.class, email);
       return userResponse.getBody();

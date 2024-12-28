@@ -31,14 +31,6 @@ public class JwtData {
   private Date expiresAt;
 
   public JwtData(DecodedJWT decoded, long ttl) {
-
-    subject = decoded.getSubject();
-    if (decoded.getAudience() != null && !decoded.getAudience().isEmpty())
-      audience = decoded.getAudience().get(0);
-    this.ttl = ttl;
-    issuedAt = decoded.getIssuedAt();
-    expiresAt = decoded.getExpiresAt();
-
     for (Field field : this.getClass().getDeclaredFields()) {
       field.setAccessible(true);
 
@@ -60,7 +52,17 @@ public class JwtData {
           e.printStackTrace();
         }
       }
+
     }
+
+    if (decoded.getAudience() != null && !decoded.getAudience().isEmpty())
+      audience = decoded.getAudience().get(0);
+
+    this.ttl = ttl;
+    issuedAt = decoded.getIssuedAt();
+    expiresAt = decoded.getExpiresAt();
+
+    System.out.println("\nDECODED TOKEN: " + this + "\n");
   }
 
   public boolean isAdmin() {

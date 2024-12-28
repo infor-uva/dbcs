@@ -1,4 +1,4 @@
-package com.uva.api.users.models.remote;
+package com.uva.api.users.models.remote.jwt;
 
 import java.util.Date;
 
@@ -17,11 +17,11 @@ public class JwtData {
 
   private String token;
 
-  private Integer id;
+  private int id = -1;
   private String name;
   private String email;
   private UserRol rol;
-  private String service;
+  private Service service;
 
   private String subject;
   private String audience;

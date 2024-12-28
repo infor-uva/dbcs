@@ -23,6 +23,15 @@ const loj = (data) => {
 	console.log(JSON.stringify(data, null, 2));
 };
 
+const showError = (error) => {
+	debug(
+		"ERROR:",
+		ERROR
+			? error
+			: error.response?.data ?? error.response?.error ?? error.cause ?? error,
+		"\n"
+	);
+};
 // Función para calcular fechas pareadas
 function genDates(ref = new Date()) {
 	// before
@@ -62,7 +71,7 @@ const savePost = async (data, first, second = "") => {
 			return await axios.post(first, data);
 		} catch (error) {
 			debug("Trying to log user", data);
-			debug("ERROR:", ERROR ? error : error.data ?? error.cause);
+			showError(error);
 			debug("ERROR Al REGISTRO, SE PROCEDE A INTENTAR ACCEDER");
 			const response = await axios.post(second, data);
 			if (!FORCE) {
@@ -74,7 +83,7 @@ const savePost = async (data, first, second = "") => {
 	} catch (error) {
 		console.error("ERROR Al LOGIN");
 		console.error("\nNo se ha podido comunicar con el servicio de auth");
-		debug("ERROR:", ERROR ? error : error.data ?? error.cause);
+		showError(error);
 		process.exit(-1);
 	}
 };
@@ -85,8 +94,10 @@ async function register(user) {
 		`${authApi}/register`,
 		`${authApi}/login`
 	);
-	debug("User identified successful");
 	const decoded = jwtDecode(data.token);
+	debug(
+		`User identified successful with id=${decoded.id} and token={${data.token}}`
+	);
 	user.id = decoded.id;
 	user.token = data.token;
 	return user;
@@ -99,7 +110,7 @@ const addUsers = async () => {
 	}
 
 	const admins = users.filter((u) => u.rol === "ADMIN");
-	const managers = users.filter((u) => u.rol === "HOTEL_ADMIN");
+	const managers = users.filter((u) => u.rol === "MANAGER");
 	const clients = users.filter((u) => u.rol === "CLIENT");
 
 	return { admins, managers, clients };
@@ -121,7 +132,7 @@ const insertHotel = async ({ manager, hotel }) => {
 		return data;
 	} catch (error) {
 		console.error("ERROR Al INSERTAR HOTEL");
-		debug("ERROR:", ERROR ? error : error.data ?? error.cause);
+		showError(error);
 		process.exit(-1);
 	}
 };
@@ -130,6 +141,7 @@ async function addHotels(managers) {
 	const hotels = [];
 	for await (const hotel of mockedHotels) {
 		const select = getRandomItem(managers);
+
 		hotels.push(await insertHotel({ hotel, manager: select }));
 	}
 	return hotels;
@@ -147,7 +159,7 @@ const insertBookings = async (booking, token) => {
 		return data;
 	} catch (error) {
 		console.error("ERROR Al INSERTAR RESERVA");
-		debug("ERROR:", ERROR ? error : error.data ?? error.cause);
+		showError(error);
 		process.exit(-1);
 	}
 };
@@ -185,12 +197,12 @@ async function init() {
 	debug("ENV:", env, "\n");
 	const { managers, clients } = await addUsers();
 	const time = 2;
-	debug("USUARIOS REGISTRADOS O IDENTIFICADOS");
+	debug("USUARIOS REGISTRADOS O IDENTIFICADOS\n\n");
 	if (DEBUG) {
 		await sleep(time * 1000);
 	}
 	const hotels = await addHotels(managers, 3);
-	debug("HOTELES REGISTRADOS");
+	debug("HOTELES REGISTRADOS\n\n");
 	if (DEBUG) {
 		await sleep(time * 1000);
 	}
