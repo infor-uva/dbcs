@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,8 +43,13 @@ public class ClientController {
   }
 
   @PatchMapping("/{id:\\d+}")
-  public ResponseEntity<?> updateClientState(@PathVariable int id, @RequestBody Map<String, String> json) {
+  public ResponseEntity<?> updateClientStateWrapper(@PathVariable int id, @RequestBody Map<String, String> json) {
+    return updateClientState(id, json);
+  }
 
+  @PutMapping("/{id:\\d+}")
+  public ResponseEntity<?> updateClientState(@PathVariable int id, @RequestBody Map<String, String> json) {
+    json.entrySet().forEach(t -> System.out.println(t));
     String strStatus = json.get("status");
     if (strStatus == null)
       throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing required fields");

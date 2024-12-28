@@ -41,9 +41,20 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
         List<Booking> findAllByManagerId(int managerId);
 
+        @Query("SELECT EXISTS (Select b from Booking b where b.userId = ?1 AND b.end >= ?2)")
+        boolean existsActiveByUserIdAndDate(int userId, LocalDate date);
+
+        @Query("SELECT EXISTS (Select b from Booking b where b.userId = ?1 AND b.end < ?2)")
+        boolean existsInactiveByUserIdAndDate(int userId, LocalDate date);
+
         @Transactional
         void deleteAllByUserId(int userId);
 
         @Transactional
         void deleteAllByManagerId(int managerId);
+
+        @Query("SELECT b from Booking b where b.end = ?1")
+        List<Booking> findAllPassed(LocalDate yesterday);
+        // List<Booking> findAllByEnd(LocalDate end);// también puede ser
+
 }

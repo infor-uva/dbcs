@@ -8,6 +8,8 @@ import com.uva.api.bookings.models.Booking;
 import com.uva.api.bookings.services.BookingService;
 
 import java.time.LocalDate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/bookings")
@@ -33,7 +35,7 @@ public class BookingController {
         return bookingService.createBooking(booking);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<?> getBookingById(@PathVariable Integer id) {
         return bookingService.getBookingById(id);
     }
@@ -46,7 +48,7 @@ public class BookingController {
         return bookingService.deleteBookings(hotelId, managerId, userId);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     public ResponseEntity<?> deleteBooking(@PathVariable Integer id) {
         return bookingService.deleteBooking(id);
     }

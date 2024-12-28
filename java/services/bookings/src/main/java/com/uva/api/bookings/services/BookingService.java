@@ -11,11 +11,14 @@ import com.uva.api.bookings.api.UserApi;
 import com.uva.api.bookings.exceptions.BookingNotFoundException;
 import com.uva.api.bookings.exceptions.InvalidDateRangeException;
 import com.uva.api.bookings.models.Booking;
+import com.uva.api.bookings.models.external.users.ClientDTO;
+import com.uva.api.bookings.models.external.users.ClientStatus;
 import com.uva.api.bookings.repositories.BookingRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class BookingService {
@@ -101,29 +104,37 @@ public class BookingService {
     public ResponseEntity<Booking> createBooking(Booking booking) {
         if (booking.getId() != null)
             booking.setId(null);
+
+        if (booking.getStart().isAfter(booking.getEnd()))
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "La reserva no puede acabar antes de que empiece");
+
         int userId = booking.getUserId();
         int roomId = booking.getRoomId();
         int hotelId = booking.getHotelId();
         int managerId = booking.getManagerId();
 
-        // Check if the customer and rooms exists
+        List<Booking> existingBookings = bookingRepository.findAllByRoomIdInDateRange(roomId, booking.getStart(),
+                booking.getEnd());
+
+        // Local checks first
+        if (!existingBookings.isEmpty())
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "Room is not available for the selected dates");
+
         if (!userApi.existsManagerById(managerId))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Manager not found");
-
-        if (!userApi.existsClientById(userId))
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "User not found");
 
         if (!hotelApi.existsById(hotelId, roomId))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Hotel or room not found");
 
-        // Check availability
-        List<Booking> existingBookings = bookingRepository.findAllByRoomIdInDateRange(roomId, booking.getStart(),
-                booking.getEnd());
+        ClientDTO client = userApi.findClientById(userId);
 
-        if (!existingBookings.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Room is not available for the selected dates");
-        }
+        if (client == null)
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "User not found");
+
+        if (client.getStatus() != ClientStatus.WITH_ACTIVE_BOOKINGS)
+            userApi.updateClientState(userId, ClientStatus.WITH_ACTIVE_BOOKINGS);
 
         booking = bookingRepository.save(booking);
 
@@ -141,9 +152,36 @@ public class BookingService {
         return ResponseEntity.ok(booking);
     }
 
+    private ClientStatus calculateClientStatus(int id) {
+        return calculateClientStatus(id, null);
+    }
+
+    private ClientStatus calculateClientStatus(int id, LocalDate date) {
+
+        date = date != null ? date : LocalDate.now();
+
+        boolean hasActiveBookings = bookingRepository.existsActiveByUserIdAndDate(id, date);
+        boolean hasInactiveBookings = bookingRepository.existsInactiveByUserIdAndDate(id, date);
+
+        ClientStatus status;
+        if (hasActiveBookings) {
+            status = ClientStatus.WITH_ACTIVE_BOOKINGS;
+        } else if (hasInactiveBookings) {
+            status = ClientStatus.WITH_INACTIVE_BOOKINGS;
+        } else {
+            status = ClientStatus.NO_BOOKINGS;
+        }
+        return status;
+    }
+
     public ResponseEntity<?> deleteBooking(Integer id) {
         Booking booking = findById(id);
         bookingRepository.deleteById(id);
+
+        ClientStatus status = calculateClientStatus(id);
+        // In this case, the check if the client has already de state is expensive
+        userApi.updateClientState(id, status);
+
         return ResponseEntity.ok(booking);
     }
 
@@ -195,5 +233,19 @@ public class BookingService {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, message);
         }
         return ResponseEntity.ok(bookings);
+    }
+
+    public long performDailyClientsStateUpdate() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        List<Booking> passedBookings = bookingRepository.findAllPassed(yesterday);
+
+        Stream<Integer> userIds = passedBookings.stream().map(b -> b.getUserId()).distinct();
+        userIds.forEach(userId -> {
+            ClientStatus status = calculateClientStatus(userId);
+            userApi.updateClientState(userId, status);
+        });
+
+        return userIds.count();
     }
 }
