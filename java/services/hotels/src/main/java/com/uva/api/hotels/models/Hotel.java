@@ -47,7 +47,7 @@ public class Hotel {
   private List<Room> rooms;
 
   @Column(name = "manager_id")
-  private int managerId;
+  private Integer managerId;
 
   public void setRooms(List<Room> rooms) {
     this.rooms = rooms;

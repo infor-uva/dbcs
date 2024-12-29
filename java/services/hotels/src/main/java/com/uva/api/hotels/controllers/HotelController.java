@@ -1,19 +1,17 @@
 package com.uva.api.hotels.controllers;
 
-import java.util.List;
 import java.util.Map;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.uva.api.hotels.exceptions.InvalidRequestException;
 import com.uva.api.hotels.models.Hotel;
-import com.uva.api.hotels.models.Room;
 import com.uva.api.hotels.services.HotelService;
+import com.uva.api.hotels.utils.Utils;
 
 @RestController
 @RequestMapping("hotels")
@@ -23,63 +21,68 @@ public class HotelController {
     private HotelService hotelService;
 
     @GetMapping
-    public List<Hotel> getAllHotels(
+    public ResponseEntity<?> getAllHotels(
+            @RequestHeader(value = "Authorization", required = true) String authorization,
             @RequestParam(required = false) Integer managerId,
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end) {
-        return hotelService.getAllHotels(managerId, start, end);
+        String token = Utils.getToken(authorization);
+        return hotelService.getAllHotels(token, managerId, start, end);
     }
 
     @PostMapping
     public ResponseEntity<?> addHotel(@RequestBody Hotel hotel) {
-        System.out.println(hotel.toString());
-        Hotel savedHotel = hotelService.addHotel(hotel);
-        return new ResponseEntity<>(savedHotel, HttpStatus.CREATED);
+        return hotelService.addHotel(hotel);
     }
 
     @GetMapping("/{id}")
-    public Hotel getHotelById(@PathVariable int id) {
-        return hotelService.getHotelById(id);
+    public ResponseEntity<?> getHotelById(
+            @RequestHeader(value = "Authorization", required = true) String authorization,
+            @PathVariable int id) {
+        String token = Utils.getToken(authorization);
+        return hotelService.getHotelById(token, id);
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteHotelsByManagerId(
+            @RequestHeader(value = "Authorization", required = true) String authorization,
             @RequestParam(required = true) Integer managerId) {
-        List<Hotel> hotels = hotelService.deleteHotelsByManagerId(managerId);
-        return new ResponseEntity<>(hotels, HttpStatus.OK);
+        String token = Utils.getToken(authorization);
+        return hotelService.deleteHotelsByManagerId(token, managerId);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> deleteHotel(@PathVariable Integer id) {
-        hotelService.deleteHotel(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteHotel(
+            @RequestHeader(value = "Authorization", required = true) String authorization,
+            @PathVariable Integer id) {
+        String token = Utils.getToken(authorization);
+        return hotelService.deleteHotel(token, id);
     }
 
     @GetMapping("/{hotelId}/rooms")
-    public ResponseEntity<List<Room>> getRoomsFromHotel(
+    public ResponseEntity<?> getRoomsFromHotel(
             @PathVariable int hotelId,
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end) {
-        List<Room> rooms = hotelService.getRoomsFromHotel(hotelId, start, end);
-        return new ResponseEntity<>(rooms, HttpStatus.OK);
+        return hotelService.getRoomsFromHotel(hotelId, start, end);
     }
 
     @PatchMapping("/{hotelId}/rooms/{roomId}")
-    public ResponseEntity<Room> updateRoomAvailability(
+    public ResponseEntity<?> updateRoomAvailability(
+            @RequestHeader(value = "Authorization", required = true) String authorization,
             @PathVariable int hotelId,
             @PathVariable int roomId,
             @RequestBody Map<String, Boolean> body) {
+        String token = Utils.getToken(authorization);
         if (!body.containsKey("available")) {
             throw new InvalidRequestException("El campo 'available' es obligatorio");
         }
-        Room updatedRoom = hotelService.updateRoomAvailability(hotelId, roomId, body.get("available"));
-        return new ResponseEntity<>(updatedRoom, HttpStatus.OK);
+        return hotelService.updateRoomAvailability(token, hotelId, roomId, body.get("available"));
     }
 
     @GetMapping("/{hotelId}/rooms/{roomId}")
-    public Room getRoomByIdFromHotel(
-            @PathVariable int hotelId, @PathVariable int roomId) {
+    public ResponseEntity<?> getRoomByIdFromHotel(@PathVariable int hotelId, @PathVariable int roomId) {
         return hotelService.getRoomByIdFromHotel(hotelId, roomId);
     }
 }

@@ -5,14 +5,50 @@ const { jwtDecode } = require("jwt-decode");
 const dev = require("./environments/env");
 const prod = require("./environments/env.production");
 
+const getKongHots = (host) => {
+	const defaultHost = "localhost";
+	const defaultPort = 8000;
+
+	if (host.match(/^(\d{1,3}\.){3}[\d]{1,3}:\d{1,5}$/)) {
+		return host; // host completo
+	} else if (host.match(/^([\d]{1,3}\.){3}[\d]{1,3}$/)) {
+		return host + `:${defaultPort}`; // hostname, agregar puerto por defecto
+	} else if (host.match(/^:\d{1,5}/)) {
+		return defaultHost + host; // puerto, agregar hostname por defecto
+	}
+	return `${defaultHost}:${defaultPort}`;
+};
+
+const getKongEnv = (env) => {
+	const { authApi, hotelsApi, bookingsApi } = env;
+	const apply = (api) =>
+		KONG ? api.replace(/:\/\/[\w.-]+(:\d+)?/, `://${KONG_SERVICE}`) : api;
+	return {
+		authApi: apply(authApi),
+		hotelsApi: apply(hotelsApi),
+		bookingsApi: apply(bookingsApi),
+	};
+};
+
 // Environments consts
 const args = process.argv;
 const isProduction = args.includes("--prod");
 const DEBUG = args.includes("--debug") || args.includes("-d");
 const FORCE = args.includes("--force") || args.includes("-f");
 const ERROR = args.includes("--error") || args.includes("-e");
+const kongLow = args.indexOf("-k");
+const kongIndex = isProduction
+	? kongLow != -1
+		? kongLow
+		: args.indexOf("--kong")
+	: -1;
+const KONG = kongIndex !== -1;
 
-const env = (isProduction ? prod : dev).env;
+const KONG_SERVICE = getKongHots(
+	args.length > kongIndex ? args[kongIndex + 1] ?? "" : ""
+);
+
+const env = getKongEnv((isProduction ? prod : dev).env);
 const { authApi, hotelsApi, bookingsApi } = env;
 
 const debug = (...values) => {
@@ -128,7 +164,7 @@ const insertHotel = async ({ manager, hotel }) => {
 				Authorization: `Bearer ${manager.token}`,
 			},
 		});
-		debug("Hotel added successful");
+		debug("Hotel added successful, identified by id " + data.id);
 		return data;
 	} catch (error) {
 		console.error("ERROR Al INSERTAR HOTEL");
@@ -155,7 +191,7 @@ const insertBookings = async (booking, token) => {
 				Authorization: `Bearer ${token}`,
 			},
 		});
-		debug("Booking added successful");
+		debug("Booking added successful, identified by id " + data.id);
 		return data;
 	} catch (error) {
 		console.error("ERROR Al INSERTAR RESERVA");

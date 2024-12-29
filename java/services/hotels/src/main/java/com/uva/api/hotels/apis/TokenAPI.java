@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.uva.api.hotels.models.external.JwtData;
+import com.uva.api.hotels.models.external.jwt.JwtData;
 
 @Component
 public class TokenAPI {

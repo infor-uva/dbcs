@@ -6,10 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.uva.api.bookings.models.Booking;
 import com.uva.api.bookings.services.BookingService;
+import com.uva.api.bookings.utils.Utils;
 
 import java.time.LocalDate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/bookings")
@@ -21,23 +20,20 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<?> getAllBookings(
+            @RequestHeader(value = "Authorization", required = true) String authorization,
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end,
             @RequestParam(required = false) Integer hotelId,
             @RequestParam(required = false) Integer roomId,
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) Integer managerId) {
-        return bookingService.getBookings(start, end, hotelId, roomId, userId, managerId);
+        String token = Utils.getToken(authorization);
+        return bookingService.getBookings(token, start, end, hotelId, roomId, userId, managerId);
     }
 
     @PostMapping
     public ResponseEntity<?> createBooking(@RequestBody Booking booking) {
         return bookingService.createBooking(booking);
-    }
-
-    @GetMapping("/{id:\\d+}")
-    public ResponseEntity<?> getBookingById(@PathVariable Integer id) {
-        return bookingService.getBookingById(id);
     }
 
     @DeleteMapping
@@ -48,8 +44,19 @@ public class BookingController {
         return bookingService.deleteBookings(hotelId, managerId, userId);
     }
 
+    @GetMapping("/{id:\\d+}")
+    public ResponseEntity<?> getBookingById(
+            @RequestHeader(value = "Authorization", required = true) String authorization,
+            @PathVariable Integer id) {
+        String token = Utils.getToken(authorization);
+        return bookingService.getBookingById(token, id);
+    }
+
     @DeleteMapping("/{id:\\d+}")
-    public ResponseEntity<?> deleteBooking(@PathVariable Integer id) {
-        return bookingService.deleteBooking(id);
+    public ResponseEntity<?> deleteBooking(
+            @RequestHeader(value = "Authorization", required = true) String authorization,
+            @PathVariable Integer id) {
+        String token = Utils.getToken(authorization);
+        return bookingService.deleteBooking(token, id);
     }
 }
