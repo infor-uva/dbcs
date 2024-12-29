@@ -1,8 +1,8 @@
-package com.uva.api.hotels.models.external;
+package com.uva.api.bookings.models.external.jwt;
 
 import java.util.Date;
 
-import com.uva.api.hotels.models.external.users.UserRol;
+import com.uva.api.bookings.models.external.users.UserRol;
 
 import lombok.Data;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class JwtData {
   private String name;
   private String email;
   private UserRol rol;
-  private String service;
+  private Service service;
 
   private String subject;
   private String audience;

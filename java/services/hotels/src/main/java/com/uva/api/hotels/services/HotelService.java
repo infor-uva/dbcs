@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.uva.api.hotels.apis.BookingAPI;
@@ -14,11 +16,14 @@ import com.uva.api.hotels.exceptions.InvalidDateRangeException;
 import com.uva.api.hotels.exceptions.InvalidRequestException;
 import com.uva.api.hotels.models.Hotel;
 import com.uva.api.hotels.models.Room;
+import com.uva.api.hotels.models.external.users.UserRol;
 import com.uva.api.hotels.repositories.HotelRepository;
 import com.uva.api.hotels.repositories.RoomRepository;
 
 @Service
 public class HotelService {
+    @Autowired
+    private TokenService tokenService;
     @Autowired
     private HotelRepository hotelRepository;
     @Autowired
@@ -28,7 +33,11 @@ public class HotelService {
     @Autowired
     private ManagerAPI managerAPI;
 
-    public List<Hotel> getAllHotels(Integer managerId, LocalDate start, LocalDate end) {
+    public ResponseEntity<List<Hotel>> getAllHotels(String token, Integer managerId, LocalDate start, LocalDate end) {
+
+        if (managerId != null)
+            tokenService.assertPermission(token, managerId);
+
         List<Hotel> hotels = (managerId != null)
                 ? hotelRepository.findAllByManagerId(managerId)
                 : hotelRepository.findAll();
@@ -37,7 +46,7 @@ public class HotelService {
                 throw new InvalidDateRangeException("La fecha de inicio debe ser anterior a la fecha de fin");
 
             Set<Integer> notAvailableRoomsId = bookingAPI.getNotAvailableRooms(start, end);
-            notAvailableRoomsId.forEach(k -> System.err.println(k));
+
             hotels = hotels.stream().map(h -> {
                 List<Room> rooms = h.getRooms().stream()
                         .filter(r -> !notAvailableRoomsId.contains(r.getId()) && r.isAvailable())
@@ -46,41 +55,54 @@ public class HotelService {
                 return h;
             }).filter(h -> !h.getRooms().isEmpty()).toList();
         }
-        return hotels;
+        if (hotels.isEmpty())
+            throw new InvalidRequestException("No hotels");
+
+        if (!tokenService.hasAnyRole(token, UserRol.ADMIN, UserRol.MANAGER))
+            hotels = hotels.stream().map(h -> {
+                h.setManagerId(null);
+                return h;
+            }).toList();
+        return ResponseEntity.ok(hotels);
     }
 
-    public Hotel addHotel(Hotel hotel) {
+    public ResponseEntity<Hotel> addHotel(Hotel hotel) {
         boolean exist = managerAPI.existsManagerById(hotel.getManagerId());
-        System.out.println("Id del manager" + hotel.getManagerId());
         if (!exist) {
             throw new InvalidRequestException("No existe el manager con id " + hotel.getManagerId());
         }
-        return hotelRepository.save(hotel);
+        hotel = hotelRepository.save(hotel);
+        return new ResponseEntity<>(hotel, HttpStatus.CREATED);
     }
 
-    public Hotel getHotelById(int id) {
-        return hotelRepository.findById(id)
+    public ResponseEntity<Hotel> getHotelById(String token, int id) {
+        Hotel h = hotelRepository.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
+        tokenService.assertPermission(token, h.getManagerId());
+        return ResponseEntity.ok(h);
     }
 
-    public List<Hotel> deleteHotelsByManagerId(int managerId) {
+    public ResponseEntity<List<Hotel>> deleteHotelsByManagerId(String token, int managerId) {
+        tokenService.assertPermission(token, managerId);
         List<Hotel> hotels = hotelRepository.findAllByManagerId(managerId);
-        if (hotels.isEmpty()) {
+        if (hotels.isEmpty())
             throw new InvalidRequestException("No hay hoteles para el manager con id " + managerId);
-        }
+
         bookingAPI.deleteAllByManagerId(managerId);
         hotelRepository.deleteAll(hotels);
-        return hotels;
+        return ResponseEntity.ok(hotels);
     }
 
-    public void deleteHotel(int id) {
+    public ResponseEntity<Hotel> deleteHotel(String token, int id) {
         Hotel target = hotelRepository.findById(id)
                 .orElseThrow(() -> new HotelNotFoundException(id));
+        tokenService.assertPermission(token, target.getManagerId());
         bookingAPI.deleteAllByHotelId(id);
         hotelRepository.delete(target);
+        return ResponseEntity.ok(target);
     }
 
-    public List<Room> getRoomsFromHotel(int hotelId, LocalDate start, LocalDate end) {
+    public ResponseEntity<List<Room>> getRoomsFromHotel(int hotelId, LocalDate start, LocalDate end) {
         List<Room> rooms = roomRepository.findAllByHotelId(hotelId);
         if (start != null && end != null) {
             if (!start.isBefore(end)) {
@@ -91,18 +113,22 @@ public class HotelService {
                     .filter(r -> !notAvailableRoomsId.contains(r.getId()) && r.isAvailable())
                     .toList();
         }
-        return rooms;
+        return ResponseEntity.ok(rooms);
     }
 
-    public Room updateRoomAvailability(int hotelId, int roomId, boolean available) {
+    public ResponseEntity<Room> updateRoomAvailability(String token, int hotelId, int roomId, boolean available) {
+        Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException(roomId));
         Room targetRoom = roomRepository.findByIdAndHotelId(roomId, hotelId)
                 .orElseThrow(() -> new InvalidRequestException("Habitación no encontrada"));
+        tokenService.assertPermission(token, hotel.getManagerId());
         targetRoom.setAvailable(available);
-        return roomRepository.save(targetRoom);
+        targetRoom = roomRepository.save(targetRoom);
+        return ResponseEntity.ok(targetRoom);
     }
 
-    public Room getRoomByIdFromHotel(int hotelId, int roomId) {
-        return roomRepository.findByIdAndHotelId(roomId, hotelId)
+    public ResponseEntity<Room> getRoomByIdFromHotel(int hotelId, int roomId) {
+        Room r = roomRepository.findByIdAndHotelId(roomId, hotelId)
                 .orElseThrow(() -> new HotelNotFoundException(hotelId));
+        return ResponseEntity.ok(r);
     }
 }
