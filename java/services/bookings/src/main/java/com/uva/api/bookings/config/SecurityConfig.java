@@ -60,6 +60,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorize -> authorize
             // Permitir OPTIONS sin autenticación
             .requestMatchers(OPTIONS, "/**").permitAll()
+
             // Restring acceso
             .requestMatchers(GET, "/bookings*").authenticated()
 
