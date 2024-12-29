@@ -68,8 +68,7 @@ export class HotelListComponent {
   rooms: Room[] = [];
   trateRooms: Room[] = [];
   userId = 0;
-  start:Date = new Date(new Date().getDate() - 3);
-  end:Date = new Date(new Date().getDate() - 3);
+  end = '';
 
   constructor(
     private fb: FormBuilder,
@@ -109,8 +108,8 @@ export class HotelListComponent {
 
   ngOnInit(): void {
     this.getHotels();
-    this.dateRangeForm.get('dateRange')?.valueChanges.subscribe(() => {
-      this.getHotels();
+    this.dateRangeForm.get('dateRange')?.valueChanges.subscribe((value) => {
+      this.getHotels(value);
     });
   }
 
@@ -152,21 +151,33 @@ export class HotelListComponent {
     return value;
   }
 
-  getHotels() {
-    const { start, end } = this.dateRangeForm.value.dateRange;
-    console.log({start, end, s:this.start, e:this.end})
-    if (end != null && this.end.getDate() === end.getDate()) return
+  getDate(date: Date) {
+    return date.toISOString().split('T')[0];
+  }
 
-    
+  getHotels(value?: { end: Date; start: Date }) {
+    const { start: startDate, end: endDate } =
+      value ?? this.dateRangeForm.value.dateRange;
+
+    if (!endDate) return;
+
+    const start = this.getDate(startDate);
+    const end = this.getDate(endDate);
+
+    if (this.end != null && this.end === end) {
+      console.log('SKIP');
+      return;
+    }
+
     const observable = this.isManaging
-    ? this.hotelClient.getAllHotelsByUser(this.userId)
-    : this.hotelClient.getAllHotels(start, end);
-    
+      ? this.hotelClient.getAllHotelsByUser(this.userId)
+      : this.hotelClient.getAllHotels(start, end);
+
     observable.subscribe({
       next: (resp) => {
+        console.log(this.isManaging, resp);
         if (!!resp && (resp as never[]).length >= 0) {
-          this.start = start
-          this.end = end
+          this.end = end;
           this._hotels = resp;
           this.update();
         }

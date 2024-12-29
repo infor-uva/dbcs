@@ -5,7 +5,6 @@ import { SessionService } from '../../session/session.service';
 import { catchError, map, switchMap, throwError } from 'rxjs';
 import { Hotel, Room } from '@features/hotels';
 
-
 @Injectable({
   providedIn: 'root',
 })
@@ -21,13 +20,12 @@ export class HotelClientService {
     return this.http.get<Hotel>(url);
   }
 
-  getAllHotels(startDate?: Date, endDate?: Date) {
+  getAllHotels(start?: string, end?: string) {
     const url = `${this.URI}`;
-    if (!startDate || !endDate) return this.http.get<Hotel[]>(url);
-    const start = new Date(startDate).toISOString().split('T')[0];
-    const end = new Date(endDate).toISOString().split('T')[0];
-    console.log({start, end})
-    
+    console.log({ start, end });
+
+    if (!start || !end) return this.http.get<Hotel[]>(url);
+
     return this.http.get<Hotel[]>(url, { params: { start, end } });
   }
 
