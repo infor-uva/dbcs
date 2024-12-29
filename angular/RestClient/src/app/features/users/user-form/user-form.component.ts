@@ -14,7 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SessionService } from '../../../core/services/session/session.service';
 import { Session } from '@core/models';
-import { UserRol, UserRolesArray} from '@features/users';
+import { UserRol, UserRolesArray } from '@features/users';
 import { MatSelectModule } from '@angular/material/select';
 import { Observable } from 'rxjs';
 import {
@@ -22,6 +22,7 @@ import {
   UserFormRoute,
 } from 'app/features/users/types/UserFormData';
 import { getBasePath } from '@utils/utils';
+import { AuthClientService } from '@core/services';
 
 const defaultUser: Session = {
   id: 0,
@@ -70,12 +71,14 @@ export class UserFormComponent implements OnInit {
   currentPasswordText = 'Contraseña actual';
 
   user = defaultUser;
-  isHotelManager = false;
+  isClient = false;
+  isManager = false;
   isAdmin = false;
 
   constructor(
     private fb: FormBuilder,
     private sessionService: SessionService,
+    private authService: AuthClientService,
     private userService: UserClientService,
     private route: ActivatedRoute,
     private router: Router
@@ -142,11 +145,11 @@ export class UserFormComponent implements OnInit {
 
   setUp() {
     const snapshot = this.route.snapshot;
-    const urlSeg = snapshot.url;
     const { data } = snapshot as UserFormRoute;
     const mode = data!.mode!;
 
     console.log(mode);
+    this.isAdmin = !!mode.admin && mode.admin === true;
 
     switch (mode.formMode) {
       case 'REGISTER':
@@ -183,7 +186,6 @@ export class UserFormComponent implements OnInit {
       default:
         break;
     }
-    this.isAdmin = !!mode.admin;
     this.mode = mode.formMode;
 
     this.initializeForm();
@@ -241,16 +243,20 @@ export class UserFormComponent implements OnInit {
   }
 
   private loadUser() {
-    // this.setData();
     this.resolve().subscribe({
       next: (user) => {
         this.user = user;
-        this.isHotelManager = (user.rol as UserRol) === 'HOTEL_ADMIN';
-        this.isAdmin = (user.rol as UserRol) === 'ADMIN';
+        this.isManager = (user.rol as UserRol) === 'MANAGER';
+        this.isClient = (user.rol as UserRol) === 'CLIENT';
+        this.isAdmin = this.isAdmin || (user.rol as UserRol) === 'ADMIN';
         this.setData();
       },
       error: (error) => {
         console.error('Error:', error);
+        if (error.status == 404)
+          this.router.navigateByUrl(
+            getBasePath(this.router.url.split('/').slice(0, -1).join('/'))
+          );
       },
     });
   }
@@ -309,6 +315,15 @@ export class UserFormComponent implements OnInit {
       case 'PASSWORD':
         this.updatePassword(data.currentPassword, data.newPassword);
         break;
+      case 'VIEW':
+        const password = this.isAdmin
+          ? confirm('Desea eliminar el usuario')
+            ? 'password'
+            : undefined
+          : prompt('Confirma tu contraseña actual');
+        if (!!password && password.trim().length != 0)
+          this.deleteUser(this.user.id, password);
+        break;
       default:
         break;
     }
@@ -356,7 +371,32 @@ export class UserFormComponent implements OnInit {
     });
   }
 
-  private updatePassword(password: string | undefined, newPassword: string) {
-    alert('Unimplemented yet');
+  private updatePassword(password: string, newPassword: string) {
+    if (this.isAdmin) password = '';
+    this.authService
+      .changePassword({ email: this.user.email, password, newPassword })
+      .subscribe({
+        next: () => {
+          alert('PASSWORD CHANGE!');
+          this.router.navigateByUrl(getBasePath(this.router.url));
+        },
+        error: (error) => {
+          console.error(error);
+          // this.toastr.error('Invalid email or password');
+        },
+      });
+  }
+
+  private deleteUser(userId: number, password: string) {
+    this.authService.deleteUser(userId, password).subscribe({
+      next: () => {
+        if (this.isAdmin) this.router.navigate(['/admin', 'users']);
+        else this.sessionService.logout();
+      },
+      error: (error) => {
+        console.error(error);
+        // this.toastr.error('Invalid email or password');
+      },
+    });
   }
 }

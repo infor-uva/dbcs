@@ -11,36 +11,28 @@ export class AuthClientService {
   constructor(private http: HttpClient) {}
 
   login(email: String, password: String) {
-    return this.http.post(
-      `${this.URI}/login`,
-      { email, password }
-      // {
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Access-Control-Allow-Origin': '*',
-      //     'Access-Control-Allow-Methods':
-      //       'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-      //     'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
-      //     'Access-Control-Allow-Credentials': 'true',
-      //   },
-      // }
-    );
+    return this.http.post(`${this.URI}/login`, { email, password });
   }
 
   register(name: String, email: String, password: String, rol?: String) {
-    return this.http.post(
-      `${this.URI}/register`,
-      {
-        name,
-        email,
-        password,
-        rol,
-      }
-      // {
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // }
-    );
+    return this.http.post(`${this.URI}/register`, {
+      name,
+      email,
+      password,
+      rol,
+    });
+  }
+
+  changePassword(data: {
+    email: String;
+    password: String;
+    newPassword: String;
+  }) {
+    console.log(data);
+    return this.http.post(`${this.URI}/password`, data);
+  }
+
+  deleteUser(userId: number, password: String) {
+    return this.http.post(`${this.URI}/delete/${userId}`, { password });
   }
 }

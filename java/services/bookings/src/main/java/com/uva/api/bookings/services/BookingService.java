@@ -186,10 +186,11 @@ public class BookingService {
     public ResponseEntity<?> deleteBooking(String token, Integer id) {
         Booking booking = findById(token, id);
         bookingRepository.deleteById(id);
+        bookingRepository.flush();
 
-        ClientStatus status = calculateClientStatus(id);
+        ClientStatus status = calculateClientStatus(booking.getUserId());
         // In this case, the check if the client has already de state is expensive
-        userApi.updateClientState(id, status);
+        userApi.updateClientState(booking.getUserId(), status);
 
         return ResponseEntity.ok(booking);
     }
@@ -198,9 +199,10 @@ public class BookingService {
             Function<Integer, List<Booking>> findAction,
             Consumer<Integer> deleteAction) {
         List<Booking> bookings = findAction.apply(id);
-        if (bookings.isEmpty()) {
+
+        if (bookings.isEmpty())
             return new ArrayList<>();
-        }
+
         deleteAction.accept(id);
 
         return bookings;

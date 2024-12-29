@@ -67,6 +67,9 @@ public class SecurityConfig {
             .requestMatchers(PATCH, "/users/clients/" + id)
             .hasAuthority(BOOKINGS.toString())
 
+            .requestMatchers(DELETE, "/users/{id}")
+            .hasAnyAuthority(join(flat(ADMIN), flat(AUTHENTICATION)))
+
             .requestMatchers("/users/clients/**")
             .hasAnyAuthority(anyService(ADMIN, CLIENT))
 

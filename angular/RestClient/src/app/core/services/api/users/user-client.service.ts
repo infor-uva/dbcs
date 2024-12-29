@@ -6,7 +6,6 @@ import { tap } from 'rxjs';
 import { Client, ClientState, User } from '@features/users';
 import { Session } from '@core/models';
 
-
 @Injectable({
   providedIn: 'root',
 })
@@ -53,18 +52,6 @@ export class UserClientService {
           ...user,
         } as Partial<Session>);
       })
-    );
-  }
-
-  // Cambiar la contraseña del usuario
-  updatePassword(currentPassword: string, newPassword: string) {
-    return this.http.patch(
-      `${this.URI}/me/password`,
-      { currentPassword, newPassword },
-      {
-        observe: 'response',
-        responseType: 'text',
-      }
     );
   }
 }

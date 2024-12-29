@@ -22,11 +22,11 @@ public class HotelController {
 
     @GetMapping
     public ResponseEntity<?> getAllHotels(
-            @RequestHeader(value = "Authorization", required = true) String authorization,
+            @RequestHeader(value = "Authorization", required = false) String authorization,
             @RequestParam(required = false) Integer managerId,
             @RequestParam(required = false) LocalDate start,
             @RequestParam(required = false) LocalDate end) {
-        String token = Utils.getToken(authorization);
+        String token = Utils.getTokenSoft(authorization);
         return hotelService.getAllHotels(token, managerId, start, end);
     }
 
@@ -47,6 +47,7 @@ public class HotelController {
     public ResponseEntity<?> deleteHotelsByManagerId(
             @RequestHeader(value = "Authorization", required = true) String authorization,
             @RequestParam(required = true) Integer managerId) {
+        System.out.println(authorization);
         String token = Utils.getToken(authorization);
         return hotelService.deleteHotelsByManagerId(token, managerId);
     }

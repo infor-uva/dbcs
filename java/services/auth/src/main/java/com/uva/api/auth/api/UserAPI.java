@@ -82,10 +82,10 @@ public class UserAPI {
     restTemplate.put(url, body, id);
   }
 
-  public void deleteUser(User user) {
+  public void deleteUser(int id) {
     String url = USER_API_URL + "/{id}";
 
-    restTemplate.delete(url, user.getId());
+    restTemplate.delete(url, id);
   }
 
 }

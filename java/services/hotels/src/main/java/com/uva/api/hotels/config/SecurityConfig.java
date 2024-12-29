@@ -61,7 +61,7 @@ public class SecurityConfig {
             // Permitir OPTIONS sin autenticación
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             // Acceso restringido
-            .requestMatchers(GET, "/hotels*", "/hotels/**").authenticated()
+            .requestMatchers(GET, "/hotels*", "/hotels/**").permitAll()
 
             .requestMatchers(POST, "/hotels*")
             .hasAnyAuthority(flat(ADMIN, MANAGER))

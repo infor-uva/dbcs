@@ -38,6 +38,7 @@ export class MainPageComponent implements OnInit {
 
     this.userClient.getAllUsers().subscribe({
       next: (data: Client[]) => {
+        console.log(data);
         this.users = data;
         this.filterUsers();
       },
@@ -48,11 +49,18 @@ export class MainPageComponent implements OnInit {
   @ViewChild(MatPaginator) paginator?: MatPaginator;
 
   filterUsers(): void {
-    this.filteredUsers = 
+    console.log(
+      this.selectedStatus,
+      this.users.map((u) => {
+        return { u, s: u?.status };
+      })
+    );
+
+    this.filteredUsers =
       this.selectedStatus === 'All'
         ? [...this.users]
-        : this.users.filter(user => user?.status === this.selectedStatus);
-    
+        : this.users.filter((user) => user?.status === this.selectedStatus);
+
     this.dataSource = new MatTableDataSource<User>(this.filteredUsers);
     this.dataSource.paginator = this.paginator!;
   }

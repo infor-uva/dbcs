@@ -78,6 +78,6 @@ public class TokenService {
     boolean isAdmin = decoded.isAdmin();
     boolean isService = decoded.getService() != null && decoded.getAudience().equals("INTERNAL");
     if (!isAdmin && !isService)
-      throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+      throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "XD");
   }
 }

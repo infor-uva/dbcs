@@ -19,6 +19,8 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
 
+        ex.printStackTrace(System.err);
+
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
@@ -28,6 +30,8 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
 
+        ex.printStackTrace(System.err);
+
         return new ResponseEntity<>(body, ex.getStatusCode());
     }
 
@@ -36,6 +40,8 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", "An unexpected error occurred: " + ex.getMessage());
+
+        ex.printStackTrace(System.err);
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }

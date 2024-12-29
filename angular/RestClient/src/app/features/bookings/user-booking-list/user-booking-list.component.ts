@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { Booking} from '@features/bookings';
+import { Booking } from '@features/bookings';
 import { User } from '@features/users';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -86,65 +86,9 @@ export class UserBookingListComponent {
     this.bookingClient.deleteBooking(bookingId).subscribe({
       next: () => {
         this.updateBookings();
-        this.updateUserStatus();
       },
       error: (err) => {
         console.error('Error al eliminar una reserva', err);
-      },
-    });
-  }
-
-  updateUserStatus() {
-    this.bookingClient.getBookingsByUser(this.user.id).subscribe({
-      next: (bookings) => {
-        const withActive = bookings.find(
-          (booking) => this.genBookingState(booking) === 'Reserva activa'
-        );
-        const withInactive = bookings.find(
-          (booking) => this.genBookingState(booking) === 'Reserva inactiva'
-        );
-        if (withActive) {
-          this.userClient
-            .alterUserStatus(this.user.id, 'WITH_ACTIVE_BOOKINGS')
-            .subscribe({
-              next: (response) => {
-                console.log('Cambio de estado en el usuario a activo correcto');
-              },
-              error: (err) => {
-                console.error('Error al cambiar de estado al usuario a activo');
-              },
-            });
-        } else if (withInactive) {
-          this.userClient
-            .alterUserStatus(this.user.id, 'WITH_INACTIVE_BOOKINGS')
-            .subscribe({
-              next: (response) => {
-                console.log(
-                  'Cambio de estado en el usuario a inactivo correcto'
-                );
-              },
-              error: (err) => {
-                console.error(
-                  'Error al cambiar de estado al usuario a inactivo'
-                );
-              },
-            });
-        } else {
-          this.userClient
-            .alterUserStatus(this.user.id, 'NO_BOOKINGS')
-            .subscribe({
-              next: (response) => {
-                console.log(
-                  'Cambio de estado en el usuario a sin reservas correcto'
-                );
-              },
-              error: (err) => {
-                console.error(
-                  'Error al cambiar de estado al usuario sin reservas'
-                );
-              },
-            });
-        }
       },
     });
   }

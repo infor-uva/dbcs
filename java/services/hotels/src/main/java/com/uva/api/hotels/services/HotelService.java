@@ -16,7 +16,6 @@ import com.uva.api.hotels.exceptions.InvalidDateRangeException;
 import com.uva.api.hotels.exceptions.InvalidRequestException;
 import com.uva.api.hotels.models.Hotel;
 import com.uva.api.hotels.models.Room;
-import com.uva.api.hotels.models.external.users.UserRol;
 import com.uva.api.hotels.repositories.HotelRepository;
 import com.uva.api.hotels.repositories.RoomRepository;
 
@@ -58,11 +57,6 @@ public class HotelService {
         if (hotels.isEmpty())
             throw new InvalidRequestException("No hotels");
 
-        if (!tokenService.hasAnyRole(token, UserRol.ADMIN, UserRol.MANAGER))
-            hotels = hotels.stream().map(h -> {
-                h.setManagerId(null);
-                return h;
-            }).toList();
         return ResponseEntity.ok(hotels);
     }
 

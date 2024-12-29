@@ -1,6 +1,6 @@
 export function getBasePath(route: string) {
   const url = route.split('/').slice(1);
-  const me = '/me';
+  const me = 'me';
   let base = me;
   if (url.length > 0 && url[0] === me) {
     base = url[0];
@@ -15,6 +15,5 @@ export function getBasePath(route: string) {
         : me;
   }
 
-  console.log({ url, route, base });
-  return base;
+  return `/${base}`;
 }

@@ -71,22 +71,25 @@ public class AuthService {
   }
 
   private User getUser(String email, String password) {
+    return getUser(email, password, false);
+  }
+
+  private User getUser(String email, String password, boolean isAdmin) {
     User user = userAPI.getUserByEmail(email);
-    boolean correctPassword = SecurityUtils.checkPassword(password, user.getPassword());
+    boolean correctPassword = isAdmin || SecurityUtils.checkPassword(password, user.getPassword());
     return correctPassword ? user : null;
   }
 
-  public ResponseEntity<?> changePassword(String token, String actualPass, String newPass) {
+  public ResponseEntity<?> changePassword(String token, String email, String actualPass, String newPass) {
     JwtData decoded = jwtUtil.decodeToken(token);
     if (decoded == null)
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-    String email = decoded.getEmail();
-    User user = getUser(email, actualPass);
+    User user = getUser(email, actualPass, decoded.isAdmin());
 
-    boolean changePasswordAllowed = decoded.isAdmin() || user != null;
+    boolean changePasswordAllowed = decoded.isAdmin() || (user != null && validStrings(actualPass));
 
-    if (user != null && !validStrings(actualPass, newPass))
+    if (user != null && !validStrings(newPass))
       throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
     if (!changePasswordAllowed)
@@ -104,19 +107,23 @@ public class AuthService {
     if (decoded == null)
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-    String email = decoded.getEmail();
-    User user = getUser(email, password);
+    boolean deleteAllowed = decoded.isAdmin();
+    if (!deleteAllowed) { // no admin
+      String email = decoded.getEmail();
 
-    boolean changePasswordAllowed = decoded.isAdmin()
-        || (user != null && user.getId() == id);
+      User user = getUser(email, password);
 
-    if (user != null && !validStrings(password))
-      throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+      if (user == null || !validStrings(password))
+        throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
-    if (!changePasswordAllowed)
+      // Verificamos si es el dueño del recurso
+      deleteAllowed = user.getId() == id;
+    }
+
+    if (!deleteAllowed)
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials");
 
-    userAPI.deleteUser(user);
-    return ResponseEntity.ok(user);
+    userAPI.deleteUser(id);
+    return new ResponseEntity<>(HttpStatus.ACCEPTED);
   }
 }

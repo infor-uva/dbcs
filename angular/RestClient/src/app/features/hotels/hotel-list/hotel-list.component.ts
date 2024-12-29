@@ -222,14 +222,16 @@ export class HotelListComponent {
       start: Date;
       end: Date;
     };
-    const {managerId} = hotel;
+    console.log({ hotel });
+
+    const { managerId } = hotel;
     const hotelId = hotel.id;
     this.storage.save('booking-data', {
       roomId,
       start: start.toString(),
       end: end.toString(),
       hotelId,
-      managerId
+      managerId,
     });
     this.router.navigate(['/me', 'bookings', 'new'], {
       queryParams: { roomId, startDate: start.toLocaleDateString() },

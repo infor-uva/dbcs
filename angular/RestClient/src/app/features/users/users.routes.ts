@@ -33,7 +33,7 @@ export const USERS_ROUTES: UserFormRoute[] = [
   {
     // Usuario administrador de hoteles
     path: 'hotels',
-    data: { expectedRole: 'HOTEL_ADMIN' },
+    data: { expectedRole: 'MANAGER' },
     loadChildren: () =>
       import('app/features/hotels').then((m) => m.MANAGERS_ROUTES),
   },

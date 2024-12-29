@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { Booking} from '@features/bookings';
+import { Booking } from '@features/bookings';
 import { User } from '@features/users';
 import { LocalStorageService } from '../../../core/services/storage/local-storage.service';
 import { BookingClientService } from '../../../core/services/api/bookings/booking-client.service';
@@ -18,8 +18,8 @@ type communication = {
   roomId: number;
   start: Date;
   end: Date;
-  hotelId : number;
-  managerId : number;
+  hotelId: number;
+  managerId: number;
 };
 
 @Component({
@@ -32,12 +32,18 @@ type communication = {
 export class BookingComponent {
   user: User = { id: 0, email: '', name: '', rol: 'CLIENT' };
   bookingForm: FormGroup;
-  bookingLocal: { roomId: number; start: Date; end: Date, hotelId : number, managerId : number } = {
+  bookingLocal: {
+    roomId: number;
+    start: Date;
+    end: Date;
+    hotelId: number;
+    managerId: number;
+  } = {
     roomId: 0,
     end: new Date(),
     start: new Date(),
-    hotelId : 0,
-    managerId : 0
+    hotelId: 0,
+    managerId: 0,
   };
 
   constructor(
@@ -46,7 +52,6 @@ export class BookingComponent {
     private fb: FormBuilder,
     private sessionService: SessionService,
     private bookingClient: BookingClientService,
-    private userClient: UserClientService,
     private storage: LocalStorageService
   ) {
     // Inicialización del formulario con validaciones
@@ -60,6 +65,8 @@ export class BookingComponent {
       this.router.navigate(['/booking', 'search']);
       return;
     }
+    console.log({ localBooking });
+
     this.bookingLocal = localBooking!;
     this.route.queryParams.subscribe((params) => {
       const roomId = Number(params['roomId']);
@@ -101,10 +108,10 @@ export class BookingComponent {
   }
 
   submitBooking() {
-    const { id } = this.user;
+    const { id: userId } = this.user;
     const bookingRequest: any = {
       ...this.bookingLocal,
-      userId: id,
+      userId,
     };
 
     // Llama al servicio para crear una nueva reserva
@@ -113,8 +120,8 @@ export class BookingComponent {
     this.bookingClient.createBooking(bookingRequest).subscribe({
       next: (response) => {
         console.log('Reserva creada con éxito', response);
-            this.storage.remove('booking-data');
-            this.router.navigate(['/me', 'bookings']);
+        this.storage.remove('booking-data');
+        this.router.navigate(['/me', 'bookings']);
       },
       error: (error) => {
         console.error('Error al crear la reserva', error);

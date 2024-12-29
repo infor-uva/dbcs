@@ -8,13 +8,17 @@
       <div class="grid grid-flow-col mb-5">
         @if (!isEditing) {
         <div>
-          @if (isHotelManager) {
+          @if (isManager) {
           <a [routerLink]="[getHotelsUri()]">
             <button class="btn btn-primary">Mis hoteles</button>
           </a>
-          }@else if(!isAdmin){
+          }@else if (isClient){
           <a [routerLink]="[getBookingsUri()]">
             <button class="btn btn-primary">Mis Reservas</button>
+          </a>
+          }@else if (isAdmin) {
+          <a [routerLink]="['/admin', 'users']">
+            <button class="btn btn-primary">Usuarios</button>
           </a>
           }
         </div>
@@ -66,7 +70,8 @@
             placeholder="Introduce tu email"
           />
         </div>
-        } @if ((isChangePassword || isAuth) && (isMeRoute || isAuth)) {
+        } @if (((isChangePassword && !isAdmin) || isAuth) && (isMeRoute ||
+        isAuth)) {
         <!-- Campo Contraseña Actual (solo en edición) -->
         <div class="form-group">
           <label for="currentPassword">{{ currentPasswordText }}:</label>
@@ -132,13 +137,18 @@
         }
         <!-- Grupo de Botones -->
         <mat-card-actions class="flex justify-center mb-5">
-          <!-- [disabled]="registerForm.invalid" -->
           <button
             type="submit"
             class="btn btn-success text-4xl"
             [disabled]="!validForm()"
           >
             {{ submitButtonText }}
+          </button>
+        </mat-card-actions>
+        } @else if (!isEditing) {
+        <mat-card-actions class="flex justify-center mb-5">
+          <button type="submit" class="btn btn-danger text-4xl">
+            DELETE USER
           </button>
         </mat-card-actions>
         }

@@ -40,13 +40,14 @@ public class AuthController {
 
         String token = authorization.substring(7);
 
+        String email = json.get("email");
         String actualPassword = json.get("password");
         String newPassword = json.get("newPassword");
 
-        return authService.changePassword(token, actualPassword, newPassword);
+        return authService.changePassword(token, email, actualPassword, newPassword);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public Object postMethodName(@PathVariable int id, @RequestBody Map<String, String> json,
             @RequestHeader(value = "Authorization", required = true) String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer "))

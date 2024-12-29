@@ -14,7 +14,8 @@ public class RestTemplateConfig {
         return new RestTemplate();
     }
 
-    public RestTemplate restTemplate(RestTemplateInterceptor interceptor) {
+    @Bean("IdentifyRestTemplate")
+    RestTemplate restTemplate(RestTemplateInterceptor interceptor) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setInterceptors(List.of(interceptor));
         return restTemplate;

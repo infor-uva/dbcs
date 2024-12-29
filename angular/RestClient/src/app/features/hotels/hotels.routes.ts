@@ -12,7 +12,7 @@ export const HOTELS_ROUTES: AppRoute[] = [
     path: 'register', // Registrar nuevo hotel
     component: HotelRegisterComponent,
     canActivate: [rolGuard],
-    data: { expectedRole: 'HOTEL_ADMIN' },
+    data: { expectedRole: 'MANAGER' },
   },
   {
     path: ':id', // Hotel concreto
