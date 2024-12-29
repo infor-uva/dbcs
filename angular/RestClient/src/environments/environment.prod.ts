@@ -1,18 +1,9 @@
-// const monolithUrl = 'http://rooms-booking-api:8080';
-
-// export const environment = {
-//   production: true,
-//   authAPI: 'http://auth-api:8101',
-//   userAPI: `http://${monolithUrl}/users`,
-//   hotelAPI: `http://${monolithUrl}/hotels`,
-//   bookingAPI: `http://${monolithUrl}/bookings`,
-// };
-const monolithUrl = 'localhost:8080';
+const gateWayUrl = 'localhost:8000/api'; // kong
 
 export const environment = {
-  production: false,
-  authAPI: 'http://localhost:8101',
-  userAPI: `http://${monolithUrl}/users`,
-  hotelAPI: `http://${monolithUrl}/hotels`,
-  bookingAPI: `http://${monolithUrl}/bookings`,
+  production: true,
+  authAPI: `http://${gateWayUrl}/auth`,
+  userAPI: `http://${gateWayUrl}/users`,
+  hotelAPI: `http://${gateWayUrl}/hotels`,
+  bookingAPI: `http://${gateWayUrl}/bookings`,
 };

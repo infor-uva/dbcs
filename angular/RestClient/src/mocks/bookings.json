@@ -1,0 +1,30 @@
+[
+  {
+    "user": {
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "status": "NO_BOOKINGS"
+    },
+    "room": {
+      "roomNumber": "101",
+      "type": "SINGLE",
+      "available": true
+    },
+    "startDate": "2024-03-01",
+    "endDate": "2024-03-08"
+  },
+  {
+    "user": {
+      "name": "Pepe",
+      "email": "pepe@example.com",
+      "status": "WITH_ACTIVE_BOOKINGS"
+    },
+    "room": {
+      "roomNumber": "101",
+      "type": "SINGLE",
+      "available": true
+    },
+    "startDate": "2024-03-15",
+    "endDate": "2024-03-22"
+  }
+]

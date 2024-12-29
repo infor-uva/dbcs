@@ -1,0 +1,40 @@
+<div class="container">
+  <h2><strong class="text-5xl font-bold">Confirmar reserva</strong></h2>
+  <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
+    <!-- <div class="form-group">
+      <label for="userId">ID del Usuario:</label>
+      <select
+        type="number"
+        id="userId"
+        formControlName="userId"
+        class="form-control"
+      >
+        @for(user of users; track user.id) {
+        <option value="{{ user.id }}">{{ user.name }}</option>
+        }
+      </select>
+    </div> -->
+
+    <div class="form-group">
+      <label for="roomId">ID del Habitación:</label>
+      <input
+        type="number"
+        id="roomId"
+        formControlName="roomId"
+        class="form-control"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="start">Fecha de Inicio (dd/mm/yyyy):</label>
+      <input id="start" formControlName="start" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label for="end">Fecha de Fin (dd/mm/yyyy):</label>
+      <input id="end" formControlName="end" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Reservar</button>
+  </form>
+</div>
