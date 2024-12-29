@@ -7,16 +7,13 @@ export const CLIENT_BOOKINGS_ROUTES: AppRoute[] = [
   {
     path: '',
     component: UserBookingListComponent,
-    data: { expectedRole: 'CLIENT' },
   },
   {
     path: ':id',
     component: BookingComponent,
-    data: { expectedRole: 'CLIENT' },
   },
   {
     path: 'new',
     component: BookingComponent,
-    data: { expectedRole: 'CLIENT' },
   },
 ];

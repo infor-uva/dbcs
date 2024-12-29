@@ -129,9 +129,9 @@
         } @if (!isViewUser) { @if (isAuth) {
         <p class="text-right">
           @if (isLogin) {
-          <a [routerLink]="['/register']">¿No tienes cuenta?</a>
+          <a [routerLink]="[getRegisterUrl()]">¿No tienes cuenta?</a>
           }@else {
-          <a [routerLink]="['/login']">¿Ya tienes cuenta?</a>
+          <a [routerLink]="[getLoginUrl()]">¿Ya tienes cuenta?</a>
           }
         </p>
         }

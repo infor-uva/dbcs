@@ -34,7 +34,7 @@ function verifyRol(expectedRole: UserRol) {
 
   if (!session) {
     console.log('no session');
-    router.navigate(['/login']);
+    router.navigateByUrl(`/login?redirect=${router.url}`);
     return false;
   }
 
@@ -75,7 +75,8 @@ export const rolGuard: CanActivateFn = (route, state) => {
 export const rolGuardChild: CanActivateChildFn = (childRoute, state) => {
   // Obtener el rol de la ruta hija si está especificado y en caso
   // de no especificarse se busca en el/los padres
-  let requiredRol = childRoute.data['rol'] ?? getInheritedRole(childRoute);
+  let requiredRol =
+    childRoute.data['expectedRole'] ?? getInheritedRole(childRoute);
 
   // Si no hay rol especificado se supone libre de verificación
   if (!requiredRol) return true;

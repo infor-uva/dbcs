@@ -11,22 +11,22 @@ services:
   #######################################
   # Cliente Angular
   #######################################
-  # RoomsBooking-Web:
-  #   image: roomsbooking-web-image
-  #   build:
-  #     context: ./angular/RestClient
-  #     dockerfile: ./Dockerfile
-  #   restart: unless-stopped
-  #   ports:
-  #     - 4200:80
-  #   networks:
-  #     - kong-net
-  #   depends_on:
-  #     - kong
-  #     - Auth-API
-  #     - Users-API
-  #     - Hotels-API
-  #     - Bookings-API
+  RoomsBooking-Web:
+    image: roomsbooking-web-image
+    build:
+      context: ./angular/RestClient
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - 4200:80
+    networks:
+      - kong-net
+    depends_on:
+      - kong
+      - Auth-API
+      - Users-API
+      - Hotels-API
+      - Bookings-API
 
   #######################################
   # Kong

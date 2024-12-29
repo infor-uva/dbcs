@@ -1,7 +1,7 @@
 import { UserFormComponent } from './user-form/user-form.component';
 import { UserFormRoute } from './types/UserFormData';
 
-export const USERS_ROUTES: UserFormRoute[] = [
+export const COMMON_USERS_ROUTES: UserFormRoute[] = [
   // Common
   {
     path: '',
@@ -30,6 +30,10 @@ export const USERS_ROUTES: UserFormRoute[] = [
     },
     component: UserFormComponent,
   },
+];
+
+export const USERS_ROUTES: UserFormRoute[] = [
+  ...COMMON_USERS_ROUTES,
   {
     // Usuario administrador de hoteles
     path: 'hotels',

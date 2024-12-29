@@ -75,6 +75,8 @@ export class UserFormComponent implements OnInit {
   isManager = false;
   isAdmin = false;
 
+  redirect?: string;
+
   constructor(
     private fb: FormBuilder,
     private sessionService: SessionService,
@@ -86,13 +88,8 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.setUp();
-
-    // const auth = this.session.getSession();
-    // this.user = auth;
-    // this.userForm.patchValue({
-    //   name: this.user.name,
-    //   email: this.user.email,
-    // });
+    const { redirect } = this.route.snapshot.queryParams;
+    this.redirect = redirect;
   }
 
   private initializeForm(): void {
@@ -112,14 +109,6 @@ export class UserFormComponent implements OnInit {
     const nameNotRequired = emailNotRequired || this.isLogin;
     // Solicitar rol
     const rolNotRequired = !this.isRegister;
-    // console.log({
-    //   confirmIdentity,
-    //   isChangePassword,
-    //   confirmPassword,
-    //   emailNotRequired,
-    //   nameNotRequired,
-    //   rolNotRequired,
-    // });
 
     this.userForm = this.fb.group({
       name: [{ value: '', disabled: nameNotRequired }, Validators.required],
@@ -202,6 +191,14 @@ export class UserFormComponent implements OnInit {
         },
       });
     }
+  }
+
+  getRegisterUrl() {
+    return this.redirect ? `/register?redirect=${this.redirect}` : '/register';
+  }
+
+  getLoginUrl() {
+    return this.redirect ? `/login?redirect=${this.redirect}` : '/login';
   }
 
   getHotelsUri() {
@@ -326,11 +323,11 @@ export class UserFormComponent implements OnInit {
   private login(email: string, password: string) {
     this.sessionService.login(email, password).subscribe({
       next: (r: any) => {
-        this.router.navigateByUrl(r.mainPage);
+        if (this.redirect) this.router.navigateByUrl(this.redirect);
+        else this.router.navigateByUrl(r.mainPage);
       },
       error: (error) => {
         console.error(error);
-        // this.toastr.error('Invalid email or password');
       },
     });
   }
@@ -344,11 +341,11 @@ export class UserFormComponent implements OnInit {
     console.log({ name, email, password, rol });
     this.sessionService.register(name, email, password, rol).subscribe({
       next: (r: any) => {
-        this.router.navigateByUrl(r.mainPage);
+        if (this.redirect) this.router.navigateByUrl(this.redirect);
+        else this.router.navigateByUrl(r.mainPage);
       },
       error: (error) => {
         console.error(error);
-        // this.toastr.error('Invalid email or password');
       },
     });
   }
@@ -360,7 +357,6 @@ export class UserFormComponent implements OnInit {
       },
       error: (error) => {
         console.error(error);
-        // this.toastr.error('Invalid email or password');
       },
     });
   }
@@ -376,7 +372,6 @@ export class UserFormComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
-          // this.toastr.error('Invalid email or password');
         },
       });
   }
@@ -399,7 +394,6 @@ export class UserFormComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
-          // this.toastr.error('Invalid email or password');
         },
       });
   }

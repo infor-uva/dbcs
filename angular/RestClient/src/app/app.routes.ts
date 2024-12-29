@@ -16,14 +16,12 @@ export const routes: AppRoute[] = [
   // Usuario
   {
     path: 'me',
-    canActivate: [rolGuard],
     canActivateChild: [rolGuardChild],
     loadChildren: () => import('./features/users').then((m) => m.USERS_ROUTES),
   },
   // Administrador
   {
     path: 'admin',
-    canActivate: [rolGuard],
     canActivateChild: [rolGuardChild],
     data: { expectedRole: 'ADMIN' },
     loadChildren: () => import('./features/admin').then((m) => m.ADMIN_ROUTES),
@@ -33,9 +31,9 @@ export const routes: AppRoute[] = [
     path: 'unauthorized',
     component: UnauthorizedComponent,
   },
-  // {
-  //   path: '**',
-  //   redirectTo: '/login',
-  //   pathMatch: 'full',
-  // },
+  {
+    path: '**',
+    redirectTo: '/login',
+    pathMatch: 'full',
+  },
 ];
