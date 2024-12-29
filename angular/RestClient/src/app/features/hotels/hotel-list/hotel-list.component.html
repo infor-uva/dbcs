@@ -1,0 +1,192 @@
+<div class="container">
+  <h2 class="text-center text-5xl font-bold mb-4">Hotel List</h2>
+  @if (isManaging) {
+  <mat-accordion>
+    <mat-expansion-panel disabled class="cursor-default">
+      <mat-expansion-panel-header>
+        <mat-panel-title class="text-3xl font-bold">Hotel</mat-panel-title>
+        <mat-panel-description class="text-3xl font-bold"
+          >Location</mat-panel-description
+        >
+      </mat-expansion-panel-header>
+    </mat-expansion-panel>
+    @for(hotel of hotels; track hotel.id) {
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title class="text-3xl">
+          {{ $index + 1 }}. {{ hotel.name }}
+        </mat-panel-title>
+        <mat-panel-description class="text-3xl">
+          {{ hotel.address.streetKind }} {{ hotel.address.streetName }} No.
+          {{ hotel.address.number }}, {{ hotel.address.postCode }}
+          {{ hotel.address.otherInfo }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="text-end mb-4">
+        <a [routerLink]="getHotelUri(hotel.id)">
+          <button
+            mat-raised-button
+            style="
+              font-size: medium;
+              background-color: rgb(28, 197, 248);
+              color: rgb(250, 250, 250);
+            "
+          >
+            View hotel
+          </button>
+        </a>
+        <button
+          mat-raised-button
+          (click)="deleteHotel(hotel.id)"
+          style="
+            margin-left: 2rem;
+            font-size: medium;
+            background-color: rgb(223, 36, 36);
+            color: rgb(250, 250, 250);
+          "
+        >
+          <strong> Delete Hotel </strong>
+        </button>
+      </div>
+      <table mat-table [dataSource]="hotel.rooms" class="mat-elevation-z8">
+        <ng-container matColumnDef="roomNumber">
+          <th class="text-3xl" mat-header-cell *matHeaderCellDef>
+            Room Number
+          </th>
+          <td class="text-2xl" mat-cell *matCellDef="let room">
+            {{ room.roomNumber }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th class="text-3xl" mat-header-cell *matHeaderCellDef>Type</th>
+          <td class="text-2xl" ce mat-cell *matCellDef="let room">
+            {{ room.type }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="available">
+          <th class="text-3xl text-center" mat-header-cell *matHeaderCellDef>
+            Available
+          </th>
+          <td class="text-2xl" mat-cell *matCellDef="let room">
+            <mat-slide-toggle
+              [checked]="room.available"
+              (change)="
+                toggleRoomAvailability(hotel.id!, room.id, !room.available)
+              "
+            ></mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="['roomNumber', 'type', 'available']"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: ['roomNumber', 'type', 'available']"
+        ></tr>
+      </table>
+    </mat-expansion-panel>
+    }
+  </mat-accordion>
+  } @else {
+  <div class="form-group text-xl flex justify-center gap-20">
+    <mat-form-field>
+      <mat-label class="text-2xl">Enter a date range</mat-label>
+      <form [formGroup]="dateRangeForm">
+        <mat-date-range-input [rangePicker]="picker" formGroupName="dateRange">
+          <input
+            matStartDate
+            formControlName="start"
+            placeholder="Fecha de inicio"
+          />
+          <input matEndDate formControlName="end" placeholder="Fecha de fin" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="picker"
+        ></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </form>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label class="text-2xl">Hotel</mat-label>
+      <mat-select
+        [(value)]="hotelSelected"
+        class="text-2xl"
+        (selectionChange)="update()"
+      >
+        <mat-option [value]="undefined" class="text-3xl">All</mat-option>
+        @for (hotel of _hotels; track hotel.id) {
+        <mat-option [value]="hotel" class="text-3xl">{{
+          hotel.name
+        }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Filter by Room Type</mat-label>
+      <mat-select [(value)]="roomTypeSelected" (selectionChange)="update()">
+        @for (type of roomTypes; track type) {
+        <mat-option [value]="type">{{ type }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  @for(hotel of hotels; track hotel.id) {
+  <div class="mt-10 shadow-md">
+    <mat-card appearance="raised">
+      <mat-card-header class="flex justify-center p-4 mb-4">
+        <mat-card-title class="text-center">
+          <a [routerLink]="getHotelUri(hotel.id)">
+            <strong class="text-4xl flex items-center justify-center gap-4">
+              <mat-icon>hotel</mat-icon> {{ hotel.name }}</strong
+            >
+            <p class="mt-5 text-2xl italic">
+              {{ hotel.address.streetKind }} {{ hotel.address.streetName }}. Nº
+              {{ hotel.address.number }} [{{ hotel.address.postCode }}]
+            </p>
+            @if (hotel.address.otherInfo) {
+            <small>{{ hotel.address.otherInfo }}</small>
+            }
+          </a>
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for(room of hotel.rooms; track room.id) { @if (showRequested(room)) {
+          <div class="drop-shadow-lg hover:shadow-2xl">
+            <mat-card appearance="raised">
+              <mat-card-header class="flex justify-center">
+                <mat-card-title>
+                  <strong
+                    >(#{{ $index + 1 }}) Habitación {{ room.roomNumber }}
+                  </strong>
+                  <span class="italic">({{ room.type }})</span>
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content class="mt-4">
+                <button
+                  [disabled]="!isAvailable(room)"
+                  mat-raised-button
+                  class="w-full text-center py-3 rounded-lg shadow-md hover:shadow-lg bg-sky-600 text-slate-200 font-bold"
+                  (click)="bookingRoom(room.id, hotel)"
+                >
+                  <span class="flex items-center justify-center text-2xl">
+                    <mat-icon>booking</mat-icon>
+                    Reservar
+                  </span>
+                </button>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          }}
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  } }
+</div>

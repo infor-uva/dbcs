@@ -19,10 +19,16 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
-    "lib": [
-      "ES2022",
-      "dom"
-    ]
+    "lib": ["ES2022", "dom"],
+    "baseUrl": "./src", // Define la base del proyecto
+    "paths": {
+      "@core/*": ["app/core/*"], // Alias para el core
+      "@shared": ["app/shared"], // Alias para shared
+      "@shared/*": ["app/shared/*"], // Alias para shared
+      "@features/*": ["app/features/*"], // Alias para features
+      "@utils/*": ["app/utils/*"], // Alias para utilidades
+      "@pages/*": ["app/pages/*"] // Alias para pages
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

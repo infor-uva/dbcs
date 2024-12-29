@@ -1,0 +1,38 @@
+src/
+├── app/
+│   ├── core/
+│   │   ├── guards/
+│   │   │   ├── rol.guard.ts
+│   │   │   └── rol.guard.spec.ts
+│   │   ├── interceptors/
+│   │   │   ├── auth.interceptor.ts
+│   │   │   └── auth.interceptor.spec.ts
+│   │   ├── services/           # Servicios singleton
+│   │   ├── interfaces/         # Interfaces globales
+│   │   └── core.module.ts
+│   ├── shared/
+│   │   ├── components/
+│   │   │   ├── header/
+│   │   │   └── footer/
+│   │   ├── directives/
+│   │   ├── pipes/
+│   │   ├── services/
+│   │   └── shared.module.ts
+│   ├── features/
+│   │   ├── auth/
+│   │   │   ├── components/
+│   │   │   ├── services/
+│   │   │   ├── interfaces/
+│   │   │   ├── unauthorized/
+│   │   │   ├── auth-routing.module.ts
+│   │   │   └── auth.module.ts
+│   │   ├── bookings/
+│   │   ├── hotel/
+│   │   └── user/
+│   ├── app-routing.module.ts
+│   ├── app.component.ts
+│   └── app.module.ts
+├── environments/
+├── styles/
+└── utils/
+
