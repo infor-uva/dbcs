@@ -50,7 +50,8 @@ Accede a la carpeta raíz (donde está este fichero) y ejecuta el comando de des
 docker compose up
 ```
 
-> [!warning]
+> #### WARNING
+>
 > Se recomienda la eliminación, en caso de que haya ya volúmenes de información con los mismos nombres usados en esta practica.
 >
 > El poblador está incluido y se reinicia por cada fallo, es importante ejecutarlo una vez ya esté kong configurado para esta practica
@@ -63,7 +64,7 @@ docker compose up
 
 ### Diagrama de despliegue del sistema
 
-![Diagrama de despligue del sistema](./diagramas/despliegue.png)
+![Diagrama de despligue del sistema](./diagramas/despliegue.svg)
 
 ### Diagrama de la arquitectura lógica del microservicio de usuarios
 
@@ -109,6 +110,7 @@ También cuenta con algunos argumentos de apoyo:
 
 Este programa genera 6 usuarios (1 administrador, 2 gestores de hoteles y 3 clientes), el programa dispersa de forma pseudoaleatoria administradores de hoteles, objetivos de la reserva (habitación implicada y cliente que la realiza).
 
-> [!note]
+> #### NOTE
+>
 > Está integrado en el docker compose y si no se detiene y se define previamente la configuración de kong el programa se reiniciará constantemente.
 > En caso de relanzamiento, si detecta que se puede logear como alguno de los usuarios detendrá su ejecución, en caso de que quieras ejecutarlo aún asi echa un vistazo al modo `Kong` con la configuración de `force`
