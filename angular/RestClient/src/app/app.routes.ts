@@ -1,12 +1,10 @@
 import { UnauthorizedComponent } from './page/unauthorized/unauthorized.component';
 import { AppRoute } from './core/models/Route.interface';
-import { rolGuard, rolGuardChild } from '@core/guards';
+import { rolGuardChild } from '@core/guards';
+import { AUTH_ROUTES } from '@features/auth';
 export const routes: AppRoute[] = [
   // Auth
-  {
-    path: '',
-    loadChildren: () => import('./features/auth').then((m) => m.AUTH_ROUTES),
-  },
+  ...AUTH_ROUTES,
   // Hoteles
   {
     path: 'hotels',

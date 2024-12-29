@@ -68,6 +68,8 @@ export class HotelListComponent {
   rooms: Room[] = [];
   trateRooms: Room[] = [];
   userId = 0;
+  start:Date = new Date(new Date().getDate() - 3);
+  end:Date = new Date(new Date().getDate() - 3);
 
   constructor(
     private fb: FormBuilder,
@@ -81,7 +83,6 @@ export class HotelListComponent {
     const baseUrl = getBasePath(url).split('/')[1];
     const isHotelManger = url.split('/')[1] === 'me';
     const isAdmin = baseUrl === 'admin';
-    console.log({ isHotelManger, isAdmin, baseUrl });
     this.isManaging = isHotelManger || isAdmin;
     const today = new Date();
 
@@ -153,15 +154,19 @@ export class HotelListComponent {
 
   getHotels() {
     const { start, end } = this.dateRangeForm.value.dateRange;
+    console.log({start, end, s:this.start, e:this.end})
+    if (end != null && this.end.getDate() === end.getDate()) return
 
+    
     const observable = this.isManaging
-      ? this.hotelClient.getAllHotelsByUser(this.userId)
-      : this.hotelClient.getAllHotels(start, end);
-    console.log('a', this.isManaging);
-
+    ? this.hotelClient.getAllHotelsByUser(this.userId)
+    : this.hotelClient.getAllHotels(start, end);
+    
     observable.subscribe({
       next: (resp) => {
         if (!!resp && (resp as never[]).length >= 0) {
+          this.start = start
+          this.end = end
           this._hotels = resp;
           this.update();
         }

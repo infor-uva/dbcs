@@ -78,9 +78,6 @@ export const rolGuardChild: CanActivateChildFn = (childRoute, state) => {
   let requiredRol =
     childRoute.data['expectedRole'] ?? getInheritedRole(childRoute);
 
-  // Si no hay rol especificado se supone libre de verificación
-  if (!requiredRol) return true;
-
   // Verificar si el usuario tiene el rol requerido
   return verifyRol(requiredRol);
 };

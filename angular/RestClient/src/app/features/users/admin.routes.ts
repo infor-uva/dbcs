@@ -2,7 +2,7 @@ import { AppRoute } from '@core/models/Route.interface';
 import { MainPageComponent } from 'app/features/users/main-page/main-page.component';
 import { UserFormRoute } from 'app/features/users/types/UserFormData';
 import { UserFormComponent } from 'app/features/users/user-form/user-form.component';
-import { COMMON_USERS_ROUTES } from 'app/features/users/users.routes';
+import { COMMON_USERS_ROUTES, USERS_ROUTES } from 'app/features/users/users.routes';
 
 function changeToAdminScope(routes: UserFormRoute[]) {
   return routes.map((r) => {
@@ -40,7 +40,7 @@ export const ADMIN_ROUTES: AppRoute[] = [
       },
       {
         path: ':id',
-        children: changeToAdminScope(COMMON_USERS_ROUTES),
+        children: changeToAdminScope(USERS_ROUTES),
       },
     ],
   },

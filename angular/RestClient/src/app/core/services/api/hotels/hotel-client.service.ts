@@ -26,6 +26,8 @@ export class HotelClientService {
     if (!startDate || !endDate) return this.http.get<Hotel[]>(url);
     const start = new Date(startDate).toISOString().split('T')[0];
     const end = new Date(endDate).toISOString().split('T')[0];
+    console.log({start, end})
+    
     return this.http.get<Hotel[]>(url, { params: { start, end } });
   }
 
