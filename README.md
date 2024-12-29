@@ -1,6 +1,6 @@
 # DEMO
 
-![Video demostración](DBCS_FINAL.mp4.mp4)
+![Video demostración](DBCS_FINAL.mp4)
 
 # Sobre el proyecto
 
