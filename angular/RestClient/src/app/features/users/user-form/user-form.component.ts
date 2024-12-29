@@ -316,13 +316,7 @@ export class UserFormComponent implements OnInit {
         this.updatePassword(data.currentPassword, data.newPassword);
         break;
       case 'VIEW':
-        const password = this.isAdmin
-          ? confirm('Desea eliminar el usuario')
-            ? 'password'
-            : undefined
-          : prompt('Confirma tu contraseña actual');
-        if (!!password && password.trim().length != 0)
-          this.deleteUser(this.user.id, password);
+        this.deleteUser(this.user.id);
         break;
       default:
         break;
@@ -387,16 +381,26 @@ export class UserFormComponent implements OnInit {
       });
   }
 
-  private deleteUser(userId: number, password: string) {
-    this.authService.deleteUser(userId, password).subscribe({
-      next: () => {
-        if (this.isAdmin) this.router.navigate(['/admin', 'users']);
-        else this.sessionService.logout();
-      },
-      error: (error) => {
-        console.error(error);
-        // this.toastr.error('Invalid email or password');
-      },
-    });
+  private deleteUser(userId: number) {
+    const isAdmin = this.isAdmin;
+    const isOwner = this.user.id == userId;
+    const adminDel = isAdmin && !isOwner;
+
+    const password = adminDel
+      ? confirm('Desea eliminar el usuario')
+        ? 'password'
+        : undefined
+      : prompt('Confirma tu contraseña actual');
+    if (!!password && password.trim().length != 0)
+      this.authService.deleteUser(userId, password).subscribe({
+        next: () => {
+          if (adminDel) this.router.navigate(['/admin', 'users']);
+          else this.sessionService.logout();
+        },
+        error: (error) => {
+          console.error(error);
+          // this.toastr.error('Invalid email or password');
+        },
+      });
   }
 }
