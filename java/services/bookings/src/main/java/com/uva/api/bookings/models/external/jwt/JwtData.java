@@ -1,4 +1,4 @@
-package com.uva.api.bookings.models.external;
+package com.uva.api.bookings.models.external.jwt;
 
 import java.util.Date;
 
@@ -21,7 +21,7 @@ public class JwtData {
   private String name;
   private String email;
   private UserRol rol;
-  private String service;
+  private Service service;
 
   private String subject;
   private String audience;

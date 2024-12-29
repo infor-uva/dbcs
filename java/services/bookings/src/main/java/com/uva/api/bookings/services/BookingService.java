@@ -18,7 +18,8 @@ import com.uva.api.bookings.repositories.BookingRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Service
 public class BookingService {
@@ -27,29 +28,27 @@ public class BookingService {
     private BookingRepository bookingRepository;
 
     @Autowired
+    private TokenService tokenService;
+
+    @Autowired
     private HotelApi hotelApi;
 
     @Autowired
     private UserApi userApi;
 
-    /**
-     * Consulta por bloques filtrados
-     * - fechas
-     * - roomId/hotelId
-     * - userId
-     * 
-     * @param start
-     * @param end
-     * @param hotelId
-     * @param roomId
-     * @param userId
-     * @return
-     */
     public ResponseEntity<?> getBookings(
+            String token,
             LocalDate start, LocalDate end,
             Integer hotelId, Integer roomId,
             Integer userId, Integer managerId) {
         List<Booking> bookings = null;
+
+        if (hotelId != null)
+            tokenService.assertPermission(token, hotelId);
+        if (userId != null)
+            tokenService.assertPermission(token, userId);
+        if (managerId != null)
+            tokenService.assertPermission(token, managerId);
 
         if (start != null && end != null) {
             if (start.isAfter(end))
@@ -141,13 +140,23 @@ public class BookingService {
         return ResponseEntity.ok(booking);
     }
 
-    public Booking findById(Integer id) {
-        return bookingRepository.findById(id)
+    /**
+     * Consulta una reserva por id y asegura que la entidad que la consulte sea un
+     * servicio/administrador o el dueño (cliente)
+     * 
+     * @param token
+     * @param id
+     * @return
+     */
+    public Booking findById(String token, Integer id) {
+        Booking b = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException(id));
+        tokenService.assertPermission(token, b.getUserId());
+        return b;
     }
 
-    public ResponseEntity<?> getBookingById(Integer id) {
-        Booking booking = findById(id);
+    public ResponseEntity<?> getBookingById(String token, Integer id) {
+        Booking booking = findById(token, id);
         bookingRepository.deleteById(id);
         return ResponseEntity.ok(booking);
     }
@@ -174,8 +183,8 @@ public class BookingService {
         return status;
     }
 
-    public ResponseEntity<?> deleteBooking(Integer id) {
-        Booking booking = findById(id);
+    public ResponseEntity<?> deleteBooking(String token, Integer id) {
+        Booking booking = findById(token, id);
         bookingRepository.deleteById(id);
 
         ClientStatus status = calculateClientStatus(id);
@@ -185,36 +194,40 @@ public class BookingService {
         return ResponseEntity.ok(booking);
     }
 
-    public List<Booking> deleteAllByHotelId(int hotelId) {
-        // Extraer reservas realizadas al hotel
-        List<Booking> bookings = bookingRepository.findAllByHotelId(hotelId);
+    private List<Booking> deleteAll(int id,
+            Function<Integer, List<Booking>> findAction,
+            Consumer<Integer> deleteAction) {
+        List<Booking> bookings = findAction.apply(id);
         if (bookings.isEmpty()) {
             return new ArrayList<>();
         }
-        bookingRepository.deleteAllByHotelId(hotelId);
+        deleteAction.accept(id);
+
         return bookings;
     }
 
-    public List<Booking> deleteAllByManagerId(int managerId) {
-        List<Booking> bookings = bookingRepository.findAllByManagerId(managerId);
-        if (bookings.isEmpty()) {
-            return new ArrayList<>();
-        }
-        bookingRepository.deleteAllByManagerId(managerId);
-        return bookings;
+    private List<Booking> deleteAllByHotelId(Integer userId) {
+        return deleteAll(userId,
+                bookingRepository::findAllByHotelId,
+                bookingRepository::deleteAllByHotelId);
     }
 
-    public List<Booking> deleteAllByUserId(Integer userId) {
-        List<Booking> bookings = bookingRepository.findAllByUserId(userId);
-        if (bookings.isEmpty()) {
-            return new ArrayList<>();
-        }
-        bookingRepository.deleteAllByUserId(userId);
-        return bookings;
+    private List<Booking> deleteAllByManagerId(Integer userId) {
+        return deleteAll(userId,
+                bookingRepository::findAllByManagerId,
+                bookingRepository::deleteAllByManagerId);
+    }
+
+    private List<Booking> deleteAllByUserId(Integer userId) {
+        return deleteAll(userId,
+                bookingRepository::findAllByUserId,
+                bookingRepository::deleteAllByUserId);
     }
 
     public ResponseEntity<?> deleteBookings(
-            Integer hotelId, Integer managerId, Integer userId) {
+            Integer hotelId,
+            Integer managerId, Integer userId) {
+
         List<Booking> bookings;
         String message;
         if (managerId != null) {
@@ -235,17 +248,21 @@ public class BookingService {
         return ResponseEntity.ok(bookings);
     }
 
+    /**
+     * Obtiene los ids de los cliente cuyas reservas finalizaron el dia anterior y
+     * actualiza su estado al nuevo
+     * 
+     * @return
+     */
     public long performDailyClientsStateUpdate() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
 
         List<Booking> passedBookings = bookingRepository.findAllPassed(yesterday);
 
-        Stream<Integer> userIds = passedBookings.stream().map(b -> b.getUserId()).distinct();
-        userIds.forEach(userId -> {
+        return passedBookings.stream().map(Booking::getUserId).distinct().map(userId -> {
             ClientStatus status = calculateClientStatus(userId);
             userApi.updateClientState(userId, status);
-        });
-
-        return userIds.count();
+            return userId;
+        }).count();
     }
 }
