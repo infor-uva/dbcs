@@ -31,30 +31,29 @@ type SelectableRoomType = 'All' | RoomType;
 const selectableRoomTypeArray: SelectableRoomType[] = ['All', ...roomTypeArray];
 
 @Component({
-  selector: 'app-hotel-list',
-  standalone: true,
-  imports: [
-    NgbDatepickerModule,
-    RouterModule,
-    MatAccordion,
-    MatSlideToggle,
-    MatButton,
-    MatTable,
-    MatTableModule,
-    MatExpansionPanel,
-    MatExpansionPanelHeader,
-    MatExpansionPanelTitle,
-    MatExpansionPanelDescription,
-    NgbAccordionModule,
-    MatCardModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatDatepickerModule,
-    MatSelectModule,
-    ReactiveFormsModule,
-  ],
-  templateUrl: './hotel-list.component.html',
-  styleUrl: './hotel-list.component.css',
+    selector: 'app-hotel-list',
+    imports: [
+        NgbDatepickerModule,
+        RouterModule,
+        MatAccordion,
+        MatSlideToggle,
+        MatButton,
+        MatTable,
+        MatTableModule,
+        MatExpansionPanel,
+        MatExpansionPanelHeader,
+        MatExpansionPanelTitle,
+        MatExpansionPanelDescription,
+        NgbAccordionModule,
+        MatCardModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatDatepickerModule,
+        MatSelectModule,
+        ReactiveFormsModule,
+    ],
+    templateUrl: './hotel-list.component.html',
+    styleUrl: './hotel-list.component.css'
 })
 export class HotelListComponent {
   _hotels!: Hotel[];

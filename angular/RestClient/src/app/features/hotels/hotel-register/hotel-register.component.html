@@ -12,7 +12,7 @@
             class="form-control"
             formControlName="name"
             placeholder="Nombre del hotel"
-          />
+            />
         </div>
 
         <div class="form-group text-3xl">
@@ -22,29 +22,29 @@
               class="form-control mb-2"
               formControlName="streetKind"
               placeholder="Tipo de calle"
-            />
+              />
             <input
               class="form-control mb-2"
               formControlName="streetName"
               placeholder="Nombre de la calle"
-            />
+              />
             <input
               class="form-control mb-2"
               formControlName="number"
               type="number"
               min="1"
               placeholder="Número"
-            />
+              />
             <input
               class="form-control mb-2"
               formControlName="postCode"
               placeholder="Código Postal"
-            />
+              />
             <input
               class="form-control mb-2"
               formControlName="otherInfo"
               placeholder="Otra información (opcional)"
-            />
+              />
           </div>
         </div>
 
@@ -57,77 +57,76 @@
               (click)="addRoom()"
               [hidden]="editMode"
               [disabled]="editMode"
-            >
+              >
               <strong class="text-3xl">+</strong>
             </button>
           </div>
 
-          <div
-            *ngFor="let room of rooms.controls; let i = index"
-            [formGroupName]="i"
-            class="form-row row align-items-center mb-3"
-          >
-            <div class="col-md-12 flex justify-between align-items-center mb-3">
-              <span class="flex gap-4 items-center pa fs-3">
-                <label>Habitación {{ i + 1 }}</label>
-                <!-- Disponibilidad de habitación -->
-                <mat-slide-toggle formControlName="available"
-                  >Disponible</mat-slide-toggle
-                >
-              </span>
-              <button
-                class="btn btn-danger"
-                (click)="removeRoom(i)"
-                [disabled]="editMode || rooms.length <= 1"
-                [hidden]="editMode"
+          @for (room of rooms.controls; track room; let i = $index) {
+            <div
+              [formGroupName]="i"
+              class="form-row row align-items-center mb-3"
               >
-                Eliminar
-              </button>
-            </div>
-
-            <!-- Número de habitación -->
-            <div class="col-md-6">
-              <mat-form-field appearance="fill" class="w-full">
-                <mat-label class="text-2xl">Número de habitación</mat-label>
-                <input
-                  matInput
-                  formControlName="roomNumber"
-                  placeholder="104A"
-                  class="text-2xl"
-                />
-              </mat-form-field>
-            </div>
-
-            <!-- Tipo de habitación -->
-            <div class="col-md-6">
-              <mat-form-field appearance="fill" class="w-full">
-                <mat-label class="text-2xl">Tipo de habitación</mat-label>
-                <mat-select formControlName="type">
-                  <mat-option class="text-2xl" value="SINGLE"
-                    >Single</mat-option
+              <div class="col-md-12 flex justify-between align-items-center mb-3">
+                <span class="flex gap-4 items-center pa fs-3">
+                  <label>Habitación {{ i + 1 }}</label>
+                  <!-- Disponibilidad de habitación -->
+                  <mat-slide-toggle formControlName="available"
+                    >Disponible</mat-slide-toggle
+                    >
+                  </span>
+                  <button
+                    class="btn btn-danger"
+                    (click)="removeRoom(i)"
+                    [disabled]="editMode || rooms.length <= 1"
+                    [hidden]="editMode"
+                    >
+                    Eliminar
+                  </button>
+                </div>
+                <!-- Número de habitación -->
+                <div class="col-md-6">
+                  <mat-form-field appearance="fill" class="w-full">
+                    <mat-label class="text-2xl">Número de habitación</mat-label>
+                    <input
+                      matInput
+                      formControlName="roomNumber"
+                      placeholder="104A"
+                      class="text-2xl"
+                      />
+                  </mat-form-field>
+                </div>
+                <!-- Tipo de habitación -->
+                <div class="col-md-6">
+                  <mat-form-field appearance="fill" class="w-full">
+                    <mat-label class="text-2xl">Tipo de habitación</mat-label>
+                    <mat-select formControlName="type">
+                      <mat-option class="text-2xl" value="SINGLE"
+                        >Single</mat-option
+                        >
+                        <mat-option class="text-2xl" value="DOUBLE"
+                          >Double</mat-option
+                          >
+                          <mat-option class="text-2xl" value="SUITE">Suite</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                }
+              </div>
+            </mat-card-content>
+            @if (!editMode) {
+              <mat-card-actions class="flex justify-center mb-5">
+                <button
+                  type="submit"
+                  class="btn btn-success text-5xl"
+                  (click)="onSubmit()"
+                  [disabled]="!hotelForm.valid"
                   >
-                  <mat-option class="text-2xl" value="DOUBLE"
-                    >Double</mat-option
-                  >
-                  <mat-option class="text-2xl" value="SUITE">Suite</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-      @if (!editMode) {
-      <mat-card-actions class="flex justify-center mb-5">
-        <button
-          type="submit"
-          class="btn btn-success text-5xl"
-          (click)="onSubmit()"
-          [disabled]="!hotelForm.valid"
-        >
-          Guardar Hotel
-        </button>
-      </mat-card-actions>
-      }
-    </mat-card>
-  </form>
-</div>
+                  Guardar Hotel
+                </button>
+              </mat-card-actions>
+            }
+          </mat-card>
+        </form>
+      </div>

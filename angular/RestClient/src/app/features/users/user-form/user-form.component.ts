@@ -32,20 +32,19 @@ const defaultUser: Session = {
 };
 
 @Component({
-  standalone: true,
-  selector: 'app-user-form',
-  templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.css'],
-  imports: [
-    ReactiveFormsModule,
-    FormsModule,
-    RouterModule,
-    MatSlideToggleModule,
-    MatCardModule,
-    MatInputModule,
-    MatSelectModule,
-    MatFormFieldModule,
-  ],
+    selector: 'app-user-form',
+    templateUrl: './user-form.component.html',
+    styleUrls: ['./user-form.component.css'],
+    imports: [
+        ReactiveFormsModule,
+        FormsModule,
+        RouterModule,
+        MatSlideToggleModule,
+        MatCardModule,
+        MatInputModule,
+        MatSelectModule,
+        MatFormFieldModule,
+    ]
 })
 export class UserFormComponent implements OnInit {
   userForm!: FormGroup;

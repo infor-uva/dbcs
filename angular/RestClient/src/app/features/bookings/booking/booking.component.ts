@@ -23,11 +23,10 @@ type communication = {
 };
 
 @Component({
-  standalone: true,
-  imports: [ReactiveFormsModule],
-  selector: 'app-booking',
-  templateUrl: './booking.component.html',
-  styleUrls: ['./booking.component.css'],
+    imports: [ReactiveFormsModule],
+    selector: 'app-booking',
+    templateUrl: './booking.component.html',
+    styleUrls: ['./booking.component.css']
 })
 export class BookingComponent {
   user: User = { id: 0, email: '', name: '', rol: 'CLIENT' };

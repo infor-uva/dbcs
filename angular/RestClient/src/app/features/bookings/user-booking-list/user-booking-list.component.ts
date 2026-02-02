@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { Booking } from '@features/bookings';
 import { User } from '@features/users';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { UserClientService } from '../../../core/services/api/users/user-client.service';
 import { BookingClientService } from '../../../core/services/api/bookings/booking-client.service';
@@ -13,11 +13,10 @@ import { Observable } from 'rxjs';
 type state = 'all' | 'active' | 'inactive';
 
 @Component({
-  selector: 'app-user-booking-list',
-  standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule],
-  templateUrl: './user-booking-list.component.html',
-  styleUrl: './user-booking-list.component.css',
+    selector: 'app-user-booking-list',
+    imports: [FormsModule, RouterModule],
+    templateUrl: './user-booking-list.component.html',
+    styleUrl: './user-booking-list.component.css'
 })
 export class UserBookingListComponent {
   selectedState: state = 'all';

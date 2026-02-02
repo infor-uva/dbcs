@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Client, User, UserStateFilter } from '@features/users';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { UserClientService } from '../../../core/services/api/users/user-client.service';
 import { users } from '../../../../mocks/users';
@@ -10,18 +10,16 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  standalone: true,
-  imports: [
+    imports: [
     FormsModule,
-    CommonModule,
     RouterModule,
     MatTableModule,
     MatCardModule,
-    MatPaginatorModule,
-  ],
-  selector: 'app-main-page',
-  templateUrl: './main-page.component.html',
-  styleUrls: ['./main-page.component.css'],
+    MatPaginatorModule
+],
+    selector: 'app-main-page',
+    templateUrl: './main-page.component.html',
+    styleUrls: ['./main-page.component.css']
 })
 export class MainPageComponent implements OnInit {
   users: Client[] = [];

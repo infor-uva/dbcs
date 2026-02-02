@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="690eecfe-6ff5-4e23-845a-065b168fa8cc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dbcs.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java/services/auth/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/java/services/auth/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java/services/auth/src/main/java/com/uva/api/auth/services/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/java/services/auth/src/main/java/com/uva/api/auth/services/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java/services/auth/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/java/services/auth/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java/services/bookings/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/java/services/bookings/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java/services/bookings/src/main/java/com/uva/api/bookings/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/java/services/bookings/src/main/java/com/uva/api/bookings/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java/services/bookings/src/main/java/com/uva/api/bookings/filter/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/java/services/bookings/src/main/java/com/uva/api/bookings/filter/JwtAuthenticationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java/services/hotels/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/java/services/hotels/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java/services/users/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/java/services/users/Dockerfile" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="395TmAVRQktXZN2fEbcSFcGqFl7" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/migudel/Documents/projects/dbcs",
+    "to.speed.mode.migration.done": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/ideas/authorizations" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28238.7" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="690eecfe-6ff5-4e23-845a-065b168fa8cc" name="Changes" comment="" />
+      <created>1769985087248</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1769985087248</updated>
+    </task>
+    <servers />
+  </component>
+</project>

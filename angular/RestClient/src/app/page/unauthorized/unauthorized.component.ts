@@ -5,11 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'app-unauthorized',
-  standalone: true,
-  imports: [RouterModule, MatIconModule, MatButtonModule],
-  templateUrl: './unauthorized.component.html',
-  styleUrl: './unauthorized.component.css',
+    selector: 'app-unauthorized',
+    imports: [RouterModule, MatIconModule, MatButtonModule],
+    templateUrl: './unauthorized.component.html',
+    styleUrl: './unauthorized.component.css'
 })
 export class UnauthorizedComponent {
   mainPage: string = '';

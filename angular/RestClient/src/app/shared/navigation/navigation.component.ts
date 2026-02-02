@@ -23,11 +23,10 @@ interface Section {
 }
 
 @Component({
-  selector: 'app-navigation',
-  standalone: true,
-  imports: [RouterModule, MatButtonModule, MatMenuModule, MatIconModule],
-  templateUrl: './navigation.component.html',
-  styleUrl: './navigation.component.css',
+    selector: 'app-navigation',
+    imports: [RouterModule, MatButtonModule, MatMenuModule, MatIconModule],
+    templateUrl: './navigation.component.html',
+    styleUrl: './navigation.component.css'
 })
 export class NavigationComponent implements OnInit {
   @ViewChild(MatMenuTrigger)

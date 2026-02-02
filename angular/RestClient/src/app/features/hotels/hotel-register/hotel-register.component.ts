@@ -12,7 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { CommonModule } from '@angular/common';
+
 import { Address, Hotel, Room } from '@features/hotels';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotelClientService } from '../../../core/services/api/hotels/hotel-client.service';
@@ -39,19 +39,17 @@ const emptyHotel: Hotel = {
 };
 
 @Component({
-  selector: 'app-hotel-register',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-hotel-register',
+    imports: [
     ReactiveFormsModule,
     MatCardModule,
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatSlideToggleModule,
-  ],
-  templateUrl: './hotel-register.component.html',
-  styleUrl: './hotel-register.component.css',
+    MatSlideToggleModule
+],
+    templateUrl: './hotel-register.component.html',
+    styleUrl: './hotel-register.component.css'
 })
 export class HotelRegisterComponent {
   editMode: boolean;
