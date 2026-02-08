@@ -1,7 +1,3 @@
-# DEMO
-
-![Video demostración](DBCS_FINAL.mp4)
-
 # Sobre el proyecto
 
 En este proyecto nos hemos centrado en la creación de microservicios lo más independientes posibles, para ello se ha trabajado con microservicios spring-boot dividiendo el proyecto en:
