@@ -1,13 +1,12 @@
-package com.uva.api.auth.services;
+package com.uva.api.auth.modules.auth;
 
-import com.uva.api.auth.api.UserAPI;
-import com.uva.api.auth.models.auth.LoginRequest;
-import com.uva.api.auth.models.auth.RegisterRequest;
-import com.uva.api.auth.models.jwt.JwtAuth;
-import com.uva.api.auth.models.jwt.JwtData;
-import com.uva.api.auth.models.remote.User;
-import com.uva.api.auth.utils.JwtUtil;
-import com.uva.api.auth.utils.SecurityUtils;
+import com.uva.api.auth.modules.auth.dto.LoginRequest;
+import com.uva.api.auth.modules.auth.dto.RegisterRequest;
+import com.uva.api.auth.modules.internal.UserAPI;
+import com.uva.api.auth.modules.internal.dto.User;
+import com.uva.api.auth.modules.jwt.JwtUtil;
+import com.uva.api.auth.modules.jwt.dto.JwtAuthRequest;
+import com.uva.api.auth.modules.jwt.dto.JwtDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +40,7 @@ public class AuthService {
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials");
 
     String token = jwtUtil.generateToken(user);
-    return ResponseEntity.ok(new JwtAuth(token));
+    return ResponseEntity.ok(new JwtAuthRequest(token));
   }
 
   public ResponseEntity<?> register(RegisterRequest registerRequest) {
@@ -71,7 +70,7 @@ public class AuthService {
   public ResponseEntity<?> changePassword(
           String token, String email, @NonNull @Validated String actualPass, String newPass
   ) {
-    JwtData decoded = jwtUtil.decodeToken(token);
+    JwtDataResponse decoded = jwtUtil.decodeToken(token);
     if (decoded == null)
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
@@ -93,7 +92,7 @@ public class AuthService {
   }
 
   public ResponseEntity<?> deleteUser(String token, int id, String password) {
-    JwtData decoded = jwtUtil.decodeToken(token);
+    JwtDataResponse decoded = jwtUtil.decodeToken(token);
     if (decoded == null)
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 

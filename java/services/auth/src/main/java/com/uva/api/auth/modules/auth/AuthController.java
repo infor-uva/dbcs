@@ -1,9 +1,8 @@
-package com.uva.api.auth.controllers;
+package com.uva.api.auth.modules.auth;
 
-import com.uva.api.auth.models.auth.ChangePasswordRequest;
-import com.uva.api.auth.models.auth.LoginRequest;
-import com.uva.api.auth.models.auth.RegisterRequest;
-import com.uva.api.auth.services.AuthService;
+import com.uva.api.auth.modules.auth.dto.ChangePasswordRequest;
+import com.uva.api.auth.modules.auth.dto.LoginRequest;
+import com.uva.api.auth.modules.auth.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

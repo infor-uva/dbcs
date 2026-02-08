@@ -1,15 +1,15 @@
-package com.uva.api.auth.models.jwt;
+package com.uva.api.auth.modules.jwt.dto;
 
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.uva.api.auth.models.remote.UserRol;
+import com.uva.api.auth.modules.internal.dto.UserRol;
 import lombok.Data;
 
 import java.lang.reflect.Field;
 import java.util.Date;
 
 @Data
-public class JwtData {
+public class JwtDataResponse {
   private Integer id;
   private String name;
   private String email;
@@ -23,7 +23,7 @@ public class JwtData {
   private Date issuedAt;
   private Date expiresAt;
 
-  public JwtData(DecodedJWT decoded, long ttl) {
+  public JwtDataResponse(DecodedJWT decoded, long ttl) {
     for (Field field : this.getClass().getDeclaredFields()) {
       field.setAccessible(true);
 

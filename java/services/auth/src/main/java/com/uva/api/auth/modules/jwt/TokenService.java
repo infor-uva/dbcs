@@ -1,8 +1,7 @@
-package com.uva.api.auth.services;
+package com.uva.api.auth.modules.jwt;
 
-import com.uva.api.auth.models.jwt.JwtAuth;
-import com.uva.api.auth.models.jwt.JwtData;
-import com.uva.api.auth.utils.JwtUtil;
+import com.uva.api.auth.modules.jwt.dto.JwtAuthRequest;
+import com.uva.api.auth.modules.jwt.dto.JwtDataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +22,11 @@ public class TokenService {
       // TODO replace with exception handling
       return new ResponseEntity<>("Token has expire or is malformed", HttpStatus.FORBIDDEN);
     String token = jwtUtil.generateInternalToken(name);
-    return ResponseEntity.ok(new JwtAuth(token));
+    return ResponseEntity.ok(new JwtAuthRequest(token));
   }
 
   public ResponseEntity<?> getTokenInf(String token) {
-    JwtData decoded = jwtUtil.decodeToken(token);
+    JwtDataResponse decoded = jwtUtil.decodeToken(token);
     if (decoded == null)
       // TODO replace with exception handling
       return new ResponseEntity<>("Token has expire or is malformed", HttpStatus.FORBIDDEN);

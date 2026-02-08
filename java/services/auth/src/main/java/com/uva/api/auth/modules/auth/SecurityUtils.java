@@ -1,10 +1,10 @@
-package com.uva.api.auth.utils;
+package com.uva.api.auth.modules.auth;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class SecurityUtils {
 
-  private static BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+  private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
   public static String encrypt(String value) {
     return encoder.encode(value);

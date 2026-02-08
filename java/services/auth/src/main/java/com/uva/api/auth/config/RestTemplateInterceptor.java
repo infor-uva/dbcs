@@ -1,6 +1,6 @@
 package com.uva.api.auth.config;
 
-import com.uva.api.auth.utils.JwtUtil;
+import com.uva.api.auth.modules.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpRequest;

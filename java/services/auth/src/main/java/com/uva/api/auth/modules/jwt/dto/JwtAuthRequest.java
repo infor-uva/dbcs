@@ -1,4 +1,4 @@
-package com.uva.api.auth.models.jwt;
+package com.uva.api.auth.modules.jwt.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class JwtAuth {
+public class JwtAuthRequest {
   private String token;
 }

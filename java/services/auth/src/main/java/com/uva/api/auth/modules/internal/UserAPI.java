@@ -1,7 +1,7 @@
-package com.uva.api.auth.api;
+package com.uva.api.auth.modules.internal;
 
-import com.uva.api.auth.models.auth.RegisterRequest;
-import com.uva.api.auth.models.remote.User;
+import com.uva.api.auth.modules.auth.dto.RegisterRequest;
+import com.uva.api.auth.modules.internal.dto.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class UserAPI {
 
   public UserAPI(
           RestTemplate restTemplate,
-          @Value("${services.external.users.url}") String userApiUrl
+          @Value("${services.internal.users.url}") String userApiUrl
   ) {
     if (userApiUrl == null) {
       throw new IllegalArgumentException("userApiUrl cannot be null");
@@ -79,7 +79,7 @@ public class UserAPI {
   public void changePassword(User user, String hashPass) {
     String url = userApiUrl + "/{id}/password";
 
-    int id = user.getId();
+    int id = user.id();
 
     Map<String, Object> body = new HashMap<>();
     body.put("password", hashPass);

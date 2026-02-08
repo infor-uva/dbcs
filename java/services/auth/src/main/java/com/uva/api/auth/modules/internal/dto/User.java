@@ -1,4 +1,4 @@
-package com.uva.api.auth.models.remote;
+package com.uva.api.auth.modules.internal.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;

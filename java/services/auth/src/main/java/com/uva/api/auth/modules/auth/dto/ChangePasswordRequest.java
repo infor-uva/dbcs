@@ -1,4 +1,4 @@
-package com.uva.api.auth.models.auth;
+package com.uva.api.auth.modules.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import org.springframework.lang.NonNull;

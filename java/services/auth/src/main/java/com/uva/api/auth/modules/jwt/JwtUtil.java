@@ -1,18 +1,17 @@
-package com.uva.api.auth.utils;
+package com.uva.api.auth.modules.jwt;
 
-import java.util.Date;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.uva.api.auth.modules.internal.dto.User;
+import com.uva.api.auth.modules.jwt.dto.JwtDataResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.uva.api.auth.models.jwt.JwtData;
-import com.uva.api.auth.models.remote.User;
-
 import java.time.Instant;
+import java.util.Date;
 
 @Component
 public class JwtUtil {
@@ -23,10 +22,10 @@ public class JwtUtil {
   @Value("${security.jwt.secret-key}")
   private String secretKey;
 
-  @Value("${security.jwt.internal.expiration}")
+  @Value("${security.jwt.expiration.internal}")
   private long intJwtExpiration;
 
-  @Value("${security.jwt.external.expiration}")
+  @Value("${security.jwt.expiration.external}")
   private long extJwtExpiration;
 
   private String token;
@@ -38,7 +37,7 @@ public class JwtUtil {
 
     // Si no hay token, no es valido o quedan 10 seg para caducar se genera otro
     if (token == null || validate(token) == null ||
-        decodeToken(token).getTtl() <= 10) {
+            decodeToken(token).getTtl() <= 10) {
       token = generateInternalToken(service);
     }
 
@@ -52,43 +51,43 @@ public class JwtUtil {
     Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
     return JWT
-        .create()
+            .create()
 
-        .withKeyId(kid)
-        .withIssuedAt(new Date())
-        .withExpiresAt(new Date(System.currentTimeMillis() + intJwtExpiration * 1000))
+            .withKeyId(kid)
+            .withIssuedAt(new Date())
+            .withExpiresAt(new Date(System.currentTimeMillis() + intJwtExpiration * 1000))
 
-        .withSubject(service)
-        .withAudience("INTERNAL")
+            .withSubject(service)
+            .withAudience("INTERNAL")
 
-        // DATA
-        .withClaim("service", service)
-        .withClaim("email", email)
-        // .withClaim("rol", "SERVICE")
+            // DATA
+            .withClaim("service", service)
+            .withClaim("email", email)
+            // .withClaim("rol", "SERVICE")
 
-        .sign(algorithm);
+            .sign(algorithm);
   }
 
   public String generateToken(User user) {
     Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
     return JWT
-        .create()
+            .create()
 
-        .withKeyId(kid)
-        .withIssuedAt(new Date())
-        .withExpiresAt(new Date(System.currentTimeMillis() + extJwtExpiration * 1000))
+            .withKeyId(kid)
+            .withIssuedAt(new Date())
+            .withExpiresAt(new Date(System.currentTimeMillis() + extJwtExpiration * 1000))
 
-        .withSubject(service)
-        .withAudience("EXTERNAL")
+            .withSubject(service)
+            .withAudience("EXTERNAL")
 
-        // DATA
-        .withClaim("id", user.getId())
-        .withClaim("name", user.getName())
-        .withClaim("email", user.getEmail())
-        .withClaim("rol", user.getRol().toString())
+            // DATA
+            .withClaim("id", user.id())
+            .withClaim("name", user.name())
+            .withClaim("email", user.email())
+            .withClaim("rol", user.rol().toString())
 
-        .sign(algorithm);
+            .sign(algorithm);
   }
 
   public DecodedJWT validate(String token) {
@@ -99,11 +98,11 @@ public class JwtUtil {
     }
   }
 
-  public JwtData decodeToken(String token) {
+  public JwtDataResponse decodeToken(String token) {
     DecodedJWT decoded = validate(token);
     if (decoded == null)
       return null;
-    return new JwtData(decoded, calculateTTL(decoded));
+    return new JwtDataResponse(decoded, calculateTTL(decoded));
   }
 
   private long calculateTTL(DecodedJWT decodedJWT) {
