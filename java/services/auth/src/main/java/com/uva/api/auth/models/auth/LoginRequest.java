@@ -1,17 +1,10 @@
 package com.uva.api.auth.models.auth;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import org.springframework.lang.NonNull;
 
-@Data
-@ToString
-@EqualsAndHashCode
-@NoArgsConstructor
-@AllArgsConstructor
-public class LoginRequest {
-  private String email;
-  private String password;
+public record LoginRequest(
+        @NonNull
+        String email,
+        @NonNull
+        String password) {
 }

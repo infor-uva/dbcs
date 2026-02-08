@@ -1,21 +1,14 @@
 package com.uva.api.auth.models.jwt;
 
-import java.lang.reflect.Field;
-import java.util.Date;
-
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.uva.api.auth.models.remote.UserRol;
-
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
+import java.lang.reflect.Field;
+import java.util.Date;
+
 @Data
-@ToString
 public class JwtData {
   private Integer id;
   private String name;

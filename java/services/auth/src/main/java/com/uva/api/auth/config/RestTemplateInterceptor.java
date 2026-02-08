@@ -1,25 +1,28 @@
 package com.uva.api.auth.config;
 
+import com.uva.api.auth.utils.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
-import com.uva.api.auth.utils.JwtUtil;
-
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
 
-  @Autowired
-  private JwtUtil jwtUtil;
+  private final JwtUtil jwtUtil;
 
   @Override
-  public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
-      throws IOException {
+  public @NotNull ClientHttpResponse intercept(
+          @NotNull HttpRequest request,
+          byte @NotNull [] body,
+          @NotNull ClientHttpRequestExecution execution
+  ) throws IOException {
 
     String token = jwtUtil.getOwnInternalToken();
 

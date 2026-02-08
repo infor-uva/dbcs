@@ -1,12 +1,5 @@
 package com.uva.api.auth.services;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-
 import com.uva.api.auth.api.UserAPI;
 import com.uva.api.auth.models.auth.LoginRequest;
 import com.uva.api.auth.models.auth.RegisterRequest;
@@ -15,31 +8,34 @@ import com.uva.api.auth.models.jwt.JwtData;
 import com.uva.api.auth.models.remote.User;
 import com.uva.api.auth.utils.JwtUtil;
 import com.uva.api.auth.utils.SecurityUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-  @Autowired
-  private JwtUtil jwtUtil;
-
-  @Autowired
-  private UserAPI userAPI;
+  private final JwtUtil jwtUtil;
+  private final UserAPI userAPI;
 
   private boolean authenticateUser(LoginRequest request, User user) {
-    return (user != null)
-        ? SecurityUtils.checkPassword(request.getPassword(), user.getPassword())
-        : false;
+    return user != null && SecurityUtils.checkPassword(request.password(), user.password());
   }
 
   /**
    * Log the user
-   * 
+   *
    * @param loginRequest
    * @return token for identify the user
    * @throws HttpClientErrorException(FORBIDDEN) if the credentials are invalid
    */
   public ResponseEntity<?> login(LoginRequest loginRequest) {
-    User user = userAPI.getUserByEmail(loginRequest.getEmail());
+    User user = userAPI.getUserByEmail(loginRequest.email());
 
     if (!authenticateUser(loginRequest, user))
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN, "Invalid credentials");
@@ -49,25 +45,17 @@ public class AuthService {
   }
 
   public ResponseEntity<?> register(RegisterRequest registerRequest) {
-    String plainTextPassword = registerRequest.getPassword();
+    String plainTextPassword = registerRequest.password();
     // Ciframos la contraseña
     String hashPass = SecurityUtils.encrypt(plainTextPassword);
-    registerRequest.setPassword(hashPass);
+    RegisterRequest encryptedRequest = new RegisterRequest(
+            registerRequest.email(), hashPass, registerRequest.rol(), registerRequest.name()
+    );
     // Registramos el usuario
     User user = userAPI.registerUser(registerRequest);
-    LoginRequest logReq = new LoginRequest();
-    BeanUtils.copyProperties(user, logReq);
     // Recuperamos la contraseña y lo loggeamos
-    logReq.setPassword(plainTextPassword);
+    LoginRequest logReq = new LoginRequest(user.email(), hashPass);
     return login(logReq);
-  }
-
-  private boolean validStrings(String... args) {
-    for (String arg : args) {
-      if (arg == null || arg.isBlank())
-        return false;
-    }
-    return true;
   }
 
   private User getUser(String email, String password) {
@@ -76,20 +64,22 @@ public class AuthService {
 
   private User getUser(String email, String password, boolean isAdmin) {
     User user = userAPI.getUserByEmail(email);
-    boolean correctPassword = isAdmin || SecurityUtils.checkPassword(password, user.getPassword());
+    boolean correctPassword = isAdmin || SecurityUtils.checkPassword(password, user.password());
     return correctPassword ? user : null;
   }
 
-  public ResponseEntity<?> changePassword(String token, String email, String actualPass, String newPass) {
+  public ResponseEntity<?> changePassword(
+          String token, String email, @NonNull @Validated String actualPass, String newPass
+  ) {
     JwtData decoded = jwtUtil.decodeToken(token);
     if (decoded == null)
       throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
     User user = getUser(email, actualPass, decoded.isAdmin());
 
-    boolean changePasswordAllowed = decoded.isAdmin() || (user != null && validStrings(actualPass));
+    boolean changePasswordAllowed = decoded.isAdmin() || (user != null);
 
-    if (user != null && !validStrings(newPass))
+    if (user != null)
       throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
     if (!changePasswordAllowed)
@@ -113,11 +103,11 @@ public class AuthService {
 
       User user = getUser(email, password);
 
-      if (user == null || !validStrings(password))
+      if (user == null)
         throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
 
       // Verificamos si es el dueño del recurso
-      deleteAllowed = user.getId() == id;
+      deleteAllowed = user.id() == id;
     }
 
     if (!deleteAllowed)

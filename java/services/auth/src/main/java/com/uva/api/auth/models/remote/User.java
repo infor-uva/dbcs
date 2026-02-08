@@ -1,25 +1,14 @@
 package com.uva.api.auth.models.remote;
 
-import com.uva.api.auth.models.auth.RegisterRequest;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import org.springframework.lang.NonNull;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-@Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
-public class User extends RegisterRequest {
-  private int id;
-
-  public User(int id, String email, String password, String name, UserRol rol) {
-    super();
-    this.id = id;
-    setEmail(email);
-    setName(name);
-    setPassword(password);
-    setRol(rol);
-  }
+public record User(
+        @Min(1) int id,
+        @Email String email,
+        @NonNull String password,
+        @NonNull String name,
+        @NonNull UserRol rol
+) {
 }
