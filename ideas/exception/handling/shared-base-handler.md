@@ -149,3 +149,140 @@ Si quieres, dime:
 * ¿Monorepo con módulos o librería común externa?
 
 y te doy un ejemplo exactamente igual a tu arquitectura 👌
+
+
+------------
+
+Perfecto, en **Spring MVC** ese patrón funciona *tal cual* 👍
+Te dejo **la forma correcta y “a prueba de sorpresas”** para tu caso (base común + posibilidad de override por
+proyecto).
+
+---
+
+## Estructura recomendada (Spring MVC)
+
+### 📦 módulo común
+
+> No se toca por los proyectos
+
+```java
+public abstract class CommonExceptionAdvice {
+
+  @ExceptionHandler(Exception.class)
+  protected ResponseEntity<ErrorResponse> handleException(Exception ex) {
+    return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ErrorResponse.generic(ex.getMessage()));
+  }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  protected ResponseEntity<ErrorResponse> handleIllegalArgument(
+          IllegalArgumentException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.badRequest(ex.getMessage()));
+  }
+}
+```
+
+⚠️ **Sin `@ControllerAdvice`**
+Esto es clave para que no se registre solo.
+
+---
+
+### 📦 proyecto A / B / C
+
+> Complementa o sobrescribe
+
+```java
+
+@ControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class ProjectExceptionAdvice extends CommonExceptionAdvice {
+
+  @Override
+  @ExceptionHandler(IllegalArgumentException.class)
+  protected ResponseEntity<ErrorResponse> handleIllegalArgument(
+          IllegalArgumentException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.UNPROCESSABLE_ENTITY)
+            .body(ErrorResponse.custom("PROJECT_IAE", ex.getMessage()));
+  }
+
+  @ExceptionHandler(ProjectException.class)
+  public ResponseEntity<ErrorResponse> handleProject(ProjectException ex) {
+    return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ErrorResponse.custom("PROJECT_ERROR", ex.getMessage()));
+  }
+}
+```
+
+✔️ El proyecto hereda todo
+✔️ Puede sobrescribir selectivamente
+✔️ Puede agregar nuevos handlers
+
+---
+
+## ¿Qué pasa internamente en Spring MVC?
+
+Spring resuelve así:
+
+1. `@ControllerAdvice` con **mayor `@Order`**
+2. `@ExceptionHandler` más **específico**
+3. Si hay herencia → **método override**
+4. Si no hay match → sigue buscando
+
+Por eso:
+
+* El override **sí se respeta**
+* El base actúa como **fallback**
+
+---
+
+## Errores comunes a evitar 🚫
+
+❌ Poner `@ControllerAdvice` en la clase base
+→ Se registra dos veces y genera ambigüedad
+
+❌ Olvidar `@ExceptionHandler` en el método sobrescrito
+→ Spring ignora el override
+
+❌ No definir `@Order` cuando hay varios advice
+→ comportamiento no determinista
+
+---
+
+## Variante si necesitas *opt-out*
+
+Si algún proyecto **no quiere** heredar todo:
+
+```java
+
+@ControllerAdvice
+public class ProjectExceptionAdvice {
+  // solo lo que necesita
+}
+```
+
+Y simplemente no extiende el base.
+
+---
+
+## Conclusión
+
+En **Spring MVC**:
+
+* ✔️ Herencia + `@ControllerAdvice` funciona perfecto
+* ✔️ Override es seguro y explícito
+* ✔️ Patrón muy usado en entornos enterprise
+
+Si quieres, puedo:
+
+* Revisar un ejemplo real que tengas
+* Ajustarlo para `@RestControllerAdvice`
+* Ver cómo documentarlo con OpenAPI
+
+Dime 👍
