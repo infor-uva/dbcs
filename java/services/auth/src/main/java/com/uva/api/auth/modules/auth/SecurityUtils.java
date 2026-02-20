@@ -1,18 +1,15 @@
 package com.uva.api.auth.modules.auth;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+
+@Configuration
 public class SecurityUtils {
 
-  private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
-  public static String encrypt(String value) {
-    return encoder.encode(value);
+  @Bean
+  BCryptPasswordEncoder bCryptPasswordEncoder() {
+    return new BCryptPasswordEncoder();
   }
-
-  // Método para comparar la contraseña ingresada con el hash almacenado
-  public static boolean checkPassword(String rawPassword, String encodedPassword) {
-    return encoder.matches(rawPassword, encodedPassword); // Comparar la contraseña con el hash
-  }
-
 }
