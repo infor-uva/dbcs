@@ -1,104 +1,128 @@
 package com.uva.api.users.config;
 
+import com.uva.api.users.models.remote.jwt.JwtData;
+import com.uva.api.users.services.TokenService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotBlank;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-
-import com.uva.api.users.models.UserRol;
-import com.uva.api.users.models.remote.jwt.JwtData;
-import com.uva.api.users.models.remote.jwt.Service;
-import com.uva.api.users.services.TokenService;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.Filter;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.yaml.snakeyaml.util.Tuple;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Component
-public class JwtAuthenticationFilter implements Filter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final TokenService service;
+  private final TokenService service;
 
-    public JwtAuthenticationFilter(TokenService service) {
-        this.service = service;
+  public JwtAuthenticationFilter(TokenService service) {
+    this.service = service;
+  }
+
+  private @NonNull @NotBlank Optional<String> getTokenFromRequest(HttpServletRequest request) {
+    String authHeader = request.getHeader("Authorization");
+    return Optional.ofNullable(
+            authHeader != null && authHeader.startsWith("Barear ")
+            ? authHeader.substring(7)
+            : null
+    );
+  }
+
+  private JwtData validateAndDecodeToken(String token) {
+    // TODO review the reason for this catch, there is no reason for return a null value in this case, if fails
+    //  should throw a exception to handle the correct response
+    try {
+      return service.decodeToken(token);
+    } catch (Exception ex) {
+      log.error("Validation for token {} failed", token);
+      log.debug("Validation token exception", ex);
+      throw ex;
+    }
+  }
+
+  private enum UserType {
+    USER,
+    SERVICE,
+    UNKNOWN
+  }
+
+  @Override
+  protected void doFilterInternal(
+          @NotNull HttpServletRequest request,
+          @NotNull HttpServletResponse response,
+          @NotNull FilterChain filterChain
+  ) throws ServletException, IOException {
+    Optional<String> opToken = getTokenFromRequest(request);
+    if (opToken.isEmpty()) {
+      // TODO Stop filter and return 401 unauthorized
+      log.info("No token provided for request {} {}", request.getMethod(), request.getRequestURI());
+      return;
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        return authHeader.substring(7);
+    String token = opToken.get();
+    log.info("Attempt {} {} with token {}", request.getMethod(), request.getRequestURI(), token);
+
+    JwtData jwt = validateAndDecodeToken(token);
+    log.debug("Decoding token {}, content: {}", token, jwt);
+
+    var tuple = getUserType(jwt);
+    UserType userType = tuple._1();
+    List<SimpleGrantedAuthority> authorities = tuple._2();
+
+    if (userType == UserType.UNKNOWN) {
+      // TODO improve this
+      log.warn("No identity found {}", jwt);
+      return;
     }
 
-    private JwtData validateAndDecodeToken(String token) {
-        try {
-            return service.decodeToken(token);
-        } catch (Exception ex) {
-            System.err.println(
-                    "[" + LocalDateTime.now().toString() + "] Error de verificación del token\n");
-            ex.printStackTrace(System.err);
-            return null;
-        }
+    String email = jwt.getEmail();
+    log.info("Successfully validated token {} ({} roles={} identity={} audience={}",
+            token, email, jwt.getRol(), userType, authorities);
+
+    if (SecurityContextHolder.getContext().getAuthentication() == null) {
+
+      // Crear autenticación
+      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+              email, null, authorities);
+      authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+      // Establecer autenticación en el contexto de seguridad
+      SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    // Continuar con el resto de filtros
+    filterChain.doFilter(request, response);
+  }
 
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String token = getTokenFromRequest(httpRequest);
+  private Tuple<UserType, List<SimpleGrantedAuthority>> getUserType(@NotNull JwtData jwt) {
+    UserType userType;
+    String audience = jwt.getAudience();
+    List<String> authorities = new ArrayList<>();
 
-        System.out.println("[" + LocalDateTime.now().toString() + "] TOKEN: " + token + "\n");
-
-        if (token != null) {
-            JwtData jwt = validateAndDecodeToken(token);
-            if (jwt != null) {
-                String email = jwt.getEmail();
-                UserRol role = jwt.getRol();
-                Service service = jwt.getService();
-                String audience = jwt.getAudience();
-
-                System.out.println("[" + LocalDateTime.now().toString() + "] email=" + email + " role=" + role
-                        + " service=" + service + " audience=" + audience + "\n");
-
-                if (audience != null) {
-                    // Definimos la autoridad
-                    String authorityValue = null;
-                    if (audience.equals("INTERNAL") && service != null) {
-                        authorityValue = service.toString();
-                    } else if (audience.equals("EXTERNAL") && role != null) {
-                        authorityValue = String.format("ROLE_%s", role);
-                    }
-
-                    if (authorityValue != null &&
-                            SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                        // Crear la autoridad con la autoridad oportuna
-                        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(authorityValue);
-
-                        // Crear autenticación
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                email,
-                                null, Collections.singletonList(authority));
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-
-                        // Establecer autenticación en el contexto de seguridad
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
-                }
-            }
-        }
-
-        // Continuar con el resto de filtros
-        chain.doFilter(request, response);
+    if (audience.equals("INTERNAL") && service != null) {
+      authorities.add(service.toString());
+      userType = UserType.SERVICE;
+    } else if (audience.equals("EXTERNAL") && jwt.getRol() != null) {
+      authorities.add("ROLE_".concat(jwt.getRol().toString()));
+      userType = UserType.USER;
+    } else {
+      userType = UserType.UNKNOWN;
     }
+
+    return new Tuple<>(userType, authorities.stream().map(SimpleGrantedAuthority::new).toList());
+  }
 }

@@ -1,11 +1,13 @@
 volumes:
-  kong_data: {}
-  users_data: {}
-  hotels_data: {}
-  bookings_data: {}
+  kong_data: { }
+  auth_data: { }
+  users_data: { }
+  hotels_data: { }
+  bookings_data: { }
 
 networks: #Red interna para comunicar los servicios
   kong-net:
+  # driver: bridge
 
 services:
   #######################################
@@ -48,7 +50,7 @@ services:
     ports:
       - 5432:5432
     healthcheck:
-      test: [CMD, pg_isready, -U, kong]
+      test: [ CMD, pg_isready, -U, kong ]
       interval: 30s
       timeout: 30s
       retries: 3
@@ -89,7 +91,7 @@ services:
       kong-database:
         condition: service_healthy
     healthcheck:
-      test: [CMD, kong, health]
+      test: [ CMD, kong, health ]
       interval: 10s
       timeout: 10s
       retries: 10
@@ -168,6 +170,8 @@ services:
       SECURITY_JWT_EXTERNAL_EXPIRATION: ${JWT_EXTERNAL_EXPIRATION:-3600}
       SECURITY_JWT_INTERNAL_EXPIRATION: ${JWT_INTERNAL_EXPIRATION:-600}
       SERVICES_EXTERNAL_USERS_URL: ${API_KONG_ROUTE_USERS_URL}
+    ports:
+      - 8080:8101
     depends_on:
       - Users-API
 
@@ -229,6 +233,26 @@ services:
   #######################################
   # Databases
   #######################################
+
+  Auth-DB:
+    image: mysql
+    hostname: auth-db
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+    networks:
+      - kong-net
+    ports:
+      - "3306:3306"
+    volumes:
+      - auth_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_CREDENTIALS_ROOT_PASSWORD:-ClaveRoot}
+      MYSQL_USER: ${DB_CREDENTIALS_USER:-user}
+      MYSQL_PASSWORD: ${DB_CREDENTIALS_PASSWORD:-password}
+      MYSQL_DATABASE: Auth
+      MYSQL_ROOT_HOST: "%"
+
 
   Users-DB:
     image: mysql

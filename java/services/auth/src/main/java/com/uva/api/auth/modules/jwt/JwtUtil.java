@@ -1,118 +1,92 @@
 package com.uva.api.auth.modules.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.uva.api.auth.modules.internal.dto.User;
-import com.uva.api.auth.modules.jwt.dto.JwtDataResponse;
+import com.uva.api.auth.modules.user.UserEntity;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 
-import java.time.Instant;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtil {
 
-  @Value("${security.jwt.kid}")
-  private String kid;
+  private final SecretKey signingKey;
+  private final long accessTokenExpiration;
+  private final long refreshTokenExpiration;
+  private final String kid;
 
-  @Value("${security.jwt.secret-key}")
-  private String secretKey;
-
-  @Value("${security.jwt.expiration.internal}")
-  private long intJwtExpiration;
-
-  @Value("${security.jwt.expiration.external}")
-  private long extJwtExpiration;
-
-  private String token;
-
-  @Value("${spring.application.name}")
-  private String service;
-
-  public String getOwnInternalToken() {
-
-    // Si no hay token, no es valido o quedan 10 seg para caducar se genera otro
-    if (token == null || validate(token) == null ||
-            decodeToken(token).getTtl() <= 10) {
-      token = generateInternalToken(service);
-    }
-
-    return token;
-
+  public JwtUtil(
+      @Value("${security.jwt.secret-key}") String secretKey,
+      @Value("${security.jwt.kid}") String kid,
+      @Value("${security.jwt.expiration.access}") long accessTokenExpiration,
+      @Value("${security.jwt.expiration.refresh}") long refreshTokenExpiration) {
+    this.signingKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    this.kid = kid;
+    this.accessTokenExpiration = accessTokenExpiration;
+    this.refreshTokenExpiration = refreshTokenExpiration;
   }
 
-  public String generateInternalToken(String service) {
-    String email = service.toLowerCase() + "@internal.com";
-    service = service.toUpperCase();
-    Algorithm algorithm = Algorithm.HMAC256(secretKey);
+  /**
+   * Generate a short-lived access token containing user claims.
+   */
+  public String generateAccessToken(UserEntity user) {
+    Date now = new Date();
+    Date expiry = new Date(now.getTime() + accessTokenExpiration * 1000);
 
-    return JWT
-            .create()
-
-            .withKeyId(kid)
-            .withIssuedAt(new Date())
-            .withExpiresAt(new Date(System.currentTimeMillis() + intJwtExpiration * 1000))
-
-            .withSubject(service)
-            .withAudience("INTERNAL")
-
-            // DATA
-            .withClaim("service", service)
-            .withClaim("email", email)
-            // .withClaim("rol", "SERVICE")
-
-            .sign(algorithm);
+    return Jwts.builder()
+        .header().keyId(kid).and()
+        .subject(user.getEmail())
+        .issuedAt(now)
+        .expiration(expiry)
+        .claim("id", user.getId())
+        .claim("name", user.getName())
+        .claim("email", user.getEmail())
+        .claim("rol", user.getRol().name())
+        .claim("provider", user.getProvider().name())
+        .signWith(signingKey)
+        .compact();
   }
 
-  public String generateToken(User user) {
-    Algorithm algorithm = Algorithm.HMAC256(secretKey);
-
-    return JWT
-            .create()
-
-            .withKeyId(kid)
-            .withIssuedAt(new Date())
-            .withExpiresAt(new Date(System.currentTimeMillis() + extJwtExpiration * 1000))
-
-            .withSubject(service)
-            .withAudience("EXTERNAL")
-
-            // DATA
-            .withClaim("id", user.id())
-            .withClaim("name", user.name())
-            .withClaim("email", user.email())
-            .withClaim("rol", user.rol().toString())
-
-            .sign(algorithm);
+  /**
+   * Generate a random refresh token string (UUID-based, not a JWT).
+   * The actual expiration is tracked in the database.
+   */
+  public String generateRefreshTokenValue() {
+    return UUID.randomUUID().toString();
   }
 
-  public DecodedJWT validate(String token) {
+  /**
+   * @return refresh token expiration in seconds
+   */
+  public long getRefreshTokenExpiration() {
+    return refreshTokenExpiration;
+  }
+
+  /**
+   * @return access token expiration in seconds
+   */
+  public long getAccessTokenExpiration() {
+    return accessTokenExpiration;
+  }
+
+  /**
+   * Validate and parse the access token. Returns claims if valid, null otherwise.
+   */
+  public Claims validateAndParseClaims(String token) {
     try {
-      return JWT.require(Algorithm.HMAC256(secretKey)).build().verify(token);
-    } catch (Exception e) {
+      return Jwts.parser()
+          .verifyWith(signingKey)
+          .build()
+          .parseSignedClaims(token)
+          .getPayload();
+    } catch (JwtException | IllegalArgumentException e) {
       return null;
     }
   }
-
-  public JwtDataResponse decodeToken(String token) {
-    DecodedJWT decoded = validate(token);
-    if (decoded == null)
-      return null;
-    return new JwtDataResponse(decoded, calculateTTL(decoded));
-  }
-
-  private long calculateTTL(DecodedJWT decodedJWT) {
-    if (decodedJWT == null)
-      throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-
-    long exp = decodedJWT.getExpiresAt().toInstant().getEpochSecond();
-    long now = Instant.now().getEpochSecond();
-
-    return exp - now;
-  }
-
 }

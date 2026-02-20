@@ -1,15 +1,14 @@
 package com.uva.api.auth.modules.auth;
 
-import com.uva.api.auth.modules.auth.dto.ChangePasswordRequest;
 import com.uva.api.auth.modules.auth.dto.LoginRequest;
 import com.uva.api.auth.modules.auth.dto.RegisterRequest;
+import com.uva.api.auth.modules.jwt.TokenService;
+import com.uva.api.auth.modules.jwt.dto.TokenPairResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("auth")
@@ -18,44 +17,28 @@ import java.util.Map;
 public class AuthController {
 
   private final AuthService authService;
+  private final TokenService tokenService;
 
   @PostMapping("/login")
-  public ResponseEntity<?> login(@RequestBody @Validated LoginRequest loginRequest) {
-    return authService.login(loginRequest);
+  public ResponseEntity<@NotNull TokenPairResponse> login(@RequestBody @Validated LoginRequest loginRequest) {
+    return ResponseEntity.ok(authService.login(loginRequest));
   }
 
   @PostMapping("/register")
-  public ResponseEntity<?> register(@RequestBody @Validated RegisterRequest registerRequest) {
-    return authService.register(registerRequest);
+  public ResponseEntity<@NotNull TokenPairResponse> register(@RequestBody @Validated RegisterRequest registerRequest) {
+    return ResponseEntity.ok(authService.register(registerRequest));
   }
 
-  @PostMapping("/password")
-  public ResponseEntity<?> changePassword(
-          @RequestBody @Validated ChangePasswordRequest changePasswordRequest,
-          @RequestHeader(value = "Authorization", required = true) String authorization
-  ) {
-    if (authorization == null || !authorization.startsWith("Bearer "))
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-    String token = authorization.substring(7);
-
-    return authService.changePassword(token, changePasswordRequest.email(), changePasswordRequest.oldPassword(), changePasswordRequest.newPassword());
+  @PostMapping("/refresh")
+  public ResponseEntity<@NotNull TokenPairResponse> refresh(@RequestBody java.util.Map<String, String> body) {
+    String refreshToken = body.get("refreshToken");
+    return ResponseEntity.ok(tokenService.refresh(refreshToken));
   }
 
-  @PatchMapping("/{id}/delete")
-  public Object postMethodName(
-          @PathVariable int id,
-          @RequestBody Map<String, String> json,
-          @RequestHeader(value = "Authorization", required = true) String authorization
-  ) {
-    if (authorization == null || !authorization.startsWith("Bearer "))
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-    String token = authorization.substring(7);
-
-    String actualPassword = json.get("password");
-
-    return authService.deleteUser(token, id, actualPassword);
+  @PostMapping("/logout")
+  public ResponseEntity<@NotNull Void> logout(@RequestBody java.util.Map<String, String> body) {
+    String refreshToken = body.get("refreshToken");
+    tokenService.revoke(refreshToken);
+    return ResponseEntity.noContent().build();
   }
-
 }

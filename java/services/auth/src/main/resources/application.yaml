@@ -1,20 +1,42 @@
 spring:
   application:
     name: authentication
+  datasource:
+    url: jdbc:mysql://localhost:3306/Auth?createDatabaseIfNotExist=true
+    username: user
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
+            scope: openid,profile,email
+          github:
+            client-id: ${OAUTH2_GITHUB_CLIENT_ID}
+            client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
+            scope: openid,profile,email
+
 server:
   port: 8101
 
 security:
   jwt:
     secret-key: MiClaveDeSeguridadMuyLargaParaQueNoFalleSpringBoot
-    kit: cYz3kNRLAirxVhHXQ5rh5xKrOwHwZVui
+    kid: cYz3kNRLAirxVhHXQ5rh5xKrOwHwZVui
     expiration:
-      # Tiempo de validez para tokens para servicios (internos) 10min in seconds
-      internal: 600
-      # Tiempo de validez para tokens para usuarios (externos) 1h in seconds
-      external: 3600
+      # Access token: 15 minutes (in seconds)
+      access: 900
+      # Refresh token: 7 days (in seconds)
+      refresh: 604800
 
-services:
-  internal:
-    users:
-      url: http://localhost:8201/users
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
