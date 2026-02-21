@@ -1,13 +1,147 @@
 ### Own ###
 .trunk
-target
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+.env.development
+*.pem
+*.key
+*.cert
+*.csr
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.secret
+
+# IDE & Editor
 .vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+*.sublime-project
+*.sublime-workspace
+.editorconfig
+
+# Build & Compilation
+target
+build
+out
+dist
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+.gradle
+gradle/
+*.gradle
+
+# Logs
+logs
+*.log
+*.logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Temporary & Cache
 tmp
+temp
+cache
+.cache
 *.tmp
 *.ln
-*.log
-.idea
+node_modules
+.node_modules
+.npm
+.eslintcache
+
+# Local Development
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+mvnw
+mvnw.cmd
+.env.defaults
+.env.local.defaults
+.awscli-metadata
+.credentials
+.aws/credentials
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+.h2.server.properties
+data/
+databases/
+
+# Docker & Containers
+.docker
+docker-compose.override.yml
+.dockerignore
+
+# OS Specific
 .DS_Store
-.env.*
+Thumbs.db
+.directory
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Private Files
 private.*
 priv.*
+secrets.*
+credential.*
+oauth.*
+token.*
+
+# Generated Files
+*.min.js
+*.min.css
+.generated-sources/
+
+# Test Coverage
+coverage
+*.lcov
+.nyc_output
+
+# Dependency Files (Lock files - optional, comment out if you want to track them)
+# package-lock.json
+# yarn.lock
+# pom.xml.bak
+
+# IDE Specific
+.vscode/launch.json
+.vscode/extensions.json
+.eclipse
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Spring Boot
+application-*.properties
+application-*.yml
+application-*.yaml
+
+# Git
+.git/
+.gitattributes
+
+# CI/CD
+.github/workflows/secrets
+.gitlab-ci.local.yml
+.circleci/local-config.yml
+

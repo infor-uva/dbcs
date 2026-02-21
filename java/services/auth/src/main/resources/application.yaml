@@ -9,6 +9,19 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  cache:
+    type: simple
+    cache-names: jwks
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
   security:
     oauth2:
       client:
@@ -25,8 +38,10 @@ spring:
 server:
   port: 8101
 
+# JWT & Key Rotation Configuration
 security:
   jwt:
+    # TODO remove secret-key
     secret-key: MiClaveDeSeguridadMuyLargaParaQueNoFalleSpringBoot
     kid: cYz3kNRLAirxVhHXQ5rh5xKrOwHwZVui
     expiration:
@@ -34,9 +49,22 @@ security:
       access: 900
       # Refresh token: 7 days (in seconds)
       refresh: 604800
+    # Hot-reload key rotation settings
+    key-rotation:
+      enabled: true
+      # Rotate every 30 days
+      interval-days: 30
+      # Grace period for old keys (can validate for this duration after rotation)
+      grace-period-days: 30
+      # Schedule rotation check (ms: 30 days)
+      schedule-ms: 2592000000
+  # Audit logging settings
+  audit:
+    retention-days: 90
 
 logging:
   level:
-    org:
-      springframework:
-        security: DEBUG
+    root: INFO
+    org.springframework.security: DEBUG
+    com.uva.api.auth: DEBUG
+
